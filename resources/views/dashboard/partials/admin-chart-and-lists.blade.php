@@ -191,9 +191,9 @@
         <div class="space-y-3">
             @forelse($lowLeaveEmployees as $emp)
                 @php
-                    $quota     = $emp->annual_leave_quota ?? 0;
-                    $used      = $emp->used_leave_days ?? 0;
-                    $remaining = max(0, $quota - $used);
+                    $quota     = $emp->annual_leave_quota_current ?? ($emp->annual_leave_quota ?? 0);
+                    $used      = $emp->current_year_used ?? 0;
+                    $remaining = $emp->remaining_leave_days ?? max(0, $quota - $used);
                     $percent   = $quota > 0 ? ($used / $quota) * 100 : 0;
                 @endphp
                 <div class="space-y-1">

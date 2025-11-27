@@ -32,7 +32,7 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse ($employees as $employee)
                     @php
-                        $remaining = max(0, ($employee->annual_leave_quota ?? 0) - ($employee->used_leave_days ?? 0));
+                        $remaining = $employee->remaining_leave_days ?? max(0, ($employee->annual_leave_quota ?? 0) - ($employee->used_leave_days ?? 0));
                     @endphp
                     <tr>
                         <td class="px-6 py-3 text-sm text-slate-900">

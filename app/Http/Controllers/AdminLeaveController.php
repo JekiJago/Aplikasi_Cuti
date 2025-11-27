@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\LeaveRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AdminLeaveController extends Controller
 {
@@ -85,5 +86,23 @@ class AdminLeaveController extends Controller
         ];
 
         return view('admin.statistics', compact('stats'));
+    }
+
+    public function attachment(Request $request, LeaveRequest $leave)
+    {
+        $this->authorize('view', $leave);
+
+        if (! $leave->file_path || ! Storage::disk('public')->exists($leave->file_path)) {
+            abort(404);
+        }
+
+        $absolutePath = Storage::disk('public')->path($leave->file_path);
+        $filename     = basename($leave->file_path);
+
+        if ($request->boolean('download')) {
+            return response()->download($absolutePath, $filename);
+        }
+
+        return response()->file($absolutePath);
     }
 }

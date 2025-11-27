@@ -17,17 +17,17 @@ class User extends Authenticatable
         'name',
         'email',
         'employee_id',
-        'nip',
-        'email_verified_at',
         'password',
         'role',
         'position',
         'department',
+        'gender',
         'hire_date',
         'annual_leave_quota',
         'used_leave_days',
         'important_leave_used_days',
         'big_leave_used_days',
+        'big_leave_last_used_at',
         'non_active_leave_used_days',
         'sick_leave_used_days',
         'maternity_leave_used_count',
@@ -40,12 +40,12 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at'          => 'datetime',
         'annual_leave_quota'         => 'integer',
         'used_leave_days'            => 'integer',
         'hire_date'                  => 'date',
         'important_leave_used_days'  => 'integer',
         'big_leave_used_days'        => 'integer',
+        'big_leave_last_used_at'     => 'datetime',
         'non_active_leave_used_days' => 'integer',
         'sick_leave_used_days'       => 'integer',
         'maternity_leave_used_count' => 'integer',
@@ -70,7 +70,9 @@ class User extends Authenticatable
     /** Helpers */
     public function getRemainingLeaveDays(): int
     {
-        return max(0, $this->annual_leave_quota - $this->used_leave_days);
+        $summary = app(\App\Services\LeaveBalanceService::class)->getAnnualLeaveSummary($this);
+
+        return $summary['total_available'];
     }
 
     public function isAdmin(): bool

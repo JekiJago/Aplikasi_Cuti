@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
         Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/leaves', [AdminLeaveController::class, 'index'])->name('leaves');
         Route::get('/leaves/{id}', [AdminLeaveController::class, 'show'])->name('leaves.show');
+        Route::get('/leaves/{leave}/attachment', [AdminLeaveController::class, 'attachment'])->name('leaves.attachment');
         Route::post('/leaves/{id}/approve', [AdminLeaveController::class, 'approve'])->name('leaves.approve');
         Route::post('/leaves/{id}/reject', [AdminLeaveController::class, 'reject'])->name('leaves.reject');
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Holiday;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -72,7 +73,11 @@ class LeaveRequest extends Model
         $start = Carbon::parse($this->start_date);
         $end   = Carbon::parse($this->end_date);
 
-        return $start->diffInDays($end) + 1; // inklusif
+        if ($this->leave_type === 'tahunan') {
+            return self::workingDaysBetween($start, $end);
+        }
+
+        return $start->diffInDays($end) + 1;
     }
 
     public function canBeApproved(): bool
@@ -110,6 +115,7 @@ class LeaveRequest extends Model
 
             case 'cuti_besar':
                 $user->big_leave_used_days += $this->days;
+                $user->big_leave_last_used_at = now();
                 break;
 
             case 'cuti_non_aktif':
@@ -138,5 +144,27 @@ class LeaveRequest extends Model
         $this->admin_notes = $notes;
         $this->reviewed_at = now();
         $this->save();
+    }
+    public static function workingDaysBetween(Carbon $start, Carbon $end): int
+    {
+        if ($start->gt($end)) {
+            return 0;
+        }
+
+        $holidayDates = Holiday::pluck('date')
+            ->map(fn ($date) => $date->format('Y-m-d'))
+            ->all();
+
+        $days = 0;
+        $cursor = $start->copy();
+        while ($cursor->lte($end)) {
+            if (! $cursor->isWeekend() && ! in_array($cursor->format('Y-m-d'), $holidayDates, true)) {
+                $days++;
+            }
+
+            $cursor->addDay();
+        }
+
+        return $days;
     }
 }

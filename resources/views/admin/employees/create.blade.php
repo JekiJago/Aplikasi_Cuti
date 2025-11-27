@@ -3,7 +3,7 @@
 @section('content')
 <div class="max-w-xl mx-auto py-8 px-4">
     <h1 class="text-xl font-semibold text-slate-900 mb-1">Tambah Pegawai</h1>
-    <p class="text-sm text-slate-500 mb-6">Masukkan nama dan NIP pegawai baru.</p>
+    <p class="text-sm text-slate-500 mb-6">Masukkan nama, gender, dan NIP pegawai baru.</p>
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         <form action="{{ route('admin.employees.store') }}" method="POST" class="space-y-4">
@@ -17,6 +17,21 @@
                        class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                        placeholder="Masukkan nama lengkap">
                 @error('name')
+                    <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Gender <span class="text-rose-500">*</span>
+                </label>
+                <select name="gender"
+                        class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                    <option value="">Pilih gender</option>
+                    <option value="male" {{ old('gender') === 'male' ? 'selected' : '' }}>Pria</option>
+                    <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>Wanita</option>
+                </select>
+                @error('gender')
                     <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
                 @enderror
             </div>

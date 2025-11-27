@@ -69,12 +69,61 @@
     </div>
 
     @if($leave->file_path)
+        @php
+            $attachmentUrl = route('admin.leaves.attachment', ['leave' => $leave->id]);
+            $downloadUrl   = route('admin.leaves.attachment', ['leave' => $leave->id, 'download' => 1]);
+            $filename      = basename($leave->file_path);
+            $extension     = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+            $isImage       = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']);
+            $modalId       = 'attachment-modal-' . $leave->id;
+        @endphp
+
         <div class="text-sm">
-            <p class="text-xs text-gray-500 mb-1">Lampiran</p>
-            <a href="{{ asset('storage/'.$leave->file_path) }}" target="_blank"
-               class="inline-flex px-3 py-2 border rounded-lg text-xs hover:bg-gray-50">
-                Lihat Lampiran
-            </a>
+            <p class="text-xs text-gray-500 mb-2">Lampiran</p>
+            <div class="flex items-center justify-between border rounded-2xl px-4 py-3 bg-slate-50">
+                <div class="flex items-center space-x-3">
+                    <div class="h-10 w-10 rounded-xl bg-slate-200 flex items-center justify-center text-lg">
+                        📎
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-900">{{ $filename }}</p>
+                        <p class="text-[11px] text-slate-500">Format: {{ strtoupper($extension) }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button"
+                            class="px-3 py-1.5 text-xs rounded-full bg-indigo-600 text-white hover:bg-indigo-700"
+                            data-modal-open="{{ $modalId }}">
+                        Preview
+                    </button>
+                    <a href="{{ $downloadUrl }}"
+                       class="px-3 py-1.5 text-xs rounded-full border border-slate-300 text-slate-700 hover:bg-white">
+                        Download
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="{{ $modalId }}" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden">
+                <div class="flex items-center justify-between border-b px-4 py-3">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900">Lampiran</p>
+                        <p class="text-xs text-slate-500">{{ $filename }}</p>
+                    </div>
+                    <button type="button" class="text-slate-400 hover:text-slate-600" data-modal-close="{{ $modalId }}">
+                        ✕
+                    </button>
+                </div>
+                <div class="p-4 bg-slate-50">
+                    @if($isImage)
+                        <img src="{{ $attachmentUrl }}" alt="Preview Lampiran"
+                             class="max-h-[70vh] mx-auto rounded shadow">
+                    @else
+                        <iframe src="{{ $attachmentUrl }}" class="w-full h-[70vh] rounded bg-white"></iframe>
+                    @endif
+                </div>
+            </div>
         </div>
     @endif
 
@@ -188,3 +237,27 @@
 @endif
 </div>
 @endsection
+
+@push('scripts')
+@if($leave->file_path)
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-modal-open]').forEach(button => {
+            const targetId = button.getAttribute('data-modal-open');
+            const modal = document.getElementById(targetId);
+            if (!modal) return;
+
+            const closeModal = () => modal.classList.add('hidden');
+
+            button.addEventListener('click', () => modal.classList.remove('hidden'));
+            modal.querySelectorAll('[data-modal-close]').forEach(closeBtn => closeBtn.addEventListener('click', closeModal));
+            modal.addEventListener('click', event => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+    });
+</script>
+@endif
+@endpush

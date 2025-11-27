@@ -14,6 +14,21 @@
         </p>
     </div>
 
+    {{-- Ringkasan kuota --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+        @foreach ($quotaCards as $card)
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+                <p class="text-xs text-slate-500 mb-1">{{ $card['label'] }}</p>
+                <p class="text-2xl font-semibold {{ $card['remaining'] > 0 ? 'text-slate-900' : 'text-red-500' }}">
+                    {{ $card['remaining'] }} {{ $card['unit'] }}
+                </p>
+                <p class="text-[11px] text-slate-400 mt-1">
+                    {{ $card['note'] }}
+                </p>
+            </div>
+        @endforeach
+    </div>
+
     {{-- Kartu form --}}
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-7">
         <h2 class="text-sm font-semibold text-slate-900 mb-1">

@@ -46,7 +46,10 @@
                 </div>
                 <div class="rounded-xl bg-amber-50 px-4 py-3">
                     <p class="text-xs text-slate-500">Cuti Akan Hangus</p>
-                    <p class="text-lg font-semibold text-slate-900">0 hari</p>
+                    <p class="text-lg font-semibold text-slate-900">{{ $expiring }} hari</p>
+                    @if($expiring > 0 && ($annualSummary['carry_over_expires_at'] ?? null))
+                        <p class="text-[11px] text-slate-600 mt-0.5">Sampai {{ $annualSummary['carry_over_expires_at']->translatedFormat('d F Y') }}</p>
+                    @endif
                 </div>
             </div>
 

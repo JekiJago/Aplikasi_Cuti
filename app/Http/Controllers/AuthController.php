@@ -58,15 +58,13 @@ class AuthController extends Controller
         ]);
 
         // Insert langsung dengan DB::table untuk memastikan urutan kolom benar
-        // Urutan kolom di database: id, name, email, employee_id, nip, email_verified_at, password, role, position, department, hire_date, annual_leave_quota, used_leave_days, ...
+        // Urutan kolom di database: id, name, email, employee_id, password, role, position, department, hire_date, annual_leave_quota, used_leave_days, ...
         $hashedPassword = Hash::make($data['password']);
         
         $userId = DB::table('users')->insertGetId([
             'name'                      => $data['name'],
             'email'                     => $data['email'],
             'employee_id'               => $data['employee_id'],
-            'nip'                       => null,
-            'email_verified_at'         => null,
             'password'                  => $hashedPassword,
             'role'                      => 'employee',
             'position'                  => $data['position'],

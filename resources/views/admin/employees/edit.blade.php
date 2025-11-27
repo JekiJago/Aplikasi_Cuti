@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('content')
 
@@ -30,16 +30,30 @@
             @enderror
         </div>
 
-        <!-- NIP -->
+        <!-- EMPLOYEE ID -->
         <div>
-            <label class="block font-medium text-slate-700 mb-1">NIP</label>
+            <label class="block font-medium text-slate-700 mb-1">NIP / ID Pegawai</label>
             <input type="text"
-                name="nip"
-                value="{{ old('nip', $employee->nip) }}"
+                name="employee_id"
+                value="{{ old('employee_id', $employee->employee_id) }}"
                 required
                 class="w-full border rounded px-3 py-2 shadow-sm focus:ring focus:ring-blue-200"
             >
-            @error('nip')
+            @error('employee_id')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <!-- GENDER -->
+        <div>
+            <label class="block font-medium text-slate-700 mb-1">Gender</label>
+            <select name="gender" required
+                    class="w-full border rounded px-3 py-2 shadow-sm focus:ring focus:ring-blue-200 bg-white">
+                <option value="">Pilih gender</option>
+                <option value="male" {{ old('gender', $employee->gender) === 'male' ? 'selected' : '' }}>Pria</option>
+                <option value="female" {{ old('gender', $employee->gender) === 'female' ? 'selected' : '' }}>Wanita</option>
+            </select>
+            @error('gender')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
