@@ -16,20 +16,22 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
         'employee_id',
+        'nip',
+        'email_verified_at',
+        'password',
+        'role',
         'position',
         'department',
-        'role',
-        'avatar',
+        'hire_date',
         'annual_leave_quota',
         'used_leave_days',
-        'hire_date',
         'important_leave_used_days',
         'big_leave_used_days',
         'non_active_leave_used_days',
         'sick_leave_used_days',
         'maternity_leave_used_count',
+        'avatar',
     ];
 
     protected $hidden = [

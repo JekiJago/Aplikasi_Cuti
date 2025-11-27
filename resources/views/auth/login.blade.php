@@ -10,9 +10,10 @@
 
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">
-            Email
+            Email / NIP
         </label>
-        <input type="email" name="email" value="{{ old('email') }}" required autofocus
+        <input type="text" name="email" value="{{ old('email') }}" required autofocus
+               placeholder="Masukkan Email atau NIP"
                class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
     </div>
 
@@ -21,6 +22,7 @@
             Password
         </label>
         <input type="password" name="password" required
+                placeholder="Masukkan Password"
                class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
     </div>
 

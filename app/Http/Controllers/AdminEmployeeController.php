@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AdminEmployeeController extends Controller
 {
@@ -26,16 +27,20 @@ class AdminEmployeeController extends Controller
     // SIMPAN DATA PEGAWAI
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'nip'  => 'required|string|unique:users,nip'
+        $validated = $request->validate([
+            'name'         => ['required', 'string', 'max:255'],
+            'employee_id'  => ['required', 'string', 'max:50', 'unique:users,employee_id'],
         ]);
 
+        $employeeId = trim($validated['employee_id']);
+        $email = sprintf('%s@pegawai.local', Str::slug($employeeId));
+
         User::create([
-            'name' => $request->name,
-            'nip'  => $request->nip,
-            'role' => 'employee',
-            'password' => bcrypt('password123'), // default pass
+            'name'         => $validated['name'],
+            'employee_id'  => $employeeId,
+            'email'        => $email,
+            'role'         => 'employee',
+            'password'     => $employeeId, // auto-hash via accessor
         ]);
 
         return redirect()->route('admin.employees.index')
