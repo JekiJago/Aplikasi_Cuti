@@ -36,7 +36,7 @@
         <thead class="bg-gray-50 text-gray-600">
         <tr>
             <th class="px-4 py-2 text-left">Karyawan</th>
-            <th class="px-4 py-2 text-left">Departemen</th>
+            <!-- <th class="px-4 py-2 text-left">Departemen</th> -->
             <th class="px-4 py-2 text-left">Tanggal</th>
             <th class="px-4 py-2 text-left">Jenis</th>
             <th class="px-4 py-2 text-left">Status</th>
@@ -50,11 +50,17 @@
                     {{ $leave->user->name }}<br>
                     <span class="text-xs text-gray-500">{{ $leave->user->employee_id }}</span>
                 </td>
-                <td class="px-4 py-2">
+                <!-- <td class="px-4 py-2">
                     {{ $leave->user->department ?: '-' }}
-                </td>
+                </td> -->
                 <td class="px-4 py-2">
-                    {{ $leave->start_date->format('d M Y') }} - {{ $leave->end_date->format('d M Y') }}
+                    @php
+                        $summary = $leave->leave_type === 'tahunan'
+                            ? App\Models\LeaveRequest::workingDaysBetween($leave->start_date, $leave->end_date)
+                            : $leave->start_date->diffInDays($leave->end_date) + 1;
+                    @endphp
+                    <div>{{ $leave->start_date->format('d M Y') }} - {{ $leave->end_date->format('d M Y') }}</div>
+                    <p class="text-xs text-gray-500">{{ $summary }} hari</p>
                 </td>
                 <td class="px-4 py-2 capitalize">{{ $leave->leave_type }}</td>
                 <td class="px-4 py-2">

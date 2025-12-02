@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\LeaveBalanceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
-    public function show()
+    public function show(LeaveBalanceService $leaveBalanceService)
     {
         $user = auth()->user();
+        $annualSummary = $leaveBalanceService->getAnnualLeaveSummary($user);
 
-        return view('profile.show', compact('user'));
+        return view('profile.show', compact('user', 'annualSummary'));
     }
 
     public function edit()
