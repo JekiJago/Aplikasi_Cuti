@@ -207,7 +207,7 @@
                         </span>
                     </div>
                     <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                        <div class="h-full bg-slate-900" style="width: {{ min(100, $percent) }}%"></div>
+                        <div class="h-full bg-emerald-500" style="width: {{ min(100, $percent) }}%"></div>
                     </div>
                 </div>
             @empty

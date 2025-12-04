@@ -7,17 +7,17 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="h-full bg-slate-50 text-slate-900 antialiased">
+<body class="h-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50 text-slate-900 antialiased">
 
 <div class="min-h-screen flex flex-col">
 
     {{-- TOP NAVBAR --}}
-    <header class="bg-white border-b">
-        <div class="max-w-6xl mx-auto px-4 lg:px-0 flex items-center justify-between h-16">
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+        <div class="app-container flex items-center justify-between h-16 gap-4">
 
             {{-- Logo + Judul --}}
             <div class="flex items-center space-x-2">
-                <div class="h-9 w-9 rounded-xl bg-blue-600 flex items-center justify-center text-white text-lg font-bold">
+                <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white text-lg font-bold">
                     <span>PP</span>
                 </div>
                 <div class="leading-tight">

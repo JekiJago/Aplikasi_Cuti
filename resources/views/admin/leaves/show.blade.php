@@ -7,9 +7,9 @@
 <div class="max-w-3xl bg-white rounded-xl shadow-sm p-6 space-y-4">
     <div class="flex justify-between items-center">
         <h2 class="text-base font-semibold">Detail Pengajuan</h2>
-        <a href="{{ route('admin.leaves') }}" class="text-sm text-blue-700 hover:underline">
+        <x-link-button href="{{ route('admin.leaves') }}" type="secondary" class="text-sm">
             Kembali ke daftar
-        </a>
+        </x-link-button>
     </div>
 
     {{-- DETAIL UTAMA --}}
@@ -91,9 +91,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button type="button"
-                            class="px-3 py-1.5 text-xs rounded-full bg-indigo-600 text-white hover:bg-indigo-700"
-                            data-modal-open="{{ $modalId }}">
+                    <button type="button" class="btn-primary text-xs px-3 py-1.5 rounded-full" data-modal-open="{{ $modalId }}">
                         Preview
                     </button>
                     <a href="{{ $downloadUrl }}"
@@ -150,14 +148,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Catatan Persetujuan (opsional)
                         </label>
-                        <textarea 
-                            name="admin_notes" 
-                            rows="3"
-                            placeholder="Tambahkan catatan jika diperlukan..."
-                            class="w-full rounded-lg border-2 border-gray-300 text-sm p-3 
-                                   focus:border-green-500 focus:ring-2 focus:ring-green-200 
-                                   transition-all duration-200"
-                        ></textarea>
+                        <textarea name="admin_notes" rows="3" placeholder="Tambahkan catatan jika diperlukan..." class="input"></textarea>
                     </div>
 
                     <button 
@@ -191,15 +182,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Alasan Penolakan <span class="text-red-600 font-bold">*</span>
                         </label>
-                        <textarea 
-                            name="admin_notes" 
-                            rows="3" 
-                            required
-                            placeholder="Wajib diisi - berikan alasan penolakan..."
-                            class="w-full rounded-lg border-2 border-gray-300 text-sm p-3 
-                                   focus:border-red-500 focus:ring-2 focus:ring-red-200 
-                                   transition-all duration-200"
-                        ></textarea>
+                        <textarea name="admin_notes" rows="3" required placeholder="Wajib diisi - berikan alasan penolakan..." class="input"></textarea>
                     </div>
 
                     <button 

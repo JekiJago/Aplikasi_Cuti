@@ -1,100 +1,135 @@
 @extends('layouts.app')
 
-@section('title', 'Semua Pengajuan Cuti')
-@section('page-title', 'Semua Pengajuan Cuti')
+@section('title', 'Verifikasi Pengajuan Cuti')
+@section('page-title', 'Verifikasi Pengajuan Cuti')
 
 @section('content')
-<h2 class="text-base font-semibold mb-4">Daftar Pengajuan Cuti Karyawan</h2>
+<div class="mb-8">
+    <div>
+        <h1 class="text-3xl font-bold text-slate-900 mb-1">Verifikasi Pengajuan Cuti</h1>
+        <p class="text-slate-600">Kelola dan verifikasi semua pengajuan cuti karyawan</p>
+    </div>
+</div>
 
-<form method="GET" class="bg-white rounded-xl shadow-sm p-4 mb-4 grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
-    <div>
-        <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
-        <select name="status" class="w-full rounded-lg border-gray-300">
-            <option value="">Semua</option>
-            @foreach(['pending' => 'Pending', 'approved' => 'Disetujui', 'rejected' => 'Ditolak'] as $val => $label)
-                <option value="{{ $val }}" {{ request('status') === $val ? 'selected' : '' }}>
-                    {{ $label }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-    <div>
-        <label class="block text-xs font-medium text-gray-600 mb-1">Departemen</label>
-        <input type="text" name="department" value="{{ request('department') }}"
-               class="w-full rounded-lg border-gray-300">
-    </div>
-    <div class="md:col-span-2 flex items-end">
-        <button type="submit"
-                class="px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-900">
-            Filter
-        </button>
+<form method="GET" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Status</label>
+            <x-select name="status">
+                <option value="">Semua Status</option>
+                @foreach(['pending' => '⏳ Pending', 'approved' => '✅ Disetujui', 'rejected' => '❌ Ditolak'] as $val => $label)
+                    <option value="{{ $val }}" {{ request('status') === $val ? 'selected' : '' }}>
+                        {{ $label }}
+                    </option>
+                @endforeach
+            </x-select>
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Departemen</label>
+            <x-input type="text" name="department" :value="request('department')" placeholder="Cari departemen" />
+        </div>
+        <div class="md:col-span-2 flex items-end gap-3">
+            <x-primary-button class="flex-1">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                Filter
+            </x-primary-button>
+            @if(request('status') || request('department'))
+                <x-link-button href="{{ route('admin.leaves') }}" type="secondary" class="px-6">
+                    Reset
+                </x-link-button>
+            @endif
+        </div>
     </div>
 </form>
 
-<div class="bg-white rounded-xl shadow-sm overflow-hidden">
-    <table class="w-full text-sm">
-        <thead class="bg-gray-50 text-gray-600">
-        <tr>
-            <th class="px-4 py-2 text-left">Karyawan</th>
-            <!-- <th class="px-4 py-2 text-left">Departemen</th> -->
-            <th class="px-4 py-2 text-left">Tanggal</th>
-            <th class="px-4 py-2 text-left">Jenis</th>
-            <th class="px-4 py-2 text-left">Status</th>
-            <th class="px-4 py-2 text-right">Aksi</th>
-        </tr>
-        </thead>
-        <tbody>
-        @forelse($leaves as $leave)
-            <tr class="border-t">
-                <td class="px-4 py-2">
-                    {{ $leave->user->name }}<br>
-                    <span class="text-xs text-gray-500">{{ $leave->user->employee_id }}</span>
-                </td>
-                <!-- <td class="px-4 py-2">
-                    {{ $leave->user->department ?: '-' }}
-                </td> -->
-                <td class="px-4 py-2">
-                    @php
-                        $summary = $leave->leave_type === 'tahunan'
-                            ? App\Models\LeaveRequest::workingDaysBetween($leave->start_date, $leave->end_date)
-                            : $leave->start_date->diffInDays($leave->end_date) + 1;
-                    @endphp
-                    <div>{{ $leave->start_date->format('d M Y') }} - {{ $leave->end_date->format('d M Y') }}</div>
-                    <p class="text-xs text-gray-500">{{ $summary }} hari</p>
-                </td>
-                <td class="px-4 py-2 capitalize">{{ $leave->leave_type }}</td>
-                <td class="px-4 py-2">
-                    @php
-                        $color = match($leave->status) {
-                            'approved' => 'bg-green-100 text-green-700',
-                            'pending'  => 'bg-yellow-100 text-yellow-700',
-                            'rejected' => 'bg-red-100 text-red-700',
-                            default    => 'bg-gray-100 text-gray-700',
-                        };
-                    @endphp
-                    <span class="inline-flex px-2 py-1 rounded-full text-xs font-medium {{ $color }}">
-                        {{ strtoupper($leave->status) }}
-                    </span>
-                </td>
-                <td class="px-4 py-2 text-right">
-                    <a href="{{ route('admin.leaves.show', $leave->id) }}"
-                       class="inline-flex px-3 py-1 rounded-lg border text-xs hover:bg-gray-50">
-                        Review
-                    </a>
-                </td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="6" class="px-4 py-4 text-center text-gray-500">
-                    Belum ada pengajuan cuti.
-                </td>
-            </tr>
-        @endforelse
-        </tbody>
-    </table>
-
-    <div class="px-4 py-3 border-t">
-        {{ $leaves->withQueryString()->links() }}
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
+                <tr>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Karyawan</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Periode</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Jenis</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-4 text-right text-xs font-semibold text-slate-700 uppercase tracking-wider">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+                @forelse($leaves as $leave)
+                    <tr class="hover:bg-slate-50 transition-colors duration-150">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-shrink-0 w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center">
+                                    <span class="text-xs font-bold text-blue-700">
+                                        {{ strtoupper(substr($leave->user->name, 0, 1)) }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-slate-900">{{ $leave->user->name }}</p>
+                                    <p class="text-xs text-slate-500">{{ $leave->user->employee_id }} • {{ $leave->user->department ?: '-' }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-slate-900">
+                            <div class="text-sm font-medium">
+                                {{ $leave->start_date->format('d M Y') }}
+                            </div>
+                            <div class="text-xs text-slate-500">
+                                s/d {{ $leave->end_date->format('d M Y') }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold capitalize">
+                                {{ $leave->leave_type }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            @php
+                                $statusConfig = match($leave->status) {
+                                    'approved' => ['icon' => '✅', 'bg' => 'bg-emerald-100', 'text' => 'text-emerald-700', 'label' => 'Disetujui'],
+                                    'pending'  => ['icon' => '⏳', 'bg' => 'bg-yellow-100', 'text' => 'text-yellow-700', 'label' => 'Pending'],
+                                    'rejected' => ['icon' => '❌', 'bg' => 'bg-red-100', 'text' => 'text-red-700', 'label' => 'Ditolak'],
+                                    default    => ['icon' => '❓', 'bg' => 'bg-slate-100', 'text' => 'text-slate-700', 'label' => ucfirst($leave->status)],
+                                };
+                            @endphp
+                            <span class="inline-flex items-center px-3 py-1 rounded-full {{ $statusConfig['bg'] }} {{ $statusConfig['text'] }} text-xs font-semibold">
+                                {{ $statusConfig['icon'] }} {{ $statusConfig['label'] }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <a href="{{ route('admin.leaves.show', $leave->id) }}" class="btn-secondary text-xs inline-flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                Review
+                            </a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                <svg class="w-12 h-12 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                <p class="text-slate-500 font-medium">Belum ada pengajuan cuti</p>
+                                <p class="text-slate-400 text-sm">Tidak ada pengajuan cuti yang sesuai dengan filter</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
+
+    @if($leaves->hasPages())
+        <div class="bg-slate-50 px-6 py-4 border-t border-slate-200">
+            {{ $leaves->withQueryString()->links() }}
+        </div>
+    @endif
 </div>
+
 @endsection

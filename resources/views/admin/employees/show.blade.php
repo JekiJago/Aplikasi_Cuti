@@ -5,7 +5,7 @@
     {{-- Header + info pegawai --}}
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div class="flex items-center gap-4">
-            <div class="w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center text-white text-2xl font-semibold">
+            <div class="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white text-2xl font-semibold">
                 {{ strtoupper(substr($employee->name, 0, 1)) }}
             </div>
             <div>
@@ -18,10 +18,9 @@
             </div>
         </div>
         <div>
-            <a href="{{ route('admin.employees.index') }}"
-               class="inline-flex items-center px-4 py-2 rounded-full border border-slate-200 text-sm text-slate-700 hover:bg-slate-50">
+            <x-link-button href="{{ route('admin.employees.index') }}" type="secondary">
                 &larr; Kembali ke Data Pegawai
-            </a>
+            </x-link-button>
         </div>
     </div>
 
@@ -59,7 +58,7 @@
             <div class="mt-2">
                 <p class="text-xs text-slate-500 mb-1">Penggunaan Cuti</p>
                 <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div class="h-full bg-slate-900" style="width: {{ min(100, $percent) }}%"></div>
+                    <div class="h-full bg-emerald-500" style="width: {{ min(100, $percent) }}%"></div>
                 </div>
                 <p class="text-xs text-slate-500 mt-1 text-right">{{ $percent }}%</p>
             </div>

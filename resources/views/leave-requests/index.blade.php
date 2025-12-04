@@ -6,10 +6,9 @@
 @section('content')
 <div class="flex justify-between items-center mb-4">
     <h2 class="text-base font-semibold">Daftar Pengajuan Cuti</h2>
-    <a href="{{ route('leave-requests.create') }}"
-       class="inline-flex items-center px-3 py-2 bg-blue-700 text-white text-sm rounded-lg hover:bg-blue-800">
+    <x-link-button href="{{ route('leave-requests.create') }}" type="primary" class="text-sm">
         + Ajukan Cuti
-    </a>
+    </x-link-button>
 </div>
 
 {{-- Filter sederhana --}}
@@ -21,27 +20,23 @@
             @foreach(['pending' => 'Pending', 'approved' => 'Disetujui', 'rejected' => 'Ditolak'] as $val => $label)
                 <option value="{{ $val }}" {{ request('status') === $val ? 'selected' : '' }}>
                     {{ $label }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-    <div>
-        <label class="block text-xs font-medium text-gray-600 mb-1">Dari Tanggal</label>
-        <input type="date" name="from" value="{{ request('from') }}"
-               class="w-full rounded-lg border-gray-300">
-    </div>
-    <div>
-        <label class="block text-xs font-medium text-gray-600 mb-1">Sampai Tanggal</label>
-        <input type="date" name="to" value="{{ request('to') }}"
-               class="w-full rounded-lg border-gray-300">
-    </div>
-    <div class="flex items-end">
-        <button type="submit"
-                class="w-full px-3 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-900">
-            Filter
-        </button>
-    </div>
-</form>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
+                    <x-select name="status">
+                        <option value="">Semua</option>
+                        @foreach(['pending' => 'Pending', 'approved' => 'Disetujui', 'rejected' => 'Ditolak'] as $val => $label)
+                            <option value="{{ $val }}" {{ request('status') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </x-select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Dari Tanggal</label>
+                    <x-input type="date" name="from" :value="request('from')" />
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Sampai Tanggal</label>
+                    <x-input type="date" name="to" :value="request('to')" />
+                </div>
 
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
     <table class="w-full text-sm">
@@ -76,10 +71,7 @@
                     </span>
                 </td>
                 <td class="px-4 py-2 text-right space-x-2">
-                    <a href="{{ route('leave-requests.show', $leave->id) }}"
-                       class="inline-flex px-3 py-1 rounded-lg border text-xs hover:bg-gray-50">
-                        Detail
-                    </a>
+                    <a href="{{ route('leave-requests.show', $leave->id) }}" class="btn-secondary inline-flex px-3 py-1 text-xs">Detail</a>
 
                     @if($leave->status === 'pending')
                         <form action="{{ route('leave-requests.destroy', $leave->id) }}" method="POST"

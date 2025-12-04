@@ -7,8 +7,9 @@
 <div class="max-w-2xl bg-white rounded-xl shadow-sm p-6 space-y-4">
     <div class="flex justify-between items-center">
         <h2 class="text-base font-semibold">Informasi Pengajuan</h2>
-        <a href="{{ route('leave-requests.index') }}"
-           class="text-sm text-blue-700 hover:underline">Kembali</a>
+        <x-link-button href="{{ route('leave-requests.index') }}" type="secondary" class="text-sm">
+            Kembali
+        </x-link-button>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -56,10 +57,10 @@
     @if($leave->file_path)
         <div class="text-sm">
             <p class="text-xs text-gray-500 mb-1">Lampiran</p>
-            <a href="{{ asset('storage/'.$leave->file_path) }}" target="_blank"
-               class="inline-flex px-3 py-2 border rounded-lg text-xs hover:bg-gray-50">
+            <x-link-button href="{{ asset('storage/'.$leave->file_path) }}" type="primary" target="_blank"
+               class="px-3 py-2 text-xs">
                 Lihat Lampiran
-            </a>
+            </x-link-button>
         </div>
     @endif
 

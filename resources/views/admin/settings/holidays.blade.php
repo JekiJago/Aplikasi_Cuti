@@ -27,26 +27,20 @@
                 @csrf
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal</label>
-                    <input type="date" name="date"
-                           class="w-full rounded-xl border border-slate-200 bg-white text-sm px-3 py-2
-                                  focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        <x-input type="date" name="date" />
                     @error('date')
                         <p class="mt-1 text-[11px] text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-xs font-medium text-slate-700 mb-1">Keterangan</label>
-                    <input type="text" name="description"
-                           placeholder="Misal: Hari Raya Idul Fitri"
-                           class="w-full rounded-xl border border-slate-200 bg-white text-sm px-3 py-2
-                                  focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        <x-input type="text" name="description" placeholder="Misal: Hari Raya Idul Fitri" />
                     @error('description')
                         <p class="mt-1 text-[11px] text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
                 <div class="md:col-span-3 flex justify-start">
-                    <button type="submit"
-                            class="inline-flex items-center px-4 py-2 rounded-full bg-slate-900 text-white text-xs md:text-sm hover:bg-black">
+                    <button type="submit" class="btn-primary inline-flex items-center">
                         <span class="mr-1">＋</span> Tambah Libur
                     </button>
                 </div>

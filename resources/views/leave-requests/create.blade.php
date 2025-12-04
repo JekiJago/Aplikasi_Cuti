@@ -3,26 +3,24 @@
 @section('title', 'Ajukan Cuti')
 
 @section('content')
-<div class="max-w-3xl mx-auto">
+<div class="max-w-3xl mx-auto py-8 px-4">
     {{-- Judul halaman --}}
-    <div class="mb-6">
-        <h1 class="text-xl md:text-2xl font-semibold text-slate-900">
-            Form Pengajuan Cuti
-        </h1>
-        <p class="mt-1 text-sm text-slate-500">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-900 mb-2">Ajukan Cuti Baru</h1>
+        <p class="text-base text-slate-600">
             Isi formulir di bawah untuk mengajukan permohonan cuti.
         </p>
     </div>
 
     {{-- Ringkasan kuota --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         @foreach ($quotaCards as $card)
-            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
-                <p class="text-xs text-slate-500 mb-1">{{ $card['label'] }}</p>
-                <p class="text-2xl font-semibold {{ $card['remaining'] > 0 ? 'text-slate-900' : 'text-red-500' }}">
-                    {{ $card['remaining'] }} {{ $card['unit'] }}
+            <div class="card p-5">
+                <p class="text-xs text-slate-600 font-medium uppercase tracking-wider mb-2">{{ $card['label'] }}</p>
+                <p class="text-3xl font-bold {{ $card['remaining'] > 0 ? 'text-slate-900' : 'text-rose-600' }}">
+                    {{ $card['remaining'] }}<span class="text-lg ml-1">{{ $card['unit'] }}</span>
                 </p>
-                <p class="text-[11px] text-slate-400 mt-1">
+                <p class="text-xs text-slate-500 mt-2">
                     {{ $card['note'] }}
                 </p>
             </div>
@@ -30,28 +28,24 @@
     </div>
 
     {{-- Kartu form --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-7">
-        <h2 class="text-sm font-semibold text-slate-900 mb-1">
-            Informasi Cuti
+    <div class="card-elevated p-8">
+        <h2 class="text-lg font-semibold text-slate-900 mb-1">
+            Detail Pengajuan Cuti
         </h2>
-        <p class="text-xs text-slate-500 mb-4">
-            Lengkapi data pengajuan cuti Anda.
+        <p class="text-sm text-slate-600 mb-6">
+            Lengkapi semua data pengajuan cuti Anda dengan benar.
         </p>
 
         <form method="POST"
               action="{{ route('leave-requests.store') }}"
               enctype="multipart/form-data"
-              class="space-y-4">
+              class="space-y-6">
             @csrf
 
             {{-- Jenis cuti --}}
             <div>
-                <label class="block text-xs font-medium text-slate-700 mb-1">
-                    Jenis Cuti <span class="text-red-500">*</span>
-                </label>
-                <select name="leave_type" required
-                        class="w-full rounded-xl border border-slate-200 bg-slate-50 text-sm px-3 py-2
-                               focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <label class="form-label form-label-required">Jenis Cuti</label>
+                <select name="leave_type" required class="input">
                     <option value="">Pilih jenis cuti</option>
                     @foreach ([
                         'tahunan'        => 'Cuti Tahunan',
@@ -77,10 +71,7 @@
                     <label class="block text-xs font-medium text-slate-700 mb-1">
                         Tanggal Mulai <span class="text-red-500">*</span>
                     </label>
-                    <input type="date" name="start_date" id="start_date"
-                           value="{{ old('start_date') }}" required
-                           class="w-full rounded-xl border border-slate-200 bg-slate-50 text-sm px-3 py-2
-                                  focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        <x-input type="date" name="start_date" id="start_date" :value="old('start_date')" required />
                     @error('start_date')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
@@ -90,10 +81,7 @@
                     <label class="block text-xs font-medium text-slate-700 mb-1">
                         Tanggal Selesai <span class="text-red-500">*</span>
                     </label>
-                    <input type="date" name="end_date" id="end_date"
-                           value="{{ old('end_date') }}" required
-                           class="w-full rounded-xl border border-slate-200 bg-slate-50 text-sm px-3 py-2
-                                  focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        <x-input type="date" name="end_date" id="end_date" :value="old('end_date')" required />
                     @error('end_date')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
@@ -105,10 +93,7 @@
                 <label class="block text-xs font-medium text-slate-700 mb-1">
                     Detail / Alasan Cuti <span class="text-red-500">*</span>
                 </label>
-                <textarea name="reason" rows="4" required
-                          class="w-full rounded-xl border border-slate-200 bg-slate-50 text-sm px-3 py-2
-                                 focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                          placeholder="Jelaskan alasan pengajuan cuti Anda...">{{ old('reason') }}</textarea>
+                  <textarea name="reason" rows="4" required class="input" placeholder="Jelaskan alasan pengajuan cuti Anda...">{{ old('reason') }}</textarea>
                 @error('reason')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror
@@ -119,14 +104,8 @@
                 <label class="block text-xs font-medium text-slate-700 mb-1">
                     Dokumen Pendukung (opsional)
                 </label>
-                <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-3 py-3 flex flex-col gap-2">
-                    <input type="file" name="attachment"
-                           class="text-xs w-full
-                                  file:mr-3 file:py-1.5 file:px-3
-                                  file:rounded-lg file:border-0
-                                  file:text-xs file:font-medium
-                                  file:bg-slate-800 file:text-white
-                                  hover:file:bg-slate-900">
+                <div class="rounded-xl border border-dashed border-slate-300 bg-white/60 px-3 py-3 flex flex-col gap-2">
+                        <input type="file" name="attachment" class="text-xs w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-slate-700 file:text-white hover:file:bg-slate-800">
                     <p class="text-[11px] text-slate-400">
                         Unggah file bukti / dokumen pendukung. Maksimal 5MB, format PDF, JPG, atau PNG.
                     </p>
@@ -138,15 +117,11 @@
 
             {{-- Tombol --}}
             <div class="pt-3 flex items-center justify-end space-x-3">
-                <button type="reset"
-                        class="px-4 py-2 rounded-full border border-slate-200 bg-white text-xs md:text-sm text-slate-700 hover:bg-slate-50">
-                    Reset
-                </button>
-                <button type="submit"
-                        class="px-5 py-2 rounded-full bg-slate-900 text-xs md:text-sm font-medium text-white flex items-center space-x-2 hover:bg-black">
+                <x-secondary-button type="reset" class="text-xs md:text-sm">Reset</x-secondary-button>
+                <x-primary-button class="flex items-center space-x-2">
                     <span>✈️</span>
                     <span>Kirim Pengajuan</span>
-                </button>
+                </x-primary-button>
             </div>
         </form>
     </div>

@@ -8,9 +8,9 @@
     {{-- Tailwind via Vite (default Laravel 11) --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="h-full bg-gray-100 flex items-center justify-center">
+<body class="h-full bg-gradient-to-br from-white via-slate-50 to-blue-50 flex items-center justify-center">
     <div class="w-full max-w-md px-4">
-        <div class="bg-white shadow-lg rounded-xl p-8">
+        <div class="card p-8">
             <h1 class="text-2xl font-bold text-center text-blue-700 mb-2">
                 @yield('heading', 'Aplikasi Cuti')
             </h1>

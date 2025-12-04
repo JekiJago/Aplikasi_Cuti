@@ -50,9 +50,9 @@
         <div class="bg-white shadow-sm rounded-xl border border-slate-100">
             <div class="p-4 border-b border-slate-100 flex items-center justify-between">
                 <h3 class="text-sm font-semibold text-slate-900">Pengajuan Terbaru</h3>
-                <a href="{{ route('leave-requests.index') }}" class="text-xs text-blue-600 hover:underline">
+                <x-link-button href="{{ route('leave-requests.index') }}" type="default" class="text-xs">
                     Lihat semua
-                </a>
+                </x-link-button>
             </div>
             <div class="divide-y divide-slate-100">
                 @forelse($recentLeaves as $leave)

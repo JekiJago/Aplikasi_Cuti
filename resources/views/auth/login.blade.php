@@ -12,18 +12,14 @@
         <label class="block text-sm font-medium text-gray-700 mb-1">
             Email / NIP
         </label>
-        <input type="text" name="email" value="{{ old('email') }}" required autofocus
-               placeholder="Masukkan Email atau NIP"
-               class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+        <x-input type="text" name="email" :value="old('email')" required autofocus placeholder="Masukkan Email atau NIP" />
     </div>
 
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">
             Password
         </label>
-        <input type="password" name="password" required
-                placeholder="Masukkan Password"
-               class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+        <x-input type="password" name="password" required placeholder="Masukkan Password" />
     </div>
 
     <div class="flex items-center justify-between text-sm">
@@ -32,19 +28,20 @@
             <span class="ml-2 text-gray-600">Remember me</span>
         </label>
 
-        <a href="#" class="text-blue-600 hover:underline text-xs">
+        <a href="#" class="text-sky-600 hover:underline text-xs">
             Lupa password?
         </a>
     </div>
 
-    <button type="submit"
-            class="w-full py-2 px-4 bg-blue-700 text-white text-sm font-semibold rounded-lg hover:bg-blue-800">
+    <x-primary-button class="w-full justify-center">
         Login
-    </button>
+    </x-primary-button>
 
     <p class="text-center text-xs text-gray-500 mt-2">
         Belum punya akun?
-        <a href="{{ route('register') }}" class="text-blue-600 hover:underline">Daftar</a>
+        <x-link-button href="{{ route('register') }}" type="default" class="text-xs">
+            Daftar
+        </x-link-button>
     </p>
 </form>
 @endsection
