@@ -4,101 +4,451 @@
 @section('page-title', 'Pengajuan Cuti Saya')
 
 @section('content')
-<div class="flex justify-between items-center mb-4">
-    <h2 class="text-base font-semibold">Daftar Pengajuan Cuti</h2>
-    <x-link-button href="{{ route('leave-requests.create') }}" type="primary" class="text-sm">
-        + Ajukan Cuti
-    </x-link-button>
-</div>
-
-{{-- Filter sederhana --}}
-<form method="GET" class="bg-white rounded-xl shadow-sm p-4 mb-4 grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
-    <div>
-        <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
-        <select name="status" class="w-full rounded-lg border-gray-300">
-            <option value="">Semua</option>
-            @foreach(['pending' => 'Pending', 'approved' => 'Disetujui', 'rejected' => 'Ditolak'] as $val => $label)
-                <option value="{{ $val }}" {{ request('status') === $val ? 'selected' : '' }}>
-                    {{ $label }}
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8 px-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
-                    <x-select name="status">
-                        <option value="">Semua</option>
-                        @foreach(['pending' => 'Pending', 'approved' => 'Disetujui', 'rejected' => 'Ditolak'] as $val => $label)
-                            <option value="{{ $val }}" {{ request('status') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                    <div class="flex items-center mb-2">
+                        <a href="{{ route('dashboard') }}" 
+                           class="inline-flex items-center text-gray-500 hover:text-gray-700 mr-3 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                        </a>
+                        <h1 class="text-2xl font-bold text-gray-800">Riwayat Pengajuan Cuti</h1>
+                    </div>
+                    <p class="text-gray-600 ml-8">
+                        Kelola dan lacak semua pengajuan cuti Anda
+                    </p>
+                </div>
+                
+                <a href="{{ route('leave-requests.create') }}"
+                   class="inline-flex items-center justify-center px-6 py-3 rounded-lg 
+                          bg-gradient-to-r from-blue-600 to-teal-600 text-white font-semibold 
+                          hover:from-blue-700 hover:to-teal-700 hover:shadow-lg 
+                          transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Ajukan Cuti Baru
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="p-2 bg-blue-50 rounded-lg">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-medium text-blue-600">Total</span>
+                </div>
+                <p class="text-2xl font-bold text-gray-800">{{ $leaveRequests->total() }}</p>
+                <p class="text-xs text-gray-500 mt-1">Pengajuan</p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="p-2 bg-amber-50 rounded-lg">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-medium text-amber-600">Menunggu</span>
+                </div>
+                <p class="text-2xl font-bold text-gray-800">{{ $leaveRequests->where('status', 'pending')->count() }}</p>
+                <p class="text-xs text-gray-500 mt-1">Pending</p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="p-2 bg-emerald-50 rounded-lg">
+                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-medium text-emerald-600">Disetujui</span>
+                </div>
+                <p class="text-2xl font-bold text-gray-800">{{ $leaveRequests->where('status', 'approved')->count() }}</p>
+                <p class="text-xs text-gray-500 mt-1">Approved</p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="p-2 bg-red-50 rounded-lg">
+                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-medium text-red-600">Ditolak</span>
+                </div>
+                <p class="text-2xl font-bold text-gray-800">{{ $leaveRequests->where('status', 'rejected')->count() }}</p>
+                <p class="text-xs text-gray-500 mt-1">Rejected</p>
+            </div>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 mb-8">
+            <div class="flex items-center mb-4">
+                <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-800">Filter Pengajuan</h3>
+            </div>
+            
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select name="status" 
+                            class="block w-full pl-3 pr-10 py-3 rounded-lg border border-gray-300 
+                                   bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                                   focus:bg-white transition-colors text-gray-800">
+                        <option value="">Semua Status</option>
+                        @foreach(['pending' => 'Menunggu', 'approved' => 'Disetujui', 'rejected' => 'Ditolak'] as $val => $label)
+                            <option value="{{ $val }}" {{ request('status') === $val ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
                         @endforeach
-                    </x-select>
+                    </select>
                 </div>
+                
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Dari Tanggal</label>
-                    <x-input type="date" name="from" :value="request('from')" />
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dari Tanggal</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <input type="date" name="from" value="{{ request('from') }}"
+                               class="block w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 
+                                      bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                                      focus:bg-white transition-colors text-gray-800">
+                    </div>
                 </div>
+                
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Sampai Tanggal</label>
-                    <x-input type="date" name="to" :value="request('to')" />
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sampai Tanggal</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <input type="date" name="to" value="{{ request('to') }}"
+                               class="block w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 
+                                      bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                                      focus:bg-white transition-colors text-gray-800">
+                    </div>
                 </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Cuti</label>
+                    <select name="leave_type" 
+                            class="block w-full pl-3 pr-10 py-3 rounded-lg border border-gray-300 
+                                   bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                                   focus:bg-white transition-colors text-gray-800">
+                        <option value="">Semua Jenis</option>
+                        @foreach([
+                            'tahunan'        => 'Cuti Tahunan',
+                            'urusan_penting' => 'Urusan Penting',
+                            'cuti_besar'     => 'Cuti Besar',
+                            'cuti_non_aktif' => 'Non Aktif',
+                            'cuti_bersalin'  => 'Bersalin',
+                            'cuti_sakit'     => 'Sakit',
+                        ] as $val => $label)
+                            <option value="{{ $val }}" {{ request('leave_type') === $val ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                
+                <div class="flex items-end">
+                    <div class="flex space-x-3 w-full">
+                        <button type="submit"
+                                class="flex-1 inline-flex items-center justify-center px-4 py-3 rounded-lg 
+                                       bg-gradient-to-r from-blue-600 to-teal-600 text-white font-semibold 
+                                       hover:from-blue-700 hover:to-teal-700 hover:shadow-lg 
+                                       transition-all duration-200 transform hover:-translate-y-0.5">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                            </svg>
+                            Filter
+                        </button>
+                        <a href="{{ route('leave-requests.index') }}"
+                           class="inline-flex items-center justify-center px-4 py-3 rounded-lg border border-gray-300 
+                                  text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 
+                                  transition-colors duration-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
 
-<div class="bg-white rounded-xl shadow-sm overflow-hidden">
-    <table class="w-full text-sm">
-        <thead class="bg-gray-50 text-gray-600">
-        <tr>
-            <th class="px-4 py-2 text-left">Tanggal</th>
-            <th class="px-4 py-2 text-left">Jenis</th>
-            <th class="px-4 py-2 text-left">Hari</th>
-            <th class="px-4 py-2 text-left">Status</th>
-            <th class="px-4 py-2 text-right">Aksi</th>
-        </tr>
-        </thead>
-        <tbody>
-        @forelse($leaveRequests as $leave)
-            <tr class="border-t">
-                <td class="px-4 py-2">
-                    {{ $leave->start_date->format('d M Y') }} - {{ $leave->end_date->format('d M Y') }}
-                </td>
-                <td class="px-4 py-2 capitalize">{{ $leave->leave_type }}</td>
-                <td class="px-4 py-2">{{ $leave->days }}</td>
-                <td class="px-4 py-2">
-                    @php
-                        $color = match($leave->status) {
-                            'approved' => 'bg-green-100 text-green-700',
-                            'pending'  => 'bg-yellow-100 text-yellow-700',
-                            'rejected' => 'bg-red-100 text-red-700',
-                            default    => 'bg-gray-100 text-gray-700',
-                        };
-                    @endphp
-                    <span class="inline-flex px-2 py-1 rounded-full text-xs font-medium {{ $color }}">
-                        {{ strtoupper($leave->status) }}
-                    </span>
-                </td>
-                <td class="px-4 py-2 text-right space-x-2">
-                    <a href="{{ route('leave-requests.show', $leave->id) }}" class="btn-secondary inline-flex px-3 py-1 text-xs">Detail</a>
+        <!-- Table Card -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            <!-- Table Header -->
+            <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-800">Daftar Pengajuan</h3>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        Menampilkan {{ $leaveRequests->firstItem() ?? 0 }}-{{ $leaveRequests->lastItem() ?? 0 }} dari {{ $leaveRequests->total() }}
+                    </div>
+                </div>
+            </div>
 
-                    @if($leave->status === 'pending')
-                        <form action="{{ route('leave-requests.destroy', $leave->id) }}" method="POST"
-                              class="inline-block"
-                              onsubmit="return confirm('Hapus pengajuan ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                    class="inline-flex px-3 py-1 rounded-lg border border-red-300 text-xs text-red-600 hover:bg-red-50">
-                                Hapus
-                            </button>
-                        </form>
-                    @endif
-                </td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="5" class="px-4 py-4 text-center text-gray-500">
-                    Belum ada pengajuan cuti.
-                </td>
-            </tr>
-        @endforelse
-        </tbody>
-    </table>
+            <!-- Table Content -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    Periode
+                                </div>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                    </svg>
+                                    Jenis
+                                </div>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Durasi
+                                </div>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Status
+                                </div>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                                    </svg>
+                                    Aksi
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                        @forelse($leaveRequests as $leave)
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                <!-- Date Range -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ $leave->start_date->format('d M Y') }} - {{ $leave->end_date->format('d M Y') }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        Diajukan: {{ $leave->created_at->format('d M Y') }}
+                                    </div>
+                                </td>
 
-    <div class="px-4 py-3 border-t">
-        {{ $leaveRequests->withQueryString()->links() }}
+                                <!-- Leave Type -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900 capitalize">
+                                        {{ str_replace('_', ' ', $leave->leave_type) }}
+                                    </div>
+                                    @if($leave->reason)
+                                        <div class="text-xs text-gray-500 truncate max-w-xs mt-1">
+                                            {{ \Illuminate\Support\Str::limit($leave->reason, 50) }}
+                                        </div>
+                                    @endif
+                                </td>
+
+                                <!-- Duration -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-medium">
+                                            {{ $leave->days }} hari
+                                        </span>
+                                        @if($leave->attachment)
+                                            <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                                            </svg>
+                                        @endif
+                                    </div>
+                                </td>
+
+                                <!-- Status -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @php
+                                        $statusConfig = match($leave->status) {
+                                            'approved' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-800', 'icon' => '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>'],
+                                            'pending'  => ['bg' => 'bg-amber-50', 'text' => 'text-amber-800', 'icon' => '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'],
+                                            'rejected' => ['bg' => 'bg-red-50', 'text' => 'text-red-800', 'icon' => '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>'],
+                                            default    => ['bg' => 'bg-gray-50', 'text' => 'text-gray-800', 'icon' => ''],
+                                        };
+                                    @endphp
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium {{ $statusConfig['bg'] }} {{ $statusConfig['text'] }}">
+                                        {!! $statusConfig['icon'] !!}
+                                        {{ match($leave->status) {
+                                            'approved' => 'Disetujui',
+                                            'pending'  => 'Menunggu',
+                                            'rejected' => 'Ditolak',
+                                            default    => ucfirst($leave->status),
+                                        } }}
+                                    </span>
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <div class="flex items-center space-x-3">
+                                        <a href="{{ route('leave-requests.show', $leave->id) }}"
+                                           class="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 
+                                                  text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 
+                                                  transition-colors duration-200 text-sm">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                            Detail
+                                        </a>
+
+                                        @if($leave->status === 'pending')
+                                            <form action="{{ route('leave-requests.destroy', $leave->id) }}" 
+                                                  method="POST"
+                                                  onsubmit="return confirm('Yakin ingin menghapus pengajuan ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                        class="inline-flex items-center px-4 py-2 rounded-lg border border-red-300 
+                                                               text-red-600 font-medium hover:bg-red-50 hover:border-red-400 
+                                                               transition-colors duration-200 text-sm">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                    Hapus
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center">
+                                    <div class="mx-auto w-24 h-24 text-gray-300 mb-4">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                        </svg>
+                                    </div>
+                                    <p class="text-gray-500 font-medium">Belum ada pengajuan cuti</p>
+                                    <p class="text-gray-400 text-sm mt-1">Mulai dengan mengajukan cuti baru</p>
+                                    <a href="{{ route('leave-requests.create') }}"
+                                       class="inline-flex items-center mt-4 px-4 py-2 rounded-lg 
+                                              bg-gradient-to-r from-blue-600 to-teal-600 text-white text-sm font-medium 
+                                              hover:from-blue-700 hover:to-teal-700 hover:shadow-lg transition-all duration-200">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        Ajukan Cuti
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if($leaveRequests->hasPages())
+                <div class="px-6 py-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-700">
+                            Menampilkan 
+                            <span class="font-medium">{{ $leaveRequests->firstItem() }}</span>
+                            sampai 
+                            <span class="font-medium">{{ $leaveRequests->lastItem() }}</span>
+                            dari 
+                            <span class="font-medium">{{ $leaveRequests->total() }}</span>
+                            pengajuan
+                        </div>
+                        <div class="flex space-x-2">
+                            {{ $leaveRequests->withQueryString()->links() }}
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
     </div>
 </div>
+
+<style>
+    /* Custom pagination styling */
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .pagination li {
+        margin: 0 2px;
+    }
+    
+    .pagination a, .pagination span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+        padding: 0 8px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .pagination a {
+        color: #4b5563;
+        background-color: white;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .pagination a:hover {
+        background-color: #f3f4f6;
+        border-color: #d1d5db;
+    }
+    
+    .pagination .active span {
+        background-color: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+    
+    .pagination .disabled span {
+        color: #9ca3af;
+        background-color: #f9fafb;
+        border-color: #e5e7eb;
+        cursor: not-allowed;
+    }
+</style>
 @endsection

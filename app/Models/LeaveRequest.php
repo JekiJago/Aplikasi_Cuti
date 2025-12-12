@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Holiday;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -36,7 +37,6 @@ class LeaveRequest extends Model
         'reviewed_at'  => 'datetime',
     ];
 
-    /** Relationships */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -47,7 +47,6 @@ class LeaveRequest extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    /** Scopes */
     public function scopePending(Builder $query): Builder
     {
         return $query->where('status', 'pending');
@@ -63,7 +62,6 @@ class LeaveRequest extends Model
         return $query->where('status', 'rejected');
     }
 
-    /** Methods */
     public function calculateDays(): int
     {
         if (!$this->start_date || !$this->end_date) {
@@ -102,10 +100,8 @@ class LeaveRequest extends Model
             return;
         }
 
-        // Update kuota berdasarkan jenis cuti
         switch ($this->leave_type) {
             case 'tahunan':
-                // tracking tahunan untuk dashboard (sisa cuti)
                 $user->used_leave_days += $this->days;
                 break;
 
@@ -133,6 +129,7 @@ class LeaveRequest extends Model
 
         $user->save();
     }
+
     public function reject(int $adminId, ?string $notes = null): void
     {
         if (!$this->canBeApproved()) {
@@ -145,6 +142,7 @@ class LeaveRequest extends Model
         $this->reviewed_at = now();
         $this->save();
     }
+
     public static function workingDaysBetween(Carbon $start, Carbon $end): int
     {
         if ($start->gt($end)) {
@@ -157,11 +155,11 @@ class LeaveRequest extends Model
 
         $days = 0;
         $cursor = $start->copy();
+
         while ($cursor->lte($end)) {
-            if (! $cursor->isWeekend() && ! in_array($cursor->format('Y-m-d'), $holidayDates, true)) {
+            if (!$cursor->isWeekend() && !in_array($cursor->format('Y-m-d'), $holidayDates, true)) {
                 $days++;
             }
-
             $cursor->addDay();
         }
 

@@ -15,30 +15,34 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">Status</label>
-            <x-select name="status">
+            <select name="status" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <option value="">Semua Status</option>
                 @foreach(['pending' => '⏳ Pending', 'approved' => '✅ Disetujui', 'rejected' => '❌ Ditolak'] as $val => $label)
                     <option value="{{ $val }}" {{ request('status') === $val ? 'selected' : '' }}>
                         {{ $label }}
                     </option>
                 @endforeach
-            </x-select>
+            </select>
         </div>
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">Departemen</label>
-            <x-input type="text" name="department" :value="request('department')" placeholder="Cari departemen" />
+            <input type="text" name="department" value="{{ request('department') }}"
+                   class="w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   placeholder="Cari departemen">
         </div>
         <div class="md:col-span-2 flex items-end gap-3">
-            <x-primary-button class="flex-1">
+            <button type="submit"
+                    class="flex-1 px-6 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 font-medium shadow-sm inline-flex items-center justify-center">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 Filter
-            </x-primary-button>
+            </button>
             @if(request('status') || request('department'))
-                <x-link-button href="{{ route('admin.leaves') }}" type="secondary" class="px-6">
+                <a href="{{ route('admin.leaves.index') }}"
+                   class="px-6 py-2.5 rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors duration-200 font-medium">
                     Reset
-                </x-link-button>
+                </a>
             @endif
         </div>
     </div>
@@ -61,8 +65,8 @@
                     <tr class="hover:bg-slate-50 transition-colors duration-150">
                         <td class="px-6 py-4">
                             <div class="flex items-center space-x-3">
-                                <div class="flex-shrink-0 w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center">
-                                    <span class="text-xs font-bold text-blue-700">
+                                <div class="flex-shrink-0 w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center">
+                                    <span class="text-xs font-bold text-indigo-700">
                                         {{ strtoupper(substr($leave->user->name, 0, 1)) }}
                                     </span>
                                 </div>
@@ -81,7 +85,7 @@
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold capitalize">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold capitalize">
                                 {{ $leave->leave_type }}
                             </span>
                         </td>
@@ -99,7 +103,8 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right">
-                            <a href="{{ route('admin.leaves.show', $leave->id) }}" class="btn-secondary text-xs inline-flex items-center">
+                            <a href="{{ route('admin.leaves.show', $leave->id) }}"
+                               class="inline-flex items-center px-4 py-2 rounded-lg border border-blue-200 text-blue-600 hover:bg-blue-50 transition-colors duration-200 font-medium text-xs">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />

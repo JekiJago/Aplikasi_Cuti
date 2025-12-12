@@ -24,11 +24,32 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        try {
+            $request->authenticate();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        }
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Redirect berdasarkan role user
+        $user = Auth::user();
+        
+        // Debug: cek role user
+        \Log::info('Login successful', [
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'role' => $user->role,
+            'isAdmin' => $user->isAdmin(),
+        ]);
+        
+        if ($user->isAdmin()) {
+            // Redirect ke dashboard admin
+            return redirect()->route('admin.dashboard');
+        }
+        
+        // Redirect ke dashboard pegawai
+        return redirect()->route('dashboard');
     }
 
     /**

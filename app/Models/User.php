@@ -2,12 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable
 {
@@ -19,6 +16,7 @@ class User extends Authenticatable
         'employee_id',
         'password',
         'role',
+        'login_type',
         'position',
         'department',
         'gender',
@@ -26,10 +24,10 @@ class User extends Authenticatable
         'annual_leave_quota',
         'used_leave_days',
         'important_leave_used_days',
+        'sick_leave_used_days',
         'big_leave_used_days',
         'big_leave_last_used_at',
         'non_active_leave_used_days',
-        'sick_leave_used_days',
         'maternity_leave_used_count',
         'avatar',
     ];
@@ -40,56 +38,33 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'annual_leave_quota'         => 'integer',
-        'used_leave_days'            => 'integer',
-        'hire_date'                  => 'date',
-        'important_leave_used_days'  => 'integer',
-        'big_leave_used_days'        => 'integer',
-        'big_leave_last_used_at'     => 'datetime',
-        'non_active_leave_used_days' => 'integer',
-        'sick_leave_used_days'       => 'integer',
-        'maternity_leave_used_count' => 'integer',
+        'hire_date' => 'date',
+        'big_leave_last_used_at' => 'date',
+        'email_verified_at' => 'datetime',
     ];
 
-    /** Relationships */
-    public function leaveRequests(): HasMany
+    /**
+     * RELASI KE TABEL leave_requests
+     * Memperbaiki error: Call to undefined method User::leaveRequests()
+     */
+    public function leaveRequests()
     {
-        return $this->hasMany(\App\Models\LeaveRequest::class);
+        return $this->hasMany(\App\Models\LeaveRequest::class, 'user_id');
     }
 
-    public function notifications(): HasMany
-    {
-        return $this->hasMany(Notification::class);
-    }
-
-    public function activityLogs(): HasMany
-    {
-        return $this->hasMany(ActivityLog::class);
-    }
-
-    /** Helpers */
-    public function getRemainingLeaveDays(): int
-    {
-        $summary = app(\App\Services\LeaveBalanceService::class)->getAnnualLeaveSummary($this);
-
-        return $summary['total_available'];
-    }
-
+    /**
+     * Cek apakah user adalah admin
+     */
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
     }
 
+    /**
+     * Cek apakah user adalah pegawai biasa
+     */
     public function isEmployee(): bool
     {
         return $this->role === 'employee';
-    }
-
-    /** Optional: auto hash password ketika set attribute */
-    protected function password(): Attribute
-    {
-        return Attribute::make(
-            set: fn ($value) => $value ? Hash::make($value) : null,
-        );
     }
 }

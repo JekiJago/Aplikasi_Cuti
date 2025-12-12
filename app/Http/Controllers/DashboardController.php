@@ -6,6 +6,7 @@ use App\Models\LeaveRequest;
 use App\Models\User;
 use App\Services\LeaveBalanceService;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -16,37 +17,123 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
-        if ($user?->isAdmin()) {
-            $stats         = $this->adminStats();
-            $monthlyStats  = $this->monthlyChartData();
-            $recentLeaves  = LeaveRequest::with('user')->latest()->limit(5)->get();
+        // Jika admin → langsung tampilkan dashboard.admin
+        if ($user->isAdmin()) {
+            $stats            = $this->adminStats();
+            $monthlyStats     = $this->monthlyChartData();
+            $recentLeaves     = LeaveRequest::with('user')->latest()->limit(5)->get();
             $lowLeaveEmployees = $this->lowLeaveEmployees();
 
-            return view('dashboard.admin', compact('stats', 'monthlyStats', 'recentLeaves', 'lowLeaveEmployees'));
+            return view('dashboard.admin', compact(
+                'stats',
+                'monthlyStats',
+                'recentLeaves',
+                'lowLeaveEmployees'
+            ));
         }
 
+        // Jika pegawai → tampilkan dashboard pegawai
         $annualSummary = $this->leaveBalanceService->getAnnualLeaveSummary($user);
-        $recentLeaves  = $user?->leaveRequests()->latest()->limit(5)->get() ?? collect();
+        $recentLeaves  = $user->leaveRequests()->latest()->limit(5)->get();
 
-        return view('dashboard', compact('annualSummary', 'recentLeaves'));
+        return view('dashboard.index', compact('annualSummary', 'recentLeaves'));
+    }
+
+    public function admin()
+    {
+        $user = Auth::user();
+
+        if (!$user->isAdmin()) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $stats            = $this->adminStats();
+        $monthlyStats     = $this->monthlyChartData();
+        $recentLeaves     = LeaveRequest::with('user')->latest()->limit(5)->get();
+        $lowLeaveEmployees = $this->lowLeaveEmployees();
+
+        return view('dashboard.admin', compact(
+            'stats',
+            'monthlyStats',
+            'recentLeaves',
+            'lowLeaveEmployees'
+        ));
     }
 
     private function adminStats(): array
     {
+        $totalEmployees = User::where('role', 'employee')->count();
+        $pending = LeaveRequest::where('status', 'pending')->count();
+        $approved = LeaveRequest::where('status', 'approved')->count();
+        $rejected = LeaveRequest::where('status', 'rejected')->count();
+        $totalRequests = $pending + $approved + $rejected;
+
+        $approvalRate = $totalRequests > 0 ? round(($approved / $totalRequests) * 100, 1) : 0;
+        $rejectionRate = $totalRequests > 0 ? round(($rejected / $totalRequests) * 100, 1) : 0;
+
+        $avgLeaveDays = $this->calculateAvgLeaveDays();
+
+        $monthlyActivity = LeaveRequest::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        $employeeGrowth = $this->calculateEmployeeGrowth();
+
         return [
-            'employees' => User::where('role', 'employee')->count(),
-            'pending'   => LeaveRequest::where('status', 'pending')->count(),
-            'approved'  => LeaveRequest::where('status', 'approved')->count(),
-            'rejected'  => LeaveRequest::where('status', 'rejected')->count(),
+            'employees'        => $totalEmployees,
+            'employee_growth'  => $employeeGrowth,
+            'pending'          => $pending,
+            'approved'         => $approved,
+            'rejected'         => $rejected,
+            'approval_rate'    => $approvalRate,
+            'rejection_rate'   => $rejectionRate,
+            'avg_leave_days'   => $avgLeaveDays,
+            'monthly_activity' => $monthlyActivity,
+            'total_requests'   => $totalRequests,
         ];
+    }
+
+    private function calculateAvgLeaveDays(): float
+    {
+        $avgDays = LeaveRequest::where('status', 'approved')
+            ->selectRaw('AVG(DATEDIFF(end_date, start_date) + 1) as avg_days')
+            ->first();
+
+        return $avgDays ? round($avgDays->avg_days, 1) : 0;
+    }
+
+    private function calculateEmployeeGrowth(): float
+    {
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+        $lastMonth = $currentMonth == 1 ? 12 : $currentMonth - 1;
+        $lastMonthYear = $currentMonth == 1 ? $currentYear - 1 : $currentYear;
+
+        $currentMonthEmployees = User::where('role', 'employee')
+            ->whereMonth('created_at', $currentMonth)
+            ->whereYear('created_at', $currentYear)
+            ->count();
+
+        $lastMonthEmployees = User::where('role', 'employee')
+            ->whereMonth('created_at', $lastMonth)
+            ->whereYear('created_at', $lastMonthYear)
+            ->count();
+
+        if ($lastMonthEmployees == 0) {
+            return $currentMonthEmployees > 0 ? 100 : 0;
+        }
+
+        $growth = (($currentMonthEmployees - $lastMonthEmployees) / $lastMonthEmployees) * 100;
+        return round($growth, 1);
     }
 
     private function monthlyChartData(): Collection
     {
         $year = now()->year;
-        $raw  = LeaveRequest::selectRaw('MONTH(start_date) as month, status, COUNT(*) as total')
+
+        $raw = LeaveRequest::selectRaw('MONTH(start_date) as month, status, COUNT(*) as total')
             ->whereYear('start_date', $year)
             ->groupBy('month', 'status')
             ->get()
@@ -55,15 +142,11 @@ class DashboardController extends Controller
         return collect(range(1, 12))->map(function ($month) use ($raw) {
             $data = $raw->get($month, collect());
 
-            $approved = (int) optional($data->firstWhere('status', 'approved'))->total;
-            $rejected = (int) optional($data->firstWhere('status', 'rejected'))->total;
-            $pending  = (int) optional($data->firstWhere('status', 'pending'))->total;
-
             return [
                 'label'    => now()->setMonth($month)->translatedFormat('M'),
-                'approved' => $approved,
-                'rejected' => $rejected,
-                'pending'  => $pending,
+                'approved' => (int) optional($data->firstWhere('status', 'approved'))->total,
+                'rejected' => (int) optional($data->firstWhere('status', 'rejected'))->total,
+                'pending'  => (int) optional($data->firstWhere('status', 'pending'))->total,
             ];
         });
     }
@@ -73,20 +156,21 @@ class DashboardController extends Controller
         return User::where('role', 'employee')
             ->get()
             ->map(function ($employee) {
-                $summary   = $this->leaveBalanceService->getAnnualLeaveSummary($employee);
+                $summary = $this->leaveBalanceService->getAnnualLeaveSummary($employee);
+
                 $remaining = $summary['current_year_available'] ?? 0;
+                $quota     = $summary['quota_per_year'] ?? 0;
 
                 return (object) [
-                    'name'                   => $employee->name,
-                    'employee_id'            => $employee->employee_id,
-                    'annual_leave_quota'     => $summary['quota_per_year'] ?? 0,
-                    'current_year_used'      => $summary['quota_per_year'] - $remaining,
-                    'remaining_leave_days'   => $remaining,
+                    'name'                => $employee->name,
+                    'employee_id'         => $employee->employee_id,
+                    'annual_leave_quota'  => $quota,
+                    'current_year_used'   => $quota - $remaining,
+                    'remaining_leave_days'=> $remaining,
                 ];
             })
+            ->filter(fn($employee) => $employee->remaining_leave_days <= 5)
             ->sortBy('remaining_leave_days')
             ->take(5);
     }
 }
-
-

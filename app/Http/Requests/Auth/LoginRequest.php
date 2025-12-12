@@ -21,41 +21,88 @@ class LoginRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
+        $rules = [
+            'login' => ['required', 'string'],
+            'password' => ['required', 'string', 'max:8'],
+            'login_type' => ['required', 'in:email,employee_id'],
+        ];
+
+        // Tambahkan validasi khusus berdasarkan login_type
+        if ($this->input('login_type') === 'email') {
+            $rules['login'][] = 'email';
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Get the validation attributes that apply to the request.
+     */
+    public function attributes(): array
+    {
+        $loginType = $this->input('login_type');
+        
         return [
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
+            'login' => $loginType === 'email' ? 'Email' : 'ID Pegawai',
+            'password' => 'Password',
+            'login_type' => 'Jenis Login',
+        ];
+    }
+
+    /**
+     * Get the validation messages that apply to the request.
+     */
+    public function messages(): array
+    {
+        return [
+            'login.required' => ':attribute harus diisi',
+            'login.email' => 'Format email tidak valid',
+            'password.required' => 'Password harus diisi',
+            'password.max' => 'Password maksimal 8 karakter',
+            'login_type.required' => 'Jenis login harus dipilih',
+            'login_type.in' => 'Jenis login tidak valid',
         ];
     }
 
     /**
      * Attempt to authenticate the request's credentials.
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        // Cari user berdasarkan login_type
+        $loginType = $this->input('login_type');
+        $login = $this->input('login');
+        $password = $this->input('password');
 
+        // Query user berdasarkan login_type
+        if ($loginType === 'email') {
+            $user = \App\Models\User::where('email', $login)->first();
+        } else {
+            $user = \App\Models\User::where('employee_id', $login)->first();
+        }
+
+        // Jika user tidak ditemukan atau password salah
+        if (!$user || !\Illuminate\Support\Facades\Hash::check($password, $user->password)) {
+            RateLimiter::hit($this->throttleKey());
+            
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'login' => 'Email/ID Pegawai atau password salah',
             ]);
         }
 
+        // Login user
+        Auth::login($user, $this->boolean('remember'));
+        
         RateLimiter::clear($this->throttleKey());
     }
 
     /**
      * Ensure the login request is not rate limited.
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function ensureIsNotRateLimited(): void
     {
@@ -68,7 +115,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'login' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -80,6 +127,9 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        $loginType = $this->input('login_type');
+        $login = $this->input('login');
+        
+        return Str::transliterate(Str::lower($loginType . '|' . $login) . '|' . $this->ip());
     }
 }

@@ -14,7 +14,7 @@ class ProfileController extends Controller
         $user = auth()->user();
         $annualSummary = $leaveBalanceService->getAnnualLeaveSummary($user);
 
-        return view('profile.show', compact('user', 'annualSummary'));
+        return view('profile.edit', compact('user', 'annualSummary'));
     }
 
     public function edit()
