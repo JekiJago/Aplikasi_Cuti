@@ -35,10 +35,33 @@ class DashboardController extends Controller
         }
 
         // Jika pegawai → tampilkan dashboard pegawai
-        $annualSummary = $this->leaveBalanceService->getAnnualLeaveSummary($user);
+        $currentYear = now()->year;
+        $previousYear = $currentYear - 1;
+        
+        // Ambil summary untuk tahun berjalan
+        $currentYearSummary = $this->leaveBalanceService->getAnnualLeaveSummary($user, $currentYear);
+        
+        // Ambil summary untuk tahun sebelumnya
+        $previousYearSummary = $this->leaveBalanceService->getAnnualLeaveSummary($user, $previousYear);
+        
+        // Ambil data riwayat cuti terbaru
         $recentLeaves  = $user->leaveRequests()->latest()->limit(5)->get();
+        
+        // Hitung statistik cuti
+        $leaveStats = [
+            'pending' => $user->leaveRequests()->where('status', 'pending')->count(),
+            'approved' => $user->leaveRequests()->where('status', 'approved')->count(),
+            'rejected' => $user->leaveRequests()->where('status', 'rejected')->count(),
+        ];
 
-        return view('dashboard.index', compact('annualSummary', 'recentLeaves'));
+        return view('dashboard.index', compact(
+            'currentYearSummary',
+            'previousYearSummary',
+            'currentYear',
+            'previousYear',
+            'recentLeaves',
+            'leaveStats'
+        ));
     }
 
     public function admin()
@@ -156,16 +179,22 @@ class DashboardController extends Controller
         return User::where('role', 'employee')
             ->get()
             ->map(function ($employee) {
-                $summary = $this->leaveBalanceService->getAnnualLeaveSummary($employee);
-
-                $remaining = $summary['current_year_available'] ?? 0;
-                $quota     = $summary['quota_per_year'] ?? 0;
+                $currentYear = now()->year;
+                $previousYear = $currentYear - 1;
+                
+                $currentYearSummary = $this->leaveBalanceService->getAnnualLeaveSummary($employee, $currentYear);
+                $previousYearSummary = $this->leaveBalanceService->getAnnualLeaveSummary($employee, $previousYear);
+                
+                $remaining = ($currentYearSummary['current_year_available'] ?? 0) + 
+                            ($previousYearSummary['current_year_available'] ?? 0);
+                $quota     = $currentYearSummary['quota_per_year'] ?? 0;
 
                 return (object) [
                     'name'                => $employee->name,
                     'employee_id'         => $employee->employee_id,
                     'annual_leave_quota'  => $quota,
-                    'current_year_used'   => $quota - $remaining,
+                    'current_year_used'   => $quota - ($currentYearSummary['current_year_available'] ?? 0),
+                    'previous_year_used'  => $quota - ($previousYearSummary['current_year_available'] ?? 0),
                     'remaining_leave_days'=> $remaining,
                 ];
             })

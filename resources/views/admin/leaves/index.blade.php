@@ -11,6 +11,7 @@
     </div>
 </div>
 
+<!-- FILTER FORM YANG DIUBAH: GANTI DEPARTEMEN JADI NAMA/NIP -->
 <form method="GET" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
@@ -24,11 +25,12 @@
                 @endforeach
             </select>
         </div>
+        <!-- GANTI INI: dari departemen jadi nama/NIP -->
         <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Departemen</label>
-            <input type="text" name="department" value="{{ request('department') }}"
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Cari Pegawai (Nama/NIP)</label>
+            <input type="text" name="search" value="{{ request('search') }}"
                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                   placeholder="Cari departemen">
+                   placeholder="Nama atau NIP pegawai">
         </div>
         <div class="md:col-span-2 flex items-end gap-3">
             <button type="submit"
@@ -38,7 +40,7 @@
                 </svg>
                 Filter
             </button>
-            @if(request('status') || request('department'))
+            @if(request('status') || request('search'))
                 <a href="{{ route('admin.leaves.index') }}"
                    class="px-6 py-2.5 rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors duration-200 font-medium">
                     Reset
@@ -48,6 +50,7 @@
     </div>
 </form>
 
+<!-- TABEL TETAP SAMA PERSIS -->
 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-sm">

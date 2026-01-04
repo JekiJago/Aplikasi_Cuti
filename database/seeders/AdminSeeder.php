@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Models\AnnualQuota;
 use Illuminate\Support\Facades\Hash;
 
 class AdminSeeder extends Seeder
@@ -20,11 +21,17 @@ class AdminSeeder extends Seeder
                 'password'           => 'admin123',
                 'role'               => 'admin',
                 'login_type'         => 'email',
-                'position'           => 'HR Manager',
-                'department'         => 'Human Resources',
                 'gender'             => 'male',
                 'hire_date'          => now()->subYears(6),
-                'annual_leave_quota' => 20,
+                // Kuota cuti lifetime
+                'sick_leave_quota' => 12,
+                'personal_leave_quota' => 12,
+                'important_leave_quota' => 30,
+                'big_leave_quota' => 90,
+                'non_active_leave_quota' => 365,
+                'maternity_leave_quota' => 90,
+                'paternity_leave_quota' => 14,
+                'marriage_leave_quota' => 3,
             ],
             
             // PEGAWAI 1
@@ -35,16 +42,23 @@ class AdminSeeder extends Seeder
                 'password'           => '19850101',
                 'role'               => 'employee',
                 'login_type'         => 'employee_id',
-                'position'           => 'Staff IT',
-                'department'         => 'Information Technology',
                 'gender'             => 'male',
                 'hire_date'          => now()->subYears(3),
-                'annual_leave_quota' => 12,
-                'used_leave_days'    => 3,
+                // Kuota cuti lifetime
+                'sick_leave_quota' => 12,
+                'personal_leave_quota' => 12,
+                'important_leave_quota' => 30,
+                'big_leave_quota' => 90,
+                'non_active_leave_quota' => 365,
+                'maternity_leave_quota' => 90,
+                'paternity_leave_quota' => 14,
+                'marriage_leave_quota' => 3,
+                // Tracking penggunaan
                 'sick_leave_used_days' => 2,
+                'important_leave_used_days' => 1,
             ],
             
-            // PEGAWAI 2 (User dari seeder lama)
+            // PEGAWAI 2
             [
                 'name'               => 'User Employee',
                 'email'              => 'USR001@pegawai.local',
@@ -52,45 +66,21 @@ class AdminSeeder extends Seeder
                 'password'           => 'USR001',
                 'role'               => 'employee',
                 'login_type'         => 'employee_id',
-                'position'           => 'Staff Intelligence',
-                'department'         => 'Intelligence',
                 'gender'             => 'female',
                 'hire_date'          => now()->subYears(7),
-                'annual_leave_quota' => 20,
-                'used_leave_days'    => 8,
+                // Kuota cuti lifetime
+                'sick_leave_quota' => 12,
+                'personal_leave_quota' => 12,
+                'important_leave_quota' => 30,
+                'big_leave_quota' => 90,
+                'non_active_leave_quota' => 365,
+                'maternity_leave_quota' => 90,
+                'paternity_leave_quota' => 14,
+                'marriage_leave_quota' => 3,
+                // Tracking penggunaan
                 'important_leave_used_days' => 2,
                 'sick_leave_used_days' => 1,
-            ],
-            
-            // PEGAWAI 3
-            [
-                'name'               => 'Siti Nurhaliza',
-                'email'              => '2023001@pegawai.local',
-                'employee_id'        => '2023001',
-                'password'           => '2023001',
-                'role'               => 'employee',
-                'login_type'         => 'employee_id',
-                'position'           => 'HR Staff',
-                'department'         => 'Human Resources',
-                'gender'             => 'female',
-                'hire_date'          => now()->subMonths(6),
-                'annual_leave_quota' => 12,
-            ],
-            
-            // PEGAWAI 4
-            [
-                'name'               => 'Budi Santoso',
-                'email'              => '2023002@pegawai.local',
-                'employee_id'        => '2023002',
-                'password'           => '2023002',
-                'role'               => 'employee',
-                'login_type'         => 'employee_id',
-                'position'           => 'Sales Manager',
-                'department'         => 'Sales',
-                'gender'             => 'male',
-                'hire_date'          => now()->subMonths(4),
-                'annual_leave_quota' => 12,
-                'used_leave_days'    => 2,
+                'maternity_leave_used_count' => 1,
             ],
         ];
 
@@ -107,12 +97,18 @@ class AdminSeeder extends Seeder
         foreach ($users as $userData) {
             // Gabungkan dengan defaults
             $data = array_merge($defaults, $userData);
+            $data['password'] = Hash::make($data['password']);
             
             // Update atau create berdasarkan email untuk admin, employee_id untuk pegawai
             if ($data['role'] === 'admin') {
-                User::updateOrCreate(['email' => $data['email']], $data);
+                $user = User::updateOrCreate(['email' => $data['email']], $data);
             } else {
-                User::updateOrCreate(['employee_id' => $data['employee_id']], $data);
+                $user = User::updateOrCreate(['employee_id' => $data['employee_id']], $data);
+            }
+            
+            // Generate yearly quotas untuk user
+            if ($user->role === 'employee') {
+                $user->generateYearlyQuotas();
             }
         }
 
@@ -129,10 +125,6 @@ class AdminSeeder extends Seeder
         $this->command->info('   Password: 19850101');
         $this->command->info('2. ID Pegawai: USR001');
         $this->command->info('   Password: USR001');
-        $this->command->info('3. ID Pegawai: 2023001');
-        $this->command->info('   Password: 2023001');
-        $this->command->info('4. ID Pegawai: 2023002');
-        $this->command->info('   Password: 2023002');
         $this->command->info('==========================================');
         $this->command->info('CATATAN: Password semua user maksimal 8 karakter');
         $this->command->info('==========================================');

@@ -23,6 +23,91 @@
             </p>
         </div>
 
+        <!-- TAMBAHKAN INI: Estimasi Kuota -->
+        @if(session('quota_estimation'))
+        <div class="mb-6 bg-gradient-to-r from-blue-50 to-teal-50 border border-blue-200 rounded-2xl p-6 shadow-sm">
+            <div class="flex items-start mb-4">
+                <div class="p-2 bg-white rounded-xl shadow-sm mr-4">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-1">Estimasi Penggunaan Kuota Cuti</h4>
+                    <p class="text-sm text-gray-600 mb-3">
+                        Jika cuti tahunan disetujui, kuota akan dikurangi dengan prioritas:
+                    </p>
+                    
+                    <div class="space-y-3">
+                        <div class="bg-white rounded-xl p-4 border border-gray-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-medium text-gray-700">Total Hari Cuti</span>
+                                <span class="text-xl font-bold text-blue-600">{{ session('quota_estimation.total_days') }} hari</span>
+                            </div>
+                        </div>
+                        
+                        @if(!empty(session('quota_estimation.quota_usage')))
+                        <div class="bg-white rounded-xl p-4 border border-gray-200">
+                            <p class="font-medium text-gray-700 mb-3">Distribusi Penggunaan Kuota:</p>
+                            <div class="space-y-2">
+                                @foreach(session('quota_estimation.quota_usage') as $usage)
+                                <div class="flex items-center justify-between py-2 px-3 bg-blue-50 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 rounded-full 
+                                            @if($usage['year'] < now()->year) bg-amber-500 
+                                            @elseif($usage['year'] == now()->year) bg-green-500 
+                                            @else bg-blue-500 @endif mr-3"></div>
+                                        <span class="text-sm text-gray-700">{{ $usage['label'] }}</span>
+                                    </div>
+                                    <span class="text-xs font-semibold px-2 py-1 rounded-full 
+                                        @if($usage['year'] < now()->year) bg-amber-100 text-amber-800 
+                                        @elseif($usage['year'] == now()->year) bg-green-100 text-green-800 
+                                        @else bg-blue-100 text-blue-800 @endif">
+                                        Kuota {{ $usage['year'] }}
+                                    </span>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+                        
+                        @if(session('quota_estimation.remaining_after') > 0)
+                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-green-800">Sisa Kuota Setelah Cuti</p>
+                                    <p class="text-sm text-green-600">Kuota yang masih tersedia untuk pengajuan berikutnya</p>
+                                </div>
+                                <span class="text-2xl font-bold text-green-700">{{ session('quota_estimation.remaining_after') }} hari</span>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-xs text-gray-500 border-t border-blue-100 pt-4 mt-4">
+                <p class="flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Prioritas penggunaan: Sisa 2024 → Kuota 2025 → Kuota 2026 (jika diperlukan)
+                </p>
+            </div>
+        </div>
+        @endif
+
+        @if(session('quota_info'))
+        <div class="mb-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-blue-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+                <p class="text-sm text-blue-800">{{ session('quota_info') }}</p>
+            </div>
+        </div>
+        @endif
+
         <!-- Quota Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             @foreach ($quotaCards as $card)

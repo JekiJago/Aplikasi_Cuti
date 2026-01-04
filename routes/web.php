@@ -12,110 +12,237 @@ use App\Http\Controllers\AdminSettingController;
 
 /*
 |--------------------------------------------------------------------------
-| Guest Routes (Belum Login)
+| ROOT ROUTE
+|--------------------------------------------------------------------------
+| - Belum login  → /login
+| - Login admin  → /admin/dashboard
+| - Login pegawai→ /dashboard
+*/
+Route::get('/', function () {
+    if (!auth()->check()) {
+        return redirect()->route('login');
+    }
+
+    if (auth()->user()->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+
+    return redirect()->route('dashboard');
+});
+
+/*
+|--------------------------------------------------------------------------
+| GUEST ROUTES
 |--------------------------------------------------------------------------
 */
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::get('/login', [AuthenticatedSessionController::class, 'create'])
+        ->name('login');
+
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
-    
-    // Register hanya untuk admin create employee
-    Route::get('/register', function () {
-        return redirect()->route('login');
-    })->name('register');
 });
 
 /*
 |--------------------------------------------------------------------------
-| Protected Routes (Sudah Login)
+| AUTHENTICATED ROUTES
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-
-    // Logout
-    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-
-    // Dashboard utama (untuk semua user) - FIX INI!
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+        ->name('logout');
 
     /*
     |--------------------------------------------------------------------------
-    | Email Verification Route (FIX ERROR)
+    | DASHBOARD PEGAWAI
     |--------------------------------------------------------------------------
     */
-    Route::post('/email/verification-notification', function (\Illuminate\Http\Request $request) {
-        $request->user()->sendEmailVerificationNotification();
-        return back()->with('status', 'verification-link-sent');
-    })->middleware(['throttle:6,1'])->name('verification.send');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
     /*
     |--------------------------------------------------------------------------
-    | Employee Leave Requests
+    | LEAVE REQUESTS (PEGAWAI)
     |--------------------------------------------------------------------------
     */
-    Route::middleware('role:employee')->group(function () {
-        Route::resource('leave-requests', LeaveRequestController::class)
-            ->except(['edit', 'update'])
-            ->middleware('leave.owner');
-    });
+    Route::prefix('leave-requests')
+        ->name('leave-requests.')
+        ->controller(LeaveRequestController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{leaveRequest}', 'show')->name('show');
+            Route::delete('/{leaveRequest}', 'destroy')->name('destroy');
+            
+            // TAMBAHKAN ROUTES INI untuk approve/reject/cancel
+            Route::post('/{leaveRequest}/approve', 'approve')->name('approve');
+            Route::post('/{leaveRequest}/reject', 'reject')->name('reject');
+            Route::post('/{leaveRequest}/cancel', 'cancel')->name('cancel');
+        });
 
     /*
     |--------------------------------------------------------------------------
-    | Admin Panel
+    | USER PROFILE
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
 
-        // Dashboard Admin - TAMBAHKAN INI!
-        Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
-
-        // Leaves Management
-        Route::get('/leaves', [AdminLeaveController::class, 'index'])->name('leaves.index');
-        Route::get('/leaves/{id}', [AdminLeaveController::class, 'show'])->name('leaves.show');
-        Route::get('/leaves/{leave}/attachment', [AdminLeaveController::class, 'attachment'])->name('leaves.attachment');
-        Route::post('/leaves/{id}/approve', [AdminLeaveController::class, 'approve'])->name('leaves.approve');
-        Route::post('/leaves/{id}/reject', [AdminLeaveController::class, 'reject'])->name('leaves.reject');
-
-        // Employees Management
-        Route::resource('employees', AdminEmployeeController::class);
-        
-        // TAMBAH ROUTE UNTUK RESET PASSWORD
-        Route::post('/employees/{employee}/reset-password', [AdminEmployeeController::class, 'resetPassword'])
-            ->name('employees.reset-password');
-
-        // Settings Holidays
-        Route::get('/settings/holidays', [AdminSettingController::class, 'holidays'])->name('settings.holidays');
-        Route::post('/settings/holidays', [AdminSettingController::class, 'storeHoliday'])->name('settings.holidays.store');
-        Route::delete('/settings/holidays/{holiday}', [AdminSettingController::class, 'destroyHoliday'])->name('settings.holidays.destroy');
-    });
+    Route::put('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
 
     /*
     |--------------------------------------------------------------------------
-    | Profile Routes
+    | ADMIN PANEL
     |--------------------------------------------------------------------------
     */
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::middleware(['auth', 'role:admin'])
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+            // Dashboard Admin
+            Route::get('/dashboard', [DashboardController::class, 'admin'])
+                ->name('dashboard');
+
+            /*
+            |--------------------------------------------------------------------------
+            | EMPLOYEES MANAGEMENT
+            |--------------------------------------------------------------------------
+            */
+            Route::prefix('employees')
+                ->name('employees.')
+                ->group(function () {
+                    Route::get('/', [AdminEmployeeController::class, 'index'])
+                        ->name('index');
+
+                    Route::get('/create', [AdminEmployeeController::class, 'create'])
+                        ->name('create');
+
+                    Route::post('/', [AdminEmployeeController::class, 'store'])
+                        ->name('store');
+
+                    Route::get('/{employee}', [AdminEmployeeController::class, 'show'])
+                        ->name('show');
+
+                    Route::get('/{employee}/edit', [AdminEmployeeController::class, 'edit'])
+                        ->name('edit');
+
+                    Route::put('/{employee}', [AdminEmployeeController::class, 'update'])
+                        ->name('update');
+
+                    Route::delete('/{employee}', [AdminEmployeeController::class, 'destroy'])
+                        ->name('destroy');
+
+                    // Reset quota dan password
+                    Route::post('/{employee}/reset-quota', [AdminEmployeeController::class, 'resetQuota'])
+                        ->name('reset-quota');
+
+                    Route::post('/{employee}/reset-password', [AdminEmployeeController::class, 'resetPassword'])
+                        ->name('reset-password');
+                });
+
+            /*
+            |--------------------------------------------------------------------------
+            | ADMIN LEAVE REQUESTS MANAGEMENT
+            |--------------------------------------------------------------------------
+            */
+            Route::prefix('leaves')
+                ->name('leaves.')
+                ->group(function () {
+                    Route::get('/', [AdminLeaveController::class, 'index'])
+                        ->name('index');
+
+                    Route::get('/{leaveRequest}', [AdminLeaveController::class, 'show'])
+                        ->name('show');
+
+                    // ROUTE ATTACHMENT - YANG DITAMBAHKAN
+                    Route::get('/{leaveRequest}/attachment', [AdminLeaveController::class, 'attachment'])
+                        ->name('attachment');
+
+                    Route::put('/{leaveRequest}/approve', [AdminLeaveController::class, 'approve'])
+                        ->name('approve');
+
+                    Route::put('/{leaveRequest}/reject', [AdminLeaveController::class, 'reject'])
+                        ->name('reject');
+
+                    Route::put('/{leaveRequest}/cancel', [AdminLeaveController::class, 'cancelApproval'])
+                        ->name('cancel');
+
+                    // Statistics (jika diperlukan)
+                    Route::get('/statistics', [AdminLeaveController::class, 'statistics'])
+                        ->name('statistics');
+
+                    // Balance management
+                    Route::get('/{user}/balance', [AdminLeaveController::class, 'viewBalance'])
+                        ->name('balance.view');
+
+                    Route::post('/{user}/adjust-quota', [AdminLeaveController::class, 'adjustQuota'])
+                        ->name('balance.adjust');
+                });
+
+            /*
+            |--------------------------------------------------------------------------
+            | ADMIN SETTINGS
+            |--------------------------------------------------------------------------
+            */
+            Route::prefix('settings')
+                ->name('settings.')
+                ->group(function () {
+                    // General Settings
+                    Route::get('/', [AdminSettingController::class, 'index'])
+                        ->name('index');
+
+                    Route::put('/general', [AdminSettingController::class, 'updateGeneral'])
+                        ->name('update-general');
+
+                    Route::put('/leave-types', [AdminSettingController::class, 'updateLeaveTypes'])
+                        ->name('update-leave-types');
+
+                    // Holidays Management
+                    Route::prefix('holidays')->group(function () {
+                        Route::get('/', [AdminSettingController::class, 'holidays'])
+                            ->name('holidays');
+
+                        Route::get('/create', [AdminSettingController::class, 'createHoliday'])
+                            ->name('holidays.create');
+
+                        Route::post('/', [AdminSettingController::class, 'storeHoliday'])
+                            ->name('holidays.store');
+
+                        Route::get('/{holiday}/edit', [AdminSettingController::class, 'editHoliday'])
+                            ->name('holidays.edit');
+
+                        Route::put('/{holiday}', [AdminSettingController::class, 'updateHoliday'])
+                            ->name('holidays.update');
+
+                        Route::delete('/{holiday}', [AdminSettingController::class, 'destroyHoliday'])
+                            ->name('holidays.destroy');
+                    });
+
+                    // Work Schedule
+                    Route::get('/work-schedule', [AdminSettingController::class, 'workSchedule'])
+                        ->name('work-schedule');
+
+                    Route::put('/work-schedule', [AdminSettingController::class, 'updateWorkSchedule'])
+                        ->name('update-work-schedule');
+                });
+        });
 
     /*
     |--------------------------------------------------------------------------
-    | Notification Routes
+    | NOTIFICATIONS
     |--------------------------------------------------------------------------
     */
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
-});
+    Route::prefix('notifications')
+        ->name('notifications.')
+        ->group(function () {
+            Route::get('/', [NotificationController::class, 'index'])
+                ->name('index');
 
-/*
-|--------------------------------------------------------------------------
-| Root Redirect
-|--------------------------------------------------------------------------
-*/
-Route::get('/', function () {
-    return auth()->check()
-        ? redirect()->route('dashboard')
-        : redirect()->route('login');
+            Route::put('/{notification}/read', [NotificationController::class, 'markAsRead'])
+                ->name('read');
+
+            Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])
+                ->name('mark-all-read');
+        });
 });

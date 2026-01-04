@@ -18,33 +18,33 @@
             <p class="text-gray-600 ml-11">Ringkasan informasi cuti dan pengajuan Anda</p>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <!-- Kuota Tahunan -->
+        <!-- Stats Cards - 4 Kartu -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Kartu Cuti Menunggu -->
             <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 p-6 hover:shadow-2xl transition-shadow duration-300">
                 <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-gradient-to-r from-blue-100 to-blue-50 rounded-xl shadow-sm">
-                        <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    <div class="p-3 bg-gradient-to-r from-amber-100 to-amber-50 rounded-xl shadow-sm">
+                        <svg class="w-7 h-7 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
-                    <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                        Tahunan
+                    <span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-full">
+                        Menunggu
                     </span>
                 </div>
-                <p class="text-sm text-gray-500 mb-2">Kuota Tahunan</p>
+                <p class="text-sm text-gray-500 mb-2">Cuti Menunggu</p>
                 <p class="text-3xl font-bold text-gray-800 mb-1">
-                    {{ $annualSummary['quota_per_year'] ?? 0 }} hari
+                    {{ $leaveStats['pending'] ?? 0 }}
                 </p>
                 <p class="text-xs text-gray-500 flex items-center">
-                    <svg class="w-3 h-3 mr-1 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    <svg class="w-3 h-3 mr-1 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                     </svg>
-                    Alokasi standar per tahun
+                    Dalam proses persetujuan
                 </p>
             </div>
 
-            <!-- Sisa Tahun Berjalan -->
+            <!-- Kartu Cuti Disetujui -->
             <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 p-6 hover:shadow-2xl transition-shadow duration-300">
                 <div class="flex items-center justify-between mb-4">
                     <div class="p-3 bg-gradient-to-r from-emerald-100 to-emerald-50 rounded-xl shadow-sm">
@@ -53,54 +53,217 @@
                         </svg>
                     </div>
                     <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
-                        Tersedia
+                        Disetujui
                     </span>
                 </div>
-                <p class="text-sm text-gray-500 mb-2">Sisa Tahun Berjalan</p>
-                <p class="text-3xl font-bold text-emerald-600 mb-1">
-                    {{ $annualSummary['current_year_available'] ?? 0 }} hari
+                <p class="text-sm text-gray-500 mb-2">Cuti Disetujui</p>
+                <p class="text-3xl font-bold text-gray-800 mb-1">
+                    {{ $leaveStats['approved'] ?? 0 }}
                 </p>
                 <p class="text-xs text-gray-500 flex items-center">
                     <svg class="w-3 h-3 mr-1 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                     </svg>
-                    Sisa kuota tahun {{ date('Y') }}
+                    Telah mendapatkan persetujuan
                 </p>
             </div>
 
-            <!-- Total Dapat Dipakai -->
-            <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 p-6 hover:shadow-2xl transition-shadow duration-300">
+            <!-- Kartu Sisa Cuti Tahun {{ $currentYear }} -->
+            <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-blue-100 p-6 hover:shadow-2xl transition-shadow duration-300 border-l-4 border-blue-500">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-gradient-to-r from-blue-100 to-blue-50 rounded-xl shadow-sm">
+                        <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                        Tahun Berjalan
+                    </span>
+                </div>
+                <p class="text-sm text-gray-500 mb-2">Sisa Cuti {{ $currentYear }}</p>
+                <p class="text-3xl font-bold text-blue-600 mb-1">
+                    {{ $currentYearSummary['current_year_available'] ?? 0 }} hari
+                </p>
+                <div class="text-xs text-gray-500">
+                    @if(isset($currentYearSummary['details'][$currentYear]))
+                        @php
+                            $detail = $currentYearSummary['details'][$currentYear];
+                            $used = $detail['used'] ?? 0;
+                            $quota = $detail['quota'] ?? 0;
+                        @endphp
+                        <div class="flex items-center justify-between mb-1">
+                            <span>Terpakai: {{ $used }} hari</span>
+                            <span>Kuota: {{ $quota }} hari</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-1.5">
+                            <div class="bg-gradient-to-r from-blue-500 to-teal-500 h-1.5 rounded-full" 
+                                 style="width: {{ $quota > 0 ? min(100, round(($used / $quota) * 100)) : 0 }}%">
+                            </div>
+                        </div>
+                    @else
+                        <span class="text-amber-600">Kuota belum diatur</span>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Kartu Sisa Cuti Tahun {{ $previousYear }} -->
+            <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-teal-100 p-6 hover:shadow-2xl transition-shadow duration-300 border-l-4 border-teal-500">
                 <div class="flex items-center justify-between mb-4">
                     <div class="p-3 bg-gradient-to-r from-teal-100 to-teal-50 rounded-xl shadow-sm">
                         <svg class="w-7 h-7 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                     </div>
-                    @if(($annualSummary['total_available'] ?? 0) > 0)
-                        <span class="text-xs font-medium text-teal-600 bg-teal-50 px-2 py-1 rounded-full">
-                            {{ $annualSummary['total_available'] }} hari
-                        </span>
+                    <span class="text-xs font-medium text-teal-600 bg-teal-50 px-2 py-1 rounded-full">
+                        Tahun Sebelumnya
+                    </span>
+                </div>
+                <p class="text-sm text-gray-500 mb-2">Sisa Cuti {{ $previousYear }}</p>
+                <p class="text-3xl font-bold text-teal-600 mb-1">
+                    {{ $previousYearSummary['current_year_available'] ?? 0 }} hari
+                </p>
+                <div class="text-xs text-gray-500">
+                    @if(isset($previousYearSummary['details'][$previousYear]))
+                        @php
+                            $detail = $previousYearSummary['details'][$previousYear];
+                            $used = $detail['used'] ?? 0;
+                            $quota = $detail['quota'] ?? 0;
+                            $isExpired = $detail['is_expired'] ?? false;
+                        @endphp
+                        <div class="flex items-center justify-between mb-1">
+                            <span>Terpakai: {{ $used }} hari</span>
+                            <span>Kuota: {{ $quota }} hari</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-1.5">
+                            <div class="bg-gradient-to-r from-teal-500 to-emerald-500 h-1.5 rounded-full" 
+                                 style="width: {{ $quota > 0 ? min(100, round(($used / $quota) * 100)) : 0 }}%">
+                            </div>
+                        </div>
+                        @if($isExpired)
+                            <div class="mt-1 text-amber-600">
+                                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Kuota telah kadaluarsa
+                            </div>
+                        @endif
+                    @else
+                        <span class="text-amber-600">Kuota belum diatur</span>
                     @endif
                 </div>
-                <p class="text-sm text-gray-500 mb-2">Total Dapat Dipakai</p>
-                <p class="text-3xl font-bold text-teal-600 mb-1">
-                    {{ $annualSummary['total_available'] ?? 0 }} hari
-                </p>
-                <p class="text-xs text-gray-500">
-                    @if(optional($annualSummary['carry_over_expires_at'] ?? null))
-                        <svg class="w-3 h-3 inline mr-1 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+            </div>
+        </div>
+
+        <!-- Kartu Total Dapat Dipakai -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-emerald-100 p-6 hover:shadow-2xl transition-shadow duration-300 border-l-4 border-emerald-500">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-gradient-to-r from-emerald-100 to-emerald-50 rounded-xl shadow-sm">
+                        <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                         </svg>
-                        Termasuk carry-over hingga {{ $annualSummary['carry_over_expires_at']->format('d M Y') }}
-                    @else
-                        Kuota tahunan tersedia
-                    @endif
+                    </div>
+                    <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
+                        Total Tersedia
+                    </span>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500 mb-1">Tahun {{ $currentYear }}</p>
+                        <p class="text-2xl font-bold text-blue-600">
+                            {{ $currentYearSummary['current_year_available'] ?? 0 }}<span class="text-sm">hr</span>
+                        </p>
+                        @if(isset($currentYearSummary['details'][$currentYear]))
+                            <p class="text-xs text-gray-500 mt-1">
+                                {{ $currentYearSummary['details'][$currentYear]['used'] ?? 0 }}/{{ $currentYearSummary['details'][$currentYear]['quota'] ?? 0 }} hari
+                            </p>
+                        @endif
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500 mb-1">Tahun {{ $previousYear }}</p>
+                        <p class="text-2xl font-bold text-teal-600">
+                            {{ $previousYearSummary['current_year_available'] ?? 0 }}<span class="text-sm">hr</span>
+                        </p>
+                        @if(isset($previousYearSummary['details'][$previousYear]))
+                            <p class="text-xs text-gray-500 mt-1">
+                                {{ $previousYearSummary['details'][$previousYear]['used'] ?? 0 }}/{{ $previousYearSummary['details'][$previousYear]['quota'] ?? 0 }} hari
+                            </p>
+                        @endif
+                    </div>
+                </div>
+                <div class="mt-4">
+                    @php
+                        $totalCurrent = $currentYearSummary['current_year_available'] ?? 0;
+                        $totalPrevious = $previousYearSummary['current_year_available'] ?? 0;
+                        $totalAvailable = $totalCurrent + $totalPrevious;
+                        $maxQuota = max(1, 
+                            (($currentYearSummary['details'][$currentYear]['quota'] ?? 12) +
+                            ($previousYearSummary['details'][$previousYear]['quota'] ?? 12))
+                        );
+                        $percentage = $maxQuota > 0 ? min(100, round(($totalAvailable / $maxQuota) * 100)) : 0;
+                    @endphp
+                    <div class="flex justify-between text-xs text-gray-500 mb-1">
+                        <span>Total Kuota Tersedia</span>
+                        <span class="font-bold text-emerald-600">
+                            {{ $totalAvailable }} hari
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500 h-2 rounded-full" 
+                             style="width: {{ $percentage }}%">
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">
+                        Termasuk sisa kuota tahun sebelumnya yang masih berlaku
+                    </p>
+                </div>
+            </div>
+
+            <!-- Kartu Cuti Ditolak -->
+            <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 p-6 hover:shadow-2xl transition-shadow duration-300">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-gradient-to-r from-red-100 to-red-50 rounded-xl shadow-sm">
+                        <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-full">
+                        Ditolak
+                    </span>
+                </div>
+                <p class="text-sm text-gray-500 mb-2">Cuti Ditolak</p>
+                <p class="text-3xl font-bold text-gray-800 mb-1">
+                    {{ $leaveStats['rejected'] ?? 0 }}
                 </p>
+                <p class="text-xs text-gray-500 flex items-center">
+                    <svg class="w-3 h-3 mr-1 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                    Tidak mendapatkan persetujuan
+                </p>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-600">Total Pengajuan:</span>
+                        <span class="font-bold text-gray-800">
+                            {{ $leaveStats['pending'] + $leaveStats['approved'] + $leaveStats['rejected'] }}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm mt-2">
+                        <span class="text-gray-600">Persentase Disetujui:</span>
+                        <span class="font-bold text-emerald-600">
+                            @php
+                                $total = $leaveStats['pending'] + $leaveStats['approved'] + $leaveStats['rejected'];
+                                $rate = $total > 0 ? round(($leaveStats['approved'] / $total) * 100) : 0;
+                            @endphp
+                            {{ $rate }}%
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <!-- Ringkasan Tahunan -->
+            <!-- Ringkasan 2 Tahun -->
             <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                 <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
                     <div class="flex items-center justify-between">
@@ -108,65 +271,95 @@
                             <svg class="w-5 h-5 text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            <h3 class="text-lg font-semibold text-gray-800">Ringkasan Tahunan</h3>
+                            <h3 class="text-lg font-semibold text-gray-800">Ringkasan Kuota 2 Tahun</h3>
                         </div>
                         <span class="text-sm text-gray-600">
-                            {{ count($annualSummary['details'] ?? []) }} tahun
+                            {{ $previousYear }} - {{ $currentYear }}
                         </span>
                     </div>
                 </div>
                 <div class="divide-y divide-gray-100">
-                    @forelse(($annualSummary['details'] ?? []) as $year => $detail)
+                    @php
+                        $yearsData = [
+                            $currentYear => $currentYearSummary['details'][$currentYear] ?? null,
+                            $previousYear => $previousYearSummary['details'][$previousYear] ?? null,
+                        ];
+                    @endphp
+                    
+                    @foreach($yearsData as $year => $detail)
                         <div class="px-6 py-4 hover:bg-gray-50 transition-colors duration-150">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
-                                    <div class="p-2 bg-blue-50 rounded-lg mr-4">
-                                        <span class="text-sm font-bold text-blue-600">{{ $year }}</span>
+                                    <div class="p-2 
+                                        @if($year == $currentYear) bg-blue-50 text-blue-600
+                                        @else bg-teal-50 text-teal-600
+                                        @endif 
+                                        rounded-lg mr-4">
+                                        <span class="text-sm font-bold">{{ $year }}</span>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium text-gray-900">{{ $detail['available'] }} hari tersisa</p>
-                                        <p class="text-xs text-gray-500 mt-1">Terpakai: {{ $detail['used'] }} hari</p>
+                                        <p class="text-sm font-medium text-gray-900">
+                                            @if($detail)
+                                                {{ $detail['available'] }} hari tersisa
+                                                @if($detail['is_expired'] ?? false)
+                                                    <span class="ml-2 text-xs text-amber-600">(Kadaluarsa)</span>
+                                                @endif
+                                            @else
+                                                Kuota belum diatur
+                                            @endif
+                                        </p>
+                                        @if($detail)
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                Terpakai: {{ $detail['used'] }} hari | 
+                                                Kuota: {{ $detail['quota'] }} hari |
+                                                Sisa: {{ $detail['available'] }} hari
+                                            </p>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    @if($detail['available'] > 0)
-                                        <span class="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700">
-                                            Tersedia
-                                        </span>
+                                    @if($detail)
+                                        @if($detail['available'] > 0)
+                                            <span class="text-xs px-2 py-1 rounded-full 
+                                                @if($year == $currentYear) bg-blue-50 text-blue-700
+                                                @else bg-teal-50 text-teal-700
+                                                @endif">
+                                                Tersedia
+                                            </span>
+                                        @else
+                                            <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                                                Habis
+                                            </span>
+                                        @endif
                                     @else
-                                        <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
-                                            Habis
+                                        <span class="text-xs px-2 py-1 rounded-full bg-amber-50 text-amber-700">
+                                            Belum diatur
                                         </span>
                                     @endif
                                 </div>
                             </div>
                             <!-- Progress Bar -->
-                            @php
-                                $total = $detail['used'] + $detail['available'];
-                                $usedPercentage = $total > 0 ? round(($detail['used'] / $total) * 100) : 0;
-                            @endphp
-                            <div class="mt-3">
-                                <div class="flex justify-between text-xs text-gray-500 mb-1">
-                                    <span>Penggunaan</span>
-                                    <span>{{ $usedPercentage }}%</span>
+                            @if($detail && $detail['quota'] > 0)
+                                @php
+                                    $usedPercentage = round(($detail['used'] / $detail['quota']) * 100);
+                                @endphp
+                                <div class="mt-3">
+                                    <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                        <span>Penggunaan</span>
+                                        <span>{{ $usedPercentage }}%</span>
+                                    </div>
+                                    <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full 
+                                            @if($year == $currentYear) bg-gradient-to-r from-blue-500 to-teal-500
+                                            @else bg-gradient-to-r from-teal-500 to-emerald-500
+                                            @endif 
+                                            rounded-full transition-all duration-500" 
+                                             style="width: {{ $usedPercentage }}%"></div>
+                                    </div>
                                 </div>
-                                <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                                    <div class="h-full bg-gradient-to-r from-blue-500 to-teal-500 rounded-full transition-all duration-500" 
-                                         style="width: {{ $usedPercentage }}%"></div>
-                                </div>
-                            </div>
+                            @endif
                         </div>
-                    @empty
-                        <div class="px-6 py-8 text-center">
-                            <div class="mx-auto w-16 h-16 text-gray-300 mb-4">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                            </div>
-                            <p class="text-gray-500 font-medium">Belum ada data tahunan</p>
-                            <p class="text-gray-400 text-sm mt-1">Data akan tersedia setelah pengajuan pertama</p>
-                        </div>
-                    @endforelse
+                    @endforeach
                 </div>
             </div>
 
