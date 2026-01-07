@@ -34,15 +34,15 @@
                         </svg>
                         Detail
                     </a>
-                    <a href="{{ route('admin.employees.index') }}"
+    <a href="{{ route('admin.employees.index') }}"
                         class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg border border-gray-300 
                                text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 
                                transition-colors duration-200 shadow-sm">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                         </svg>
-                        Kembali
-                    </a>
+        Kembali
+    </a>
                 </div>
             </div>
         </div>
@@ -64,18 +64,18 @@
                         <p class="text-sm text-gray-600">ID: <span class="font-mono text-gray-800">{{ $employee->employee_id }}</span></p>
                     </div>
                 </div>
-            </div>
+</div>
 
             <!-- Form Content -->
             <form action="{{ route('admin.employees.update', $employee->id) }}" method="POST" class="p-6 space-y-8" id="editEmployeeForm">
-                @csrf
-                @method('PUT')
-                
+        @csrf
+        @method('PUT')
+
                 <!-- Input hidden untuk membedakan action -->
                 <input type="hidden" name="action" value="update_employee">
 
                 <!-- Informasi Dasar -->
-                <div>
+        <div>
                     <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
                         <svg class="w-5 h-5 inline-block mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -94,26 +94,26 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                         </svg>
                                     </div>
-                                    <input type="text"
-                                        name="name"
-                                        value="{{ old('name', $employee->name) }}"
-                                        required
+            <input type="text"
+                name="name"
+                value="{{ old('name', $employee->name) }}"
+                required
                                         class="block w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 bg-gray-50 
                                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white 
                                                transition-colors placeholder-gray-500 text-gray-800"
                                         placeholder="Masukkan nama lengkap pegawai"
-                                    >
+            >
                                 </div>
                             </label>
-                            @error('name')
+            @error('name')
                                 <div class="flex items-start space-x-2 text-red-600 text-sm mt-1 bg-red-50 px-3 py-2 rounded-lg">
                                     <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                                     </svg>
                                     <span>{{ $message }}</span>
                                 </div>
-                            @enderror
-                        </div>
+            @enderror
+        </div>
 
                         <!-- NIP Field -->
                         <div class="space-y-2">
@@ -125,7 +125,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/>
                                         </svg>
                                     </div>
-                                    <input type="text"
+            <input type="text"
                                         name="employee_id"
                                         value="{{ old('employee_id', $employee->employee_id) }}"
                                         required
@@ -224,7 +224,7 @@
                                     <input type="number"
                                         name="annual_leave_quota"
                                         value="{{ old('annual_leave_quota', $employee->annual_leave_quota ?? 12) }}"
-                                        required
+                required
                                         min="0"
                                         max="365"
                                         class="block w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 bg-gray-50 
@@ -298,8 +298,8 @@
                                     </svg>
                                     <span>{{ $message }}</span>
                                 </div>
-                            @enderror
-                        </div>
+            @enderror
+        </div>
 
                         <!-- Confirm Password -->
                         <div class="space-y-2">
@@ -356,8 +356,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
                         Simpan Perubahan Data Pegawai
-                    </button>
-                </div>
+            </button>
+        </div>
             </form>
         </div>
 
@@ -447,7 +447,7 @@
                         Simpan Penyesuaian Kuota
                     </button>
                 </div>
-            </form>
+    </form>
         </div>
 
         <!-- Status Info -->

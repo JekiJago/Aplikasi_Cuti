@@ -263,9 +263,9 @@ class LeaveBalanceService
             ];
         }
         
-        // Get all active quotas
+        // Get all active quotas (hanya 2 tahun terakhir: tahun berjalan + carry-over tahun sebelumnya)
         $currentYear = date('Y');
-        $activeYears = [$currentYear - 1, $currentYear, $currentYear + 1];
+        $activeYears = [$currentYear - 1, $currentYear];
         
         $quotas = AnnualQuota::where('user_id', $user->id)
             ->whereIn('year', $activeYears)
@@ -440,7 +440,8 @@ class LeaveBalanceService
         }
         
         $currentYear = date('Y');
-        $years = [$currentYear - 1, $currentYear, $currentYear + 1];
+        // Hanya 2 tahun terakhir: carry-over tahun sebelumnya + tahun berjalan
+        $years = [$currentYear - 1, $currentYear];
         
         $quotas = AnnualQuota::where('user_id', $userId)
             ->whereIn('year', $years)
