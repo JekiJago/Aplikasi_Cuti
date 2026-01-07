@@ -7,6 +7,7 @@ use App\Services\LeaveBalanceService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -35,18 +36,23 @@ class LeaveRequestController extends Controller
         }
 
         $leaveRequests = $query->paginate(10);
+        
+        // DAPATKAN DATA KUOTA YANG KONSISTEN
+        $currentYear = now()->year;
+        $currentYearSummary = $this->leaveBalanceService->getFixedAnnualLeaveSummary($user, $currentYear);
 
-        return view('leave-requests.index', compact('leaveRequests'));
+        return view('leave-requests.index', compact('leaveRequests', 'currentYearSummary'));
     }
 
     public function create()
     {
         $user          = auth()->user();
         $currentYear   = now()->year;
+        $previousYear  = $currentYear - 1;
         
-        // Ambil summary untuk tahun berjalan dan sebelumnya
-        $currentYearSummary = $this->leaveBalanceService->getAnnualLeaveSummary($user, $currentYear);
-        $previousYearSummary = $this->leaveBalanceService->getAnnualLeaveSummary($user, $currentYear - 1);
+        // GUNAKAN METHOD BARU YANG KONSISTEN DENGAN ADMIN
+        $currentYearSummary = $this->leaveBalanceService->getFixedAnnualLeaveSummary($user, $currentYear);
+        $previousYearSummary = $this->leaveBalanceService->getFixedAnnualLeaveSummary($user, $previousYear);
         
         // Get available annual leave with priority
         $availableQuota = $this->leaveBalanceService->getAvailableAnnualLeaveWithPriority($user->id);
@@ -63,7 +69,7 @@ class LeaveRequestController extends Controller
             'currentYearAvailable'=> $currentYearSummary['current_year_available'] ?? 12,
             'previousYearAvailable'=> $previousYearSummary['current_year_available'] ?? 0,
             'currentYear'         => $currentYear,
-            'previousYear'        => $currentYear - 1,
+            'previousYear'        => $previousYear,
             'quotaCards'          => $quotaCards,
             'quotaDetails'        => $quotaDetails,
         ]);
@@ -160,7 +166,8 @@ class LeaveRequestController extends Controller
 
         // Tambahkan info kuota tahun untuk cuti tahunan
         if ($leave->leave_type === 'tahunan') {
-            $quotaSummary = $this->leaveBalanceService->getBalanceBreakdown($leave->user_id);
+            $currentYear = now()->year;
+            $quotaSummary = $this->leaveBalanceService->getFixedAnnualLeaveSummary($leave->user, $currentYear);
             return view('leave-requests.show', compact('leave', 'quotaSummary'));
         }
 

@@ -14,67 +14,142 @@ class LeaveBalanceService
     private const DEFAULT_ANNUAL_QUOTA = 12;
 
     /**
-     * Get annual leave summary for a user
+     * NEW METHOD: Get annual leave summary with FIFO calculation (for consistency with admin)
      */
-    public function getAnnualLeaveSummary(User $user, ?int $referenceYear = null): array
+    public function getFixedAnnualLeaveSummary(User $user, int $year): array
     {
-        $year = $referenceYear ?? now()->year;
-
-        // Pastikan quota tergenerate
-        if (method_exists($user, 'generateYearlyQuotas')) {
-            $user->generateYearlyQuotas();
-        }
-
-        // Ambil kuota untuk tahun berjalan dan tahun sebelumnya
-        $quotas = AnnualQuota::where('user_id', $user->id)
-            ->whereIn('year', [$year, $year - 1])
-            ->orderBy('year', 'asc')
-            ->get();
-
+        // GUNAKAN FIFO BREAKDOWN YANG SAMA DENGAN ADMIN
+        $fifoBreakdown = AnnualQuota::getFIFOBreakdown($user->id);
+        $quotas = $fifoBreakdown['quotas'] ?? [];
+        
+        $previousYear = $year - 1;
+        
+        // Hitung total available sesuai FIFO
         $totalAvailable = 0;
         $details = [];
-
-        foreach ($quotas as $quota) {
-            $available = max(0, $quota->annual_quota - $quota->used_days);
-            $isActive = !$quota->is_expired;
-
-            $details[$quota->year] = [
-                'label' => $quota->year,
-                'quota' => $quota->annual_quota,
-                'used' => $quota->used_days,
-                'available' => $available,
-                'is_active' => $isActive,
-                'is_expired' => $quota->is_expired,
-            ];
-
-            if ($isActive) {
-                $totalAvailable += $available;
+        
+        // Ambil data untuk tahun yang diminta dan tahun sebelumnya
+        $yearsToShow = [$previousYear, $year];
+        
+        foreach ($yearsToShow as $yearKey) {
+            if (isset($quotas[$yearKey])) {
+                $quotaData = $quotas[$yearKey];
+                $available = $quotaData['remaining'] ?? 0;
+                
+                // Ambil data asli dari database
+                $dbQuota = AnnualQuota::where('user_id', $user->id)
+                    ->where('year', $yearKey)
+                    ->first();
+                
+                $isExpired = $dbQuota ? $dbQuota->is_expired : ($yearKey < (date('Y') - 1));
+                
+                $details[$yearKey] = [
+                    'label' => $yearKey,
+                    'quota' => $quotaData['total'] ?? 0,
+                    'used' => $quotaData['used'] ?? 0,
+                    'available' => $available,
+                    'is_active' => !$isExpired,
+                    'is_expired' => $isExpired,
+                ];
+                
+                if (!$isExpired) {
+                    $totalAvailable += $available;
+                }
+            } else {
+                // Default jika tidak ada data
+                $defaultQuota = $user->annual_leave_quota ?? self::DEFAULT_ANNUAL_QUOTA;
+                $isExpired = $yearKey < (date('Y') - 1);
+                
+                $details[$yearKey] = [
+                    'label' => $yearKey,
+                    'quota' => $defaultQuota,
+                    'used' => 0,
+                    'available' => $isExpired ? 0 : $defaultQuota,
+                    'is_active' => !$isExpired,
+                    'is_expired' => $isExpired,
+                ];
+                
+                if (!$isExpired) {
+                    $totalAvailable += $defaultQuota;
+                }
             }
         }
 
-        // Tambahkan tahun berjalan jika belum ada
-        if (!isset($details[$year])) {
-            $defaultQuota = $user->annual_leave_quota ?? self::DEFAULT_ANNUAL_QUOTA;
-            $details[$year] = [
-                'label' => $year,
-                'quota' => $defaultQuota,
-                'used' => 0,
-                'available' => $defaultQuota,
-                'is_active' => true,
-                'is_expired' => false,
-            ];
-            $totalAvailable += $defaultQuota;
-        }
-
-        krsort($details);
-
+        // FORMAT UNTUK KOMPATIBILITAS DENGAN VIEW LAMA
         return [
             'year' => $year,
             'total_available' => $totalAvailable,
             'current_year_available' => $details[$year]['available'] ?? 0,
-            'previous_year_available' => $details[$year - 1]['available'] ?? 0,
+            'previous_year_available' => $details[$previousYear]['available'] ?? 0,
+            'quota_per_year' => $user->annual_leave_quota ?? self::DEFAULT_ANNUAL_QUOTA,
             'details' => $details,
-            'carry_over_expires_at' => Carbon::create($year, 12, 31, 23, 59, 59),
+            'fifo_breakdown' => $fifoBreakdown,
+        ];
+    }
+
+    /**
+     * Get annual leave summary for a user - DIPERBAIKI untuk konsisten dengan admin
+     */
+    public function getAnnualLeaveSummary(User $user, ?int $referenceYear = null): array
+    {
+        // PANGGIL METHOD BARU YANG SUDAH FIX
+        $year = $referenceYear ?? now()->year;
+        return $this->getFixedAnnualLeaveSummary($user, $year);
+    }
+
+    /**
+     * Get annual leave summary for employee dashboard (optimized dan konsisten dengan admin)
+     */
+    public function getEmployeeDashboardBalance(int $userId): array
+    {
+        $user = User::findOrFail($userId);
+        
+        // Gunakan FIFO breakdown untuk konsistensi dengan admin
+        $fifoBreakdown = AnnualQuota::getFIFOBreakdown($userId);
+        $quotas = $fifoBreakdown['quotas'] ?? [];
+        
+        $currentYear = date('Y');
+        $previousYear = $currentYear - 1;
+        
+        $prevYearData = $quotas[$previousYear] ?? ['total' => 0, 'used' => 0, 'remaining' => 0];
+        $currentYearData = $quotas[$currentYear] ?? ['total' => 0, 'used' => 0, 'remaining' => 0];
+        
+        // Total aktif = sisa tahun lalu + sisa tahun ini (sesuai FIFO)
+        $totalActiveBalance = $prevYearData['remaining'] + $currentYearData['remaining'];
+        
+        // Hitung penggunaan kuota tahun sebelumnya untuk cuti di tahun berjalan
+        $usedFromPrevForCurrentYear = $fifoBreakdown['used_from_previous_for_current_year'] ?? 0;
+        
+        // Ambil data real dari database untuk perbandingan
+        $prevYearQuota = AnnualQuota::where('user_id', $userId)
+            ->where('year', $previousYear)
+            ->first();
+            
+        $currentYearQuota = AnnualQuota::where('user_id', $userId)
+            ->where('year', $currentYear)
+            ->first();
+        
+        return [
+            'total_available' => $totalActiveBalance,
+            'previous_year' => [
+                'year' => $previousYear,
+                'quota' => $prevYearData['total'],
+                'used' => $prevYearData['used'],
+                'remaining' => $prevYearData['remaining'],
+                'real_used_days' => $prevYearQuota->used_days ?? 0,
+                'is_expired' => $prevYearQuota->is_expired ?? false,
+            ],
+            'current_year' => [
+                'year' => $currentYear,
+                'quota' => $currentYearData['total'],
+                'used' => $currentYearData['used'],
+                'remaining' => $currentYearData['remaining'],
+                'real_used_days' => $currentYearQuota->used_days ?? 0,
+                'is_expired' => $currentYearQuota->is_expired ?? false,
+            ],
+            'used_from_previous_for_current_year' => $usedFromPrevForCurrentYear,
+            'fifo_breakdown' => $fifoBreakdown,
+            'is_consistent' => true,
         ];
     }
 
@@ -435,47 +510,44 @@ class LeaveBalanceService
     public function getAvailableAnnualLeaveWithPriority(int $userId): array
     {
         $user = User::findOrFail($userId);
-        if (method_exists($user, 'generateYearlyQuotas')) {
-            $user->generateYearlyQuotas();
-        }
         
-        $currentYear = date('Y');
-        $years = [$currentYear - 1, $currentYear, $currentYear + 1];
-        
-        $quotas = AnnualQuota::where('user_id', $userId)
-            ->whereIn('year', $years)
-            ->orderBy('year', 'asc')
-            ->get();
+        // Gunakan FIFO breakdown untuk konsistensi
+        $fifoBreakdown = AnnualQuota::getFIFOBreakdown($userId);
+        $quotas = $fifoBreakdown['quotas'] ?? [];
         
         $available = [];
         $total = 0;
         
-        foreach ($quotas as $quota) {
-            if (!$quota->is_expired) {
-                $remaining = max(0, $quota->annual_quota - $quota->used_days);
-                $available[$quota->year] = [
-                    'quota' => $quota->annual_quota,
-                    'used' => $quota->used_days,
+        $currentYear = date('Y');
+        
+        foreach ($quotas as $year => $quotaData) {
+            if ($year >= ($currentYear - 1)) { // Hanya tahun aktif
+                $remaining = $quotaData['remaining'] ?? 0;
+                $available[$year] = [
+                    'quota' => $quotaData['total'] ?? 0,
+                    'used' => $quotaData['used'] ?? 0,
                     'remaining' => $remaining,
-                    'is_expired' => $quota->is_expired
+                    'is_expired' => $year < ($currentYear - 1)
                 ];
                 $total += $remaining;
             }
         }
         
-        // Add future years if not exists
-        foreach ($years as $year) {
-            if (!isset($available[$year])) {
-                $isExpired = $year < ($currentYear - 1);
-                $available[$year] = [
-                    'quota' => self::DEFAULT_ANNUAL_QUOTA,
-                    'used' => 0,
-                    'remaining' => $isExpired ? 0 : self::DEFAULT_ANNUAL_QUOTA,
-                    'is_expired' => $isExpired
+        // Tambahkan tahun depan jika perlu
+        $nextYear = $currentYear + 1;
+        if (!isset($available[$nextYear])) {
+            $nextQuota = AnnualQuota::where('user_id', $userId)
+                ->where('year', $nextYear)
+                ->first();
+                
+            if ($nextQuota) {
+                $remaining = max(0, $nextQuota->annual_quota - $nextQuota->used_days);
+                $available[$nextYear] = [
+                    'quota' => $nextQuota->annual_quota,
+                    'used' => $nextQuota->used_days,
+                    'remaining' => $remaining,
+                    'is_expired' => $nextQuota->is_expired
                 ];
-                if (!$isExpired) {
-                    $total += self::DEFAULT_ANNUAL_QUOTA;
-                }
             }
         }
         
@@ -484,7 +556,8 @@ class LeaveBalanceService
         return [
             'total_available' => $total,
             'breakdown' => $available,
-            'priority_order' => array_keys($available)
+            'priority_order' => array_keys($available),
+            'fifo_breakdown' => $fifoBreakdown
         ];
     }
 
