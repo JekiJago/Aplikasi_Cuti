@@ -290,6 +290,15 @@ class AdminEmployeeController extends Controller
             Log::info('AdminEmployeeController Update - Annual Quota Data:', $request->annual_quota);
             
             foreach ($request->annual_quota as $year => $quota) {
+                // Cari kuota yang sudah ada
+                $existingQuota = AnnualQuota::where([
+                    'user_id' => $employee->id,
+                    'year' => $year
+                ])->first();
+                
+                // Pertahankan used_days yang sudah ada
+                $usedDays = $existingQuota ? $existingQuota->used_days : 0;
+                
                 $currentYear = date('Y');
                 $isExpired = $year < ($currentYear - 1);
                 
@@ -300,7 +309,7 @@ class AdminEmployeeController extends Controller
                     ],
                     [
                         'annual_quota' => $quota,
-                        'used_days' => $request->used_days[$year] ?? 0,
+                        'used_days' => $usedDays, // ✅ Pertahankan nilai used_days
                         'is_expired' => $isExpired
                     ]
                 );
@@ -322,7 +331,7 @@ class AdminEmployeeController extends Controller
                         ],
                         [
                             'annual_quota' => $employee->annual_leave_quota ?? 12,
-                            'used_days' => 0,
+                            'used_days' => 0, // ✅ Ini benar karena RESET memang mengulang dari 0
                             'is_expired' => $isExpired
                         ]
                     );
@@ -337,51 +346,85 @@ class AdminEmployeeController extends Controller
     }
 
     /**
-     * Handle penyesuaian kuota khusus
+     * Handle penyesuaian kuota khusus (FIX FINAL)
      */
     private function handleQuotaAdjustment(Request $request, $employee)
     {
         Log::info('Handle Quota Adjustment - Request Data:', $request->all());
-        
+
+        // PERBAIKAN: Validasi menerima nilai negatif
         $request->validate([
             'quota_adjustment_year' => 'required|integer|min:2000|max:' . (date('Y') + 2),
-            'quota_adjustment_quota' => 'required|integer|min:0|max:365',
+            'quota_adjustment_quota' => 'required|integer|min:-365|max:365',
             'quota_adjustment_reason' => 'required|string|max:500',
         ]);
 
         try {
-            $oldQuota = $employee->getYearlyQuota($request->quota_adjustment_year);
-            
-            // Update kuota
-            AnnualQuota::updateOrCreate(
+            // 1️⃣ Ambil kuota tahunan yang ada (atau buat jika belum ada)
+            $annualQuota = AnnualQuota::firstOrCreate(
                 [
                     'user_id' => $employee->id,
                     'year' => $request->quota_adjustment_year,
                 ],
                 [
-                    'annual_quota' => $request->quota_adjustment_quota,
+                    'annual_quota' => $employee->annual_leave_quota ?? 12,
                     'used_days' => 0,
-                    'is_expired' => $request->quota_adjustment_year < (date('Y') - 1),
+                    'is_expired' => false,
                 ]
             );
-            
-            // Simpan riwayat penyesuaian
+
+            $oldQuota = $annualQuota->annual_quota;
+            $usedDays = $annualQuota->used_days;
+
+            // 2️⃣ HITUNG KUOTA BARU (INI KUNCI)
+            $newQuota = $oldQuota + $request->quota_adjustment_quota;
+
+            // 3️⃣ VALIDASI LOGIS - Pastikan kuota baru tidak negatif
+            if ($newQuota < 0) {
+                return back()->with(
+                    'error',
+                    'Kuota tidak boleh negatif. Kuota lama: ' . $oldQuota . ', Penyesuaian: ' . $request->quota_adjustment_quota . ' = ' . $newQuota
+                );
+            }
+
+            // 4️⃣ VALIDASI LOGIS - Pastikan kuota baru tidak lebih kecil dari cuti terpakai
+            if ($newQuota < $usedDays) {
+                return back()->with(
+                    'error',
+                    'Kuota baru (' . $newQuota . ') tidak boleh lebih kecil dari cuti yang sudah terpakai (' . $usedDays . ').'
+                );
+            }
+
+            // 5️⃣ UPDATE KUOTA UTAMA (BUKAN DITIMPA)
+            $annualQuota->update([
+                'annual_quota' => $newQuota,
+                'is_expired' => $request->quota_adjustment_year < (date('Y') - 1),
+            ]);
+
+            // 6️⃣ SIMPAN RIWAYAT PENYESUAIAN
             QuotaAdjustment::create([
                 'user_id' => $employee->id,
                 'admin_id' => auth()->id(),
                 'year' => $request->quota_adjustment_year,
                 'old_quota' => $oldQuota,
-                'new_quota' => $request->quota_adjustment_quota,
+                'new_quota' => $newQuota,
+                'adjustment_amount' => $request->quota_adjustment_quota,
                 'reason' => $request->quota_adjustment_reason,
             ]);
 
-            Log::info('Quota adjustment successful for employee: ' . $employee->id);
+            // 7️⃣ REFRESH FIFO
+            $this->leaveBalanceService->refreshExpiredQuotas();
 
-            return redirect()->route('admin.employees.show', $employee->id)
-                ->with('success', 'Penyesuaian kuota berhasil ditambahkan.');
+            Log::info('Quota adjustment SUCCESS for employee: ' . $employee->id);
+            Log::info('Old quota: ' . $oldQuota . ', Adjustment: ' . $request->quota_adjustment_quota . ', New quota: ' . $newQuota);
+
+            return redirect()
+                ->route('admin.employees.show', $employee->id)
+                ->with('success', 'Penyesuaian kuota berhasil. Kuota baru: ' . $newQuota . ' hari (dari ' . $oldQuota . ' hari).');
 
         } catch (\Exception $e) {
-            Log::error('Quota adjustment failed: ' . $e->getMessage());
+            Log::error('Quota adjustment FAILED: ' . $e->getMessage());
+
             return back()
                 ->withInput()
                 ->with('error', 'Gagal menyesuaikan kuota: ' . $e->getMessage());
@@ -426,6 +469,7 @@ class AdminEmployeeController extends Controller
         ]);
         
         try {
+            // RESET kuota memang harus mengembalikan used_days ke 0
             AnnualQuota::where('user_id', $employee->id)
                 ->where('year', $request->year)
                 ->update(['used_days' => 0]);
@@ -484,6 +528,14 @@ class AdminEmployeeController extends Controller
                 try {
                     $employee = User::find($employeeId);
                     if ($employee) {
+                        // === PERBAIKAN: Cari kuota yang sudah ada ===
+                        $existingQuota = AnnualQuota::where([
+                            'user_id' => $employeeId,
+                            'year' => $request->year,
+                        ])->first();
+                        
+                        $usedDays = $existingQuota ? $existingQuota->used_days : 0;
+                        
                         AnnualQuota::updateOrCreate(
                             [
                                 'user_id' => $employeeId,
@@ -491,7 +543,7 @@ class AdminEmployeeController extends Controller
                             ],
                             [
                                 'annual_quota' => $request->quota_days,
-                                'used_days' => 0,
+                                'used_days' => $usedDays, // ✅ Pertahankan nilai used_days
                                 'is_expired' => $request->year < (date('Y') - 1),
                             ]
                         );

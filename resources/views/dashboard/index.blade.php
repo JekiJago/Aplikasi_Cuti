@@ -300,7 +300,11 @@
                                     <div>
                                         <p class="text-sm font-medium text-gray-900">
                                             @if($detail)
-                                                {{ $detail['available'] }} hari tersisa
+                                                @if($year == $currentYear)
+                                                    {{ $currentYearSummary['current_year_available'] }} hari tersisa
+                                                @else
+                                                    {{ $previousYearSummary['current_year_available'] }} hari tersisa
+                                                @endif
                                                 @if($detail['is_expired'] ?? false)
                                                     <span class="ml-2 text-xs text-amber-600">(Kadaluarsa)</span>
                                                 @endif
@@ -312,24 +316,39 @@
                                             <p class="text-xs text-gray-500 mt-1">
                                                 Terpakai: {{ $detail['used'] }} hari | 
                                                 Kuota: {{ $detail['quota'] }} hari |
-                                                Sisa: {{ $detail['available'] }} hari
+                                                Sisa: 
+                                                @if($year == $currentYear)
+                                                    {{ $currentYearSummary['current_year_available'] }}
+                                                @else
+                                                    {{ $previousYearSummary['current_year_available'] }}
+                                                @endif
+                                                hari
                                             </p>
                                         @endif
                                     </div>
                                 </div>
                                 <div class="text-right">
                                     @if($detail)
-                                        @if($detail['available'] > 0)
-                                            <span class="text-xs px-2 py-1 rounded-full 
-                                                @if($year == $currentYear) bg-blue-50 text-blue-700
-                                                @else bg-teal-50 text-teal-700
-                                                @endif">
-                                                Tersedia
-                                            </span>
+                                        @if($year == $currentYear)
+                                            @if($currentYearSummary['current_year_available'] > 0)
+                                                <span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700">
+                                                    Tersedia
+                                                </span>
+                                            @else
+                                                <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                                                    Habis
+                                                </span>
+                                            @endif
                                         @else
-                                            <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
-                                                Habis
-                                            </span>
+                                            @if($previousYearSummary['current_year_available'] > 0)
+                                                <span class="text-xs px-2 py-1 rounded-full bg-teal-50 text-teal-700">
+                                                    Tersedia
+                                                </span>
+                                            @else
+                                                <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                                                    Habis
+                                                </span>
+                                            @endif
                                         @endif
                                     @else
                                         <span class="text-xs px-2 py-1 rounded-full bg-amber-50 text-amber-700">

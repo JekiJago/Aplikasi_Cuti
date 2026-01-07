@@ -34,15 +34,13 @@ class DashboardController extends Controller
             ));
         }
 
-        // Jika pegawai → tampilkan dashboard pegawai
+        // Jika pegawai → tampilkan dashboard pegawai dengan PERHITUNGAN YANG BENAR
         $currentYear = now()->year;
         $previousYear = $currentYear - 1;
         
-        // Ambil summary untuk tahun berjalan
-        $currentYearSummary = $this->leaveBalanceService->getAnnualLeaveSummary($user, $currentYear);
-        
-        // Ambil summary untuk tahun sebelumnya
-        $previousYearSummary = $this->leaveBalanceService->getAnnualLeaveSummary($user, $previousYear);
+        // GUNAKAN METHOD BARU YANG MEMAKAI FIFO BREAKDOWN (SAMA DENGAN ADMIN)
+        $currentYearSummary = $this->leaveBalanceService->getFixedAnnualLeaveSummary($user, $currentYear);
+        $previousYearSummary = $this->leaveBalanceService->getFixedAnnualLeaveSummary($user, $previousYear);
         
         // Ambil data riwayat cuti terbaru
         $recentLeaves  = $user->leaveRequests()->latest()->limit(5)->get();
@@ -182,8 +180,9 @@ class DashboardController extends Controller
                 $currentYear = now()->year;
                 $previousYear = $currentYear - 1;
                 
-                $currentYearSummary = $this->leaveBalanceService->getAnnualLeaveSummary($employee, $currentYear);
-                $previousYearSummary = $this->leaveBalanceService->getAnnualLeaveSummary($employee, $previousYear);
+                // GUNAKAN SERVICE YANG SAMA
+                $currentYearSummary = $this->leaveBalanceService->getFixedAnnualLeaveSummary($employee, $currentYear);
+                $previousYearSummary = $this->leaveBalanceService->getFixedAnnualLeaveSummary($employee, $previousYear);
                 
                 $remaining = ($currentYearSummary['current_year_available'] ?? 0) + 
                             ($previousYearSummary['current_year_available'] ?? 0);
@@ -193,9 +192,11 @@ class DashboardController extends Controller
                     'name'                => $employee->name,
                     'employee_id'         => $employee->employee_id,
                     'annual_leave_quota'  => $quota,
-                    'current_year_used'   => $quota - ($currentYearSummary['current_year_available'] ?? 0),
-                    'previous_year_used'  => $quota - ($previousYearSummary['current_year_available'] ?? 0),
+                    'current_year_used'   => $currentYearSummary['details'][$currentYear]['used'] ?? 0,
+                    'previous_year_used'  => $previousYearSummary['details'][$previousYear]['used'] ?? 0,
                     'remaining_leave_days'=> $remaining,
+                    'current_year_remaining' => $currentYearSummary['current_year_available'] ?? 0,
+                    'previous_year_remaining' => $previousYearSummary['current_year_available'] ?? 0,
                 ];
             })
             ->filter(fn($employee) => $employee->remaining_leave_days <= 5)

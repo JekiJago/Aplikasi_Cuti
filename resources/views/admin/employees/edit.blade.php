@@ -416,12 +416,16 @@
                     
                     <div>
                         <label for="quota_adjustment_quota" class="block text-sm font-medium text-gray-700 mb-1">
-                            Kuota (hari) <span class="text-red-500">*</span>
+                            Penyesuaian (hari) <span class="text-red-500">*</span>
                         </label>
                         <input type="number" id="quota_adjustment_quota" name="quota_adjustment_quota" 
-                               min="0" max="365" value="{{ $employee->annual_leave_quota ?? 12 }}" required
+                               min="-365" max="365" value="0" required  PERBAIKAN: min="-365" 
                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg bg-gray-50
-                                      focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:bg-white">
+                                      focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:bg-white"
+                               placeholder="Contoh: +5 (tambah) atau -5 (kurang)">
+                        <p class="text-xs text-gray-500 mt-1">
+                            Masukkan nilai positif untuk menambah kuota, negatif untuk mengurangi.
+                        </p>
                     </div>
                     
                     <div>
@@ -494,9 +498,9 @@
         const quota = this.querySelector('input[name="quota_adjustment_quota"]').value;
         const reason = this.querySelector('input[name="quota_adjustment_reason"]').value;
         
-        if (parseInt(quota) > 365) {
+        if (parseInt(quota) > 365 || parseInt(quota) < -365) {
             e.preventDefault();
-            alert('Kuota maksimal 365 hari!');
+            alert('Penyesuaian kuota harus antara -365 dan +365 hari!');
             return false;
         }
         
