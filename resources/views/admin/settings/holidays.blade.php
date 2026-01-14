@@ -65,17 +65,17 @@
 
         <!-- Main Content Card -->
         <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden mb-6">
-            <!-- Card Header -->
-            <div class="bg-gradient-to-r from-blue-50 to-teal-50 px-6 py-4 border-b border-gray-200">
+            <!-- Card Header - Menggunakan Hijau Kejaksaan -->
+            <div class="bg-gradient-to-r from-[#0B5E2E] to-[#083D1D] px-6 py-4 border-b border-[#DCE5DF]">
                 <div class="flex items-center">
                     <div class="p-2 bg-white rounded-lg shadow-sm mr-3">
-                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-800">Kelola Hari Libur Nasional</h2>
-                        <p class="text-sm text-gray-600">Total: <span class="font-mono text-gray-800">{{ $holidays->count() }} hari libur</span></p>
+                        <h2 class="text-lg font-semibold text-white">Kelola Hari Libur Nasional</h2>
+                        <p class="text-sm text-green-100">Total: <span class="font-mono text-white">{{ $holidays->count() }} hari libur</span></p>
                     </div>
                 </div>
             </div>
@@ -84,16 +84,16 @@
             <div class="p-6 space-y-8">
                 <!-- Add New Holiday Form -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
-                        <svg class="w-5 h-5 inline-block mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-[#DCE5DF]">
+                        <svg class="w-5 h-5 inline-block mr-2 text-[#F2B705]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                         </svg>
                         Tambah Hari Libur Baru
                     </h3>
                     
-                    <div class="mb-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl">
+                    <div class="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-xl">
                         <div class="flex items-start">
-                            <svg class="w-5 h-5 text-purple-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-5 h-5 text-[#F2B705] mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                             </svg>
                             <div class="text-sm text-gray-800">
@@ -118,8 +118,8 @@
                                             </svg>
                                         </div>
                                         <input type="date" name="date" required
-                                               class="block w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 bg-gray-50 
-                                                      focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:bg-white 
+                                               class="block w-full pl-10 pr-3 py-3 rounded-lg border border-[#DCE5DF] bg-[#F9FAF7] 
+                                                      focus:ring-2 focus:ring-[#F2B705] focus:border-[#F2B705] focus:bg-white 
                                                       transition-colors placeholder-gray-500 text-gray-800"
                                                value="{{ old('date') }}">
                                     </div>
@@ -145,8 +145,8 @@
                                             </svg>
                                         </div>
                                         <input type="text" name="description" required
-                                               class="block w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 bg-gray-50 
-                                                      focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:bg-white 
+                                               class="block w-full pl-10 pr-3 py-3 rounded-lg border border-[#DCE5DF] bg-[#F9FAF7] 
+                                                      focus:ring-2 focus:ring-[#F2B705] focus:border-[#F2B705] focus:bg-white 
                                                       transition-colors placeholder-gray-500 text-gray-800"
                                                placeholder="Contoh: Hari Raya Idul Fitri"
                                                value="{{ old('description') }}">
@@ -163,12 +163,12 @@
                             </div>
                         </div>
                         
-                        <!-- Submit Button - Warna Diubah menjadi Purple -->
+                        <!-- Submit Button - Menggunakan Kuning Emas -->
                         <div class="pt-4">
                             <button type="submit"
                             class="inline-flex items-center justify-center px-6 py-3 rounded-lg 
-                                bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold 
-                                hover:from-blue-700 hover:to-cyan-700 hover:shadow-lg 
+                                bg-gradient-to-r from-[#F2B705] to-[#E6A800] text-[#083D1D] font-semibold 
+                                hover:from-[#E6A800] hover:to-[#D99A00] hover:shadow-lg 
                                 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -181,8 +181,8 @@
 
                 <!-- Holidays List -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
-                        <svg class="w-5 h-5 inline-block mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-[#DCE5DF]">
+                        <svg class="w-5 h-5 inline-block mr-2 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                         </svg>
                         Daftar Hari Libur
@@ -192,16 +192,16 @@
                     @if($holidays->count() > 0)
                         <div class="space-y-3">
                             @foreach($holidays as $holiday)
-                                <div class="flex items-center justify-between rounded-xl border border-gray-200 p-4 hover:bg-gray-50 transition-colors duration-200">
+                                <div class="flex items-center justify-between rounded-xl border border-[#DCE5DF] bg-[#F9FAF7] p-4 hover:bg-green-50 transition-colors duration-200">
                                     <div class="flex items-center">
-                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg flex items-center justify-center mr-4">
-                                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-green-100 to-green-50 rounded-lg flex items-center justify-center mr-4">
+                                            <svg class="w-5 h-5 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                             </svg>
                                         </div>
                                         <div>
                                             <!-- Format tanggal Indonesia: Senin, 15 Januari 2025 -->
-                                            <p class="font-medium text-gray-900">
+                                            <p class="font-medium text-[#083D1D]">
                                                 @php
                                                     // Set locale Carbon ke Indonesia
                                                     \Carbon\Carbon::setLocale('id');
@@ -247,7 +247,7 @@
                         </div>
                         
                         <!-- Info jumlah data -->
-                        <div class="mt-6 pt-6 border-t border-gray-200">
+                        <div class="mt-6 pt-6 border-t border-[#DCE5DF]">
                             <div class="flex items-center justify-between">
                                 <p class="text-sm text-gray-600">
                                     Menampilkan semua hari libur ({{ $holidays->count() }} hari)
@@ -274,16 +274,16 @@
 
         <!-- Informasi Tambahan -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Info Card 1 -->
-            <div class="bg-gradient-to-r from-purple-50 to-indigo-100 rounded-xl border border-purple-200 p-5">
+            <!-- Info Card 1 - Menggunakan Kuning Emas -->
+            <div class="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl border border-yellow-200 p-5">
                 <div class="flex items-start">
                     <div class="p-2 bg-white rounded-lg shadow-sm mr-3">
-                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-[#F2B705]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
                     <div>
-                        <h4 class="text-sm font-semibold text-gray-800">Cara Kerja Hari Libur</h4>
+                        <h4 class="text-sm font-semibold text-[#083D1D]">Cara Kerja Hari Libur</h4>
                         <ul class="mt-2 space-y-1 text-xs text-gray-600">
                             <li>• Hari libur tidak dihitung dalam perhitungan hari cuti</li>
                             <li>• Jika cuti jatuh pada hari libur, akan dilewati</li>
@@ -293,16 +293,16 @@
                 </div>
             </div>
             
-            <!-- Info Card 2 -->
-            <div class="bg-gradient-to-r from-blue-50 to-teal-100 rounded-xl border border-blue-200 p-5">
+            <!-- Info Card 2 - Menggunakan Hijau Kejaksaan -->
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-[#DCE5DF] p-5">
                 <div class="flex items-start">
                     <div class="p-2 bg-white rounded-lg shadow-sm mr-3">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                         </svg>
                     </div>
                     <div>
-                        <h4 class="text-sm font-semibold text-gray-800">Tips Penggunaan</h4>
+                        <h4 class="text-sm font-semibold text-[#083D1D]">Tips Penggunaan</h4>
                         <ul class="mt-2 space-y-1 text-xs text-gray-600">
                             <li>• Tambahkan semua hari libur nasional resmi</li>
                             <li>• Periksa kalender pemerintah untuk update</li>
@@ -323,7 +323,7 @@
                 @csrf
                 @method('PUT')
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800">Edit Hari Libur</h3>
+                    <h3 class="text-lg font-semibold text-[#083D1D]">Edit Hari Libur</h3>
                     <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -334,7 +334,7 @@
                 <div class="space-y-4">
                     <!-- Date Field -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <label class="block text-sm font-medium text-[#083D1D] mb-1">
                             Tanggal Libur <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
@@ -344,14 +344,14 @@
                                 </svg>
                             </div>
                             <input type="date" name="date" id="editDate" required
-                                   class="block w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-300 
-                                          focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+                                   class="block w-full pl-10 pr-3 py-2.5 rounded-lg border border-[#DCE5DF] bg-[#F9FAF7]
+                                          focus:ring-2 focus:ring-[#F2B705] focus:border-[#F2B705]">
                         </div>
                     </div>
                     
                     <!-- Description Field -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <label class="block text-sm font-medium text-[#083D1D] mb-1">
                             Keterangan Libur <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
@@ -361,8 +361,8 @@
                                 </svg>
                             </div>
                             <input type="text" name="description" id="editDescription" required
-                                   class="block w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-300 
-                                          focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                                   class="block w-full pl-10 pr-3 py-2.5 rounded-lg border border-[#DCE5DF] bg-[#F9FAF7]
+                                          focus:ring-2 focus:ring-[#F2B705] focus:border-[#F2B705]"
                                    placeholder="Contoh: Hari Raya Idul Fitri">
                         </div>
                     </div>
@@ -370,15 +370,15 @@
                 
                 <div class="mt-6 flex justify-end space-x-3">
                     <button type="button" onclick="closeEditModal()"
-                            class="px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 
+                            class="px-4 py-2.5 border border-[#DCE5DF] text-[#083D1D] rounded-lg hover:bg-gray-50 
                                    transition-colors duration-200">
                         Batal
                     </button>
                     <button type="submit"
-    class="px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 
-           text-white font-semibold rounded-lg
-           hover:from-green-700 hover:to-emerald-700 
-           hover:shadow-md transition-all duration-200">
+                            class="px-4 py-2.5 bg-gradient-to-r from-[#F2B705] to-[#E6A800] 
+                                   text-[#083D1D] font-semibold rounded-lg
+                                   hover:from-[#E6A800] hover:to-[#D99A00] 
+                                   hover:shadow-md transition-all duration-200">
                         <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
