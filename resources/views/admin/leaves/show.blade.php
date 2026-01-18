@@ -4,16 +4,25 @@
 @section('page-title', 'Review Pengajuan Cuti')
 
 @section('content')
+@php
+    // Definisi warna resmi Kejaksaan
+    $primaryColor = '#F2B705';      // Kuning Emas
+    $secondaryColor = '#0B5E2E';    // Hijau Kejaksaan
+    $darkColor = '#083D1D';         // Hijau tua
+    $backgroundColor = '#F9FAF7';   // Putih / Abu muda
+    $borderColor = '#DCE5DF';       // Abu kehijauan
+@endphp
+
 <div class="max-w-4xl mx-auto">
     {{-- HEADER CARD --}}
-    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+    <div class="bg-[#F9FAF7] rounded-xl shadow-sm p-6 mb-6 border border-[#DCE5DF]">
         <div class="flex justify-between items-center mb-6">
             <div>
-                <h1 class="text-2xl font-bold text-slate-900">Portal Pegawai</h1>
-                <p class="text-slate-600">Sistem Manajemen Cuti</p>
+                <h1 class="text-2xl font-bold text-[#083D1D]">Portal Pegawai</h1>
+                <p class="text-[#083D1D]/70">Sistem Manajemen Cuti</p>
             </div>
             <a href="{{ route('admin.leaves.index') }}" 
-               class="px-4 py-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+               class="px-4 py-2 text-sm bg-[#DCE5DF] hover:bg-[#DCE5DF]/80 text-[#083D1D] rounded-lg transition-colors">
                 ← Kembali ke Daftar
             </a>
         </div>
@@ -21,34 +30,34 @@
         {{-- INFO KARYAWAN --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="space-y-2">
-                <p class="text-xs text-slate-500">Karyawan</p>
+                <p class="text-xs text-[#083D1D]/70">Karyawan</p>
                 <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                        <span class="text-lg font-bold text-blue-700">
+                    <div class="w-12 h-12 rounded-full bg-[#0B5E2E]/10 flex items-center justify-center border border-[#0B5E2E]/20">
+                        <span class="text-lg font-bold text-[#0B5E2E]">
                             {{ strtoupper(substr($leave->user->name, 0, 1)) }}
                         </span>
                     </div>
                     <div>
-                        <p class="font-bold text-lg">{{ $leave->user->name }}</p>
-                        <p class="text-sm text-slate-600">{{ $leave->user->employee_id }}</p>
+                        <p class="font-bold text-lg text-[#083D1D]">{{ $leave->user->name }}</p>
+                        <p class="text-sm text-[#083D1D]/70">{{ $leave->user->employee_id }}</p>
                     </div>
                 </div>
-                <p class="text-sm text-slate-700">{{ $leave->user->department ?: '-' }}</p>
-                <p class="text-sm text-slate-700">{{ $leave->user->position ?: 'Staff' }}</p>
+                <p class="text-sm text-[#083D1D]">{{ $leave->user->department ?: '-' }}</p>
+                <p class="text-sm text-[#083D1D]">{{ $leave->user->position ?: 'Staff' }}</p>
             </div>
 
             <div class="space-y-2">
-                <p class="text-xs text-slate-500">Jenis Cuti</p>
-                <p class="font-bold text-lg">{{ ucfirst($leave->leave_type) }}</p>
+                <p class="text-xs text-[#083D1D]/70">Jenis Cuti</p>
+                <p class="font-bold text-lg text-[#083D1D]">{{ ucfirst($leave->leave_type) }}</p>
                 
-                <p class="text-xs text-slate-500 mt-4">Status</p>
+                <p class="text-xs text-[#083D1D]/70 mt-4">Status</p>
                 @php
                     $statusConfig = match($leave->status) {
-                        'approved' => ['class' => 'bg-green-100 text-green-700 border-green-300', 'icon' => '✅', 'label' => 'DISETUJUI'],
-                        'pending'  => ['class' => 'bg-yellow-100 text-yellow-700 border-yellow-300', 'icon' => '⏳', 'label' => 'MENUNGGU'],
+                        'approved' => ['class' => 'bg-[#0B5E2E]/10 text-[#083D1D] border-[#0B5E2E]/30', 'icon' => '✅', 'label' => 'DISETUJUI'],
+                        'pending'  => ['class' => 'bg-[#F2B705]/10 text-[#083D1D] border-[#F2B705]/30', 'icon' => '⏳', 'label' => 'MENUNGGU'],
                         'rejected' => ['class' => 'bg-red-100 text-red-700 border-red-300', 'icon' => '❌', 'label' => 'DITOLAK'],
-                        'cancelled' => ['class' => 'bg-gray-100 text-gray-700 border-gray-300', 'icon' => '🚫', 'label' => 'DIBATALKAN'],
-                        default    => ['class' => 'bg-gray-100 text-gray-700 border-gray-300', 'icon' => '❓', 'label' => strtoupper($leave->status)],
+                        'cancelled' => ['class' => 'bg-[#DCE5DF] text-[#083D1D] border-[#DCE5DF]', 'icon' => '🚫', 'label' => 'DIBATALKAN'],
+                        default    => ['class' => 'bg-[#DCE5DF] text-[#083D1D] border-[#DCE5DF]', 'icon' => '❓', 'label' => strtoupper($leave->status)],
                     };
                 @endphp
                 <div class="inline-flex items-center px-4 py-2 rounded-lg border {{ $statusConfig['class'] }}">
@@ -58,7 +67,7 @@
             </div>
 
             <div class="space-y-2">
-                <p class="text-xs text-slate-500">Lampiran</p>
+                <p class="text-xs text-[#083D1D]/70">Lampiran</p>
                 @if($leave->file_path)
                     @php
                         $filename = basename($leave->file_path);
@@ -68,66 +77,66 @@
                             ? substr($filename, 0, 15) . '...' . $extension 
                             : $filename;
                     @endphp
-                    <div class="flex items-center space-x-3 p-3 bg-slate-50 rounded-lg">
-                        <div class="w-10 h-10 bg-slate-200 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-file text-slate-600"></i>
+                    <div class="flex items-center space-x-3 p-3 bg-[#F9FAF7] rounded-lg border border-[#DCE5DF]">
+                        <div class="w-10 h-10 bg-[#DCE5DF] rounded-lg flex items-center justify-center">
+                            <i class="fas fa-file text-[#083D1D]/70"></i>
                         </div>
                         <div class="min-w-0">
-                            <p class="font-medium text-sm truncate" title="{{ $filename }}">
+                            <p class="font-medium text-sm truncate text-[#083D1D]" title="{{ $filename }}">
                                 {{ $displayName }}
                             </p>
-                            <p class="text-xs text-slate-500">Format: {{ strtoupper($extension) }}</p>
+                            <p class="text-xs text-[#083D1D]/70">Format: {{ strtoupper($extension) }}</p>
                         </div>
                     </div>
                 @else
-                    <p class="text-slate-500 italic">Tidak ada lampiran</p>
+                    <p class="text-[#083D1D]/70 italic">Tidak ada lampiran</p>
                 @endif
             </div>
         </div>
 
-        <hr class="my-8 border-slate-300">
+        <hr class="my-8 border-[#DCE5DF]">
 
         {{-- DETAIL CUTI --}}
         <div class="mb-8">
-            <h2 class="text-lg font-bold text-slate-900 mb-4">Detail Cuti</h2>
+            <h2 class="text-lg font-bold text-[#083D1D] mb-4">Detail Cuti</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-4">
                     <div>
-                        <p class="text-xs text-slate-500 mb-1">Diajukan pada</p>
-                        <p class="text-lg font-bold">{{ $leave->created_at->format('d M Y H:i') }}</p>
+                        <p class="text-xs text-[#083D1D]/70 mb-1">Diajukan pada</p>
+                        <p class="text-lg font-bold text-[#083D1D]">{{ $leave->created_at->format('d M Y H:i') }}</p>
                     </div>
                     
                     <div>
-                        <p class="text-xs text-slate-500 mb-1">Durasi Cuti</p>
-                        <p class="text-lg font-bold">{{ $leave->days }} hari</p>
+                        <p class="text-xs text-[#083D1D]/70 mb-1">Durasi Cuti</p>
+                        <p class="text-lg font-bold text-[#083D1D]">{{ $leave->days }} hari</p>
                     </div>
                     
                     <div>
-                        <p class="text-xs text-slate-500 mb-1">Alasan Cuti</p>
-                        <p class="text-slate-700 p-3 bg-slate-50 rounded-lg">{{ $leave->reason ?: '-' }}</p>
+                        <p class="text-xs text-[#083D1D]/70 mb-1">Alasan Cuti</p>
+                        <p class="text-[#083D1D] p-3 bg-[#F9FAF7] rounded-lg border border-[#DCE5DF]">{{ $leave->reason ?: '-' }}</p>
                     </div>
                 </div>
                 
-                <div class="bg-blue-50 p-4 rounded-xl">
-                    <p class="text-xs text-slate-500 mb-2">Periode Cuti</p>
+                <div class="bg-[#0B5E2E]/5 p-4 rounded-xl border border-[#0B5E2E]/20">
+                    <p class="text-xs text-[#083D1D]/70 mb-2">Periode Cuti</p>
                     <div class="flex items-center space-x-4">
                         <div class="text-center">
-                            <p class="text-3xl font-bold text-blue-700">{{ $leave->start_date->format('d') }}</p>
-                            <p class="text-sm text-slate-600">{{ $leave->start_date->format('M') }}</p>
-                            <p class="text-sm text-slate-600">{{ $leave->start_date->format('Y') }}</p>
+                            <p class="text-3xl font-bold text-[#0B5E2E]">{{ $leave->start_date->format('d') }}</p>
+                            <p class="text-sm text-[#083D1D]/70">{{ $leave->start_date->format('M') }}</p>
+                            <p class="text-sm text-[#083D1D]/70">{{ $leave->start_date->format('Y') }}</p>
                         </div>
-                        <div class="text-slate-400">
+                        <div class="text-[#DCE5DF]">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
                         </div>
                         <div class="text-center">
-                            <p class="text-3xl font-bold text-blue-700">{{ $leave->end_date->format('d') }}</p>
-                            <p class="text-sm text-slate-600">{{ $leave->end_date->format('M') }}</p>
-                            <p class="text-sm text-slate-600">{{ $leave->end_date->format('Y') }}</p>
+                            <p class="text-3xl font-bold text-[#0B5E2E]">{{ $leave->end_date->format('d') }}</p>
+                            <p class="text-sm text-[#083D1D]/70">{{ $leave->end_date->format('M') }}</p>
+                            <p class="text-sm text-[#083D1D]/70">{{ $leave->end_date->format('Y') }}</p>
                         </div>
                         <div class="ml-4">
-                            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
+                            <span class="px-3 py-1 bg-[#0B5E2E]/10 text-[#083D1D] rounded-full text-sm font-bold border border-[#0B5E2E]/20">
                                 {{ $leave->days }} hari
                             </span>
                         </div>
@@ -155,34 +164,34 @@
             @endphp
 
             <div class="mb-8">
-                <p class="text-xs text-slate-500 mb-2">Lampiran</p>
-                <div class="border rounded-2xl p-4 bg-slate-50">
+                <p class="text-xs text-[#083D1D]/70 mb-2">Lampiran</p>
+                <div class="border border-[#DCE5DF] rounded-2xl p-4 bg-[#F9FAF7]">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div class="flex items-center flex-1 min-w-0">
-                            <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-lg mr-4 flex-shrink-0">
+                            <div class="w-12 h-12 rounded-xl bg-[#0B5E2E]/10 flex items-center justify-center text-lg mr-4 flex-shrink-0 border border-[#0B5E2E]/20">
                                 @if($isImage)
-                                    <i class="fas fa-file-image text-blue-600"></i>
+                                    <i class="fas fa-file-image text-[#0B5E2E]"></i>
                                 @elseif($extension === 'pdf')
                                     <i class="fas fa-file-pdf text-red-600"></i>
                                 @else
-                                    <i class="fas fa-file text-slate-600"></i>
+                                    <i class="fas fa-file text-[#083D1D]/70"></i>
                                 @endif
                             </div>
                             <div class="min-w-0">
-                                <p class="font-medium text-slate-900 truncate" title="{{ $filename }}">
+                                <p class="font-medium text-[#083D1D] truncate" title="{{ $filename }}">
                                     {{ $displayName }}
                                 </p>
-                                <p class="text-xs text-slate-500">Format: {{ strtoupper($extension) }}</p>
+                                <p class="text-xs text-[#083D1D]/70">Format: {{ strtoupper($extension) }}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3 flex-shrink-0">
                             <button type="button"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
+                                    class="px-4 py-2 bg-[#0B5E2E] text-white rounded-lg hover:bg-[#083D1D] transition-colors whitespace-nowrap"
                                     onclick="openModal('{{ $modalId }}')">
                                 Preview
                             </button>
                             <a href="{{ $downloadUrl }}"
-                               class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-white transition-colors whitespace-nowrap">
+                               class="px-4 py-2 border border-[#DCE5DF] text-[#083D1D] rounded-lg hover:bg-white transition-colors whitespace-nowrap">
                                 Download
                             </a>
                         </div>
@@ -191,30 +200,30 @@
 
                 {{-- MODAL PREVIEW --}}
                 <div id="{{ $modalId }}" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4">
-                    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden max-h-[90vh]">
-                        <div class="flex items-center justify-between border-b px-6 py-4">
+                    <div class="bg-[#F9FAF7] rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden max-h-[90vh] border border-[#DCE5DF]">
+                        <div class="flex items-center justify-between border-b border-[#DCE5DF] px-6 py-4">
                             <div class="min-w-0">
-                                <p class="font-semibold text-slate-900 truncate">{{ $displayName }}</p>
-                                <p class="text-sm text-slate-500 truncate">Lampiran Pengajuan Cuti</p>
+                                <p class="font-semibold text-[#083D1D] truncate">{{ $displayName }}</p>
+                                <p class="text-sm text-[#083D1D]/70 truncate">Lampiran Pengajuan Cuti</p>
                             </div>
                             <button type="button" 
-                                    class="text-slate-400 hover:text-slate-600 text-xl p-2 flex-shrink-0"
+                                    class="text-[#083D1D]/70 hover:text-[#083D1D] text-xl p-2 flex-shrink-0"
                                     onclick="closeModal('{{ $modalId }}')">
                                 ✕
                             </button>
                         </div>
-                        <div class="p-6 bg-slate-50 overflow-auto max-h-[calc(90vh-80px)]">
+                        <div class="p-6 bg-[#F9FAF7] overflow-auto max-h-[calc(90vh-80px)]">
                             @if($isImage)
                                 <img src="{{ $previewUrl }}" alt="Preview Lampiran"
                                      class="max-h-full max-w-full mx-auto rounded-lg shadow"
                                      loading="lazy">
                             @elseif(in_array($extension, ['pdf']))
                                 <iframe src="{{ $previewUrl }}" 
-                                        class="w-full h-[70vh] rounded bg-white border"
+                                        class="w-full h-[70vh] rounded bg-white border border-[#DCE5DF]"
                                         frameborder="0"></iframe>
                             @else
                                 <div class="text-center py-12">
-                                    <div class="text-5xl mb-4 text-blue-500">
+                                    <div class="text-5xl mb-4 text-[#0B5E2E]">
                                         @if($isImage)
                                             <i class="fas fa-file-image"></i>
                                         @elseif($extension === 'pdf')
@@ -223,10 +232,10 @@
                                             <i class="fas fa-file"></i>
                                         @endif
                                     </div>
-                                    <p class="text-lg font-medium text-slate-700">File {{ strtoupper($extension) }}</p>
-                                    <p class="text-slate-500 mb-6">Format file tidak dapat dipreview di browser</p>
+                                    <p class="text-lg font-medium text-[#083D1D]">File {{ strtoupper($extension) }}</p>
+                                    <p class="text-[#083D1D]/70 mb-6">Format file tidak dapat dipreview di browser</p>
                                     <a href="{{ $downloadUrl }}"
-                                       class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 inline-flex items-center">
+                                       class="px-6 py-3 bg-[#0B5E2E] text-white rounded-lg hover:bg-[#083D1D] inline-flex items-center">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                         </svg>
@@ -242,17 +251,17 @@
 
         {{-- INFO ADMIN PROSES --}}
         <div class="mb-8">
-            <p class="text-xs text-slate-500 mb-2">Proses Admin</p>
-            <div class="bg-slate-50 p-4 rounded-xl">
+            <p class="text-xs text-[#083D1D]/70 mb-2">Proses Admin</p>
+            <div class="bg-[#F9FAF7] p-4 rounded-xl border border-[#DCE5DF]">
                 <div class="flex items-center space-x-3 mb-3">
-                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                        <span class="text-green-700 font-bold">
+                    <div class="w-10 h-10 rounded-full bg-[#0B5E2E]/10 flex items-center justify-center border border-[#0B5E2E]/20">
+                        <span class="text-[#0B5E2E] font-bold">
                             {{ strtoupper(substr($leave->approver?->name ?? 'A', 0, 1)) }}
                         </span>
                     </div>
                     <div>
-                        <p class="font-medium">{{ $leave->approver?->name ?? 'Belum diproses' }}</p>
-                        <p class="text-sm text-slate-500">
+                        <p class="font-medium text-[#083D1D]">{{ $leave->approver?->name ?? 'Belum diproses' }}</p>
+                        <p class="text-sm text-[#083D1D]/70">
                             {{ $leave->reviewed_at?->format('d M Y H:i') ?? 'Belum diproses' }}
                         </p>
                     </div>
@@ -260,8 +269,8 @@
                 
                 @if($leave->admin_notes)
                     <div>
-                        <p class="text-xs text-slate-500 mb-1">Catatan Admin:</p>
-                        <p class="text-slate-700 p-3 bg-white rounded-lg border whitespace-pre-line">
+                        <p class="text-xs text-[#083D1D]/70 mb-1">Catatan Admin:</p>
+                        <p class="text-[#083D1D] p-3 bg-white rounded-lg border border-[#DCE5DF] whitespace-pre-line">
                             {{ $leave->admin_notes }}
                         </p>
                     </div>
@@ -271,19 +280,19 @@
 
         {{-- FORM APPROVE / REJECT --}}
         @if($leave->status === 'pending')
-            <div class="mt-8 pt-8 border-t">
-                <h3 class="text-lg font-bold text-slate-900 mb-6">Proses Pengajuan</h3>
+            <div class="mt-8 pt-8 border-t border-[#DCE5DF]">
+                <h3 class="text-lg font-bold text-[#083D1D] mb-6">Proses Pengajuan</h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     {{-- APPROVE FORM --}}
                     <form method="POST" action="{{ route('admin.leaves.approve', $leave->id) }}"
-                          class="bg-gradient-to-br from-green-50 to-white border-2 border-green-300 rounded-xl p-6">
+                          class="bg-gradient-to-br from-[#0B5E2E]/5 to-white border-2 border-[#0B5E2E]/30 rounded-xl p-6">
                         @csrf
                         @method('PUT')
 
-                        <h4 class="text-green-800 font-bold mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <h4 class="text-[#083D1D] font-bold mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-[#0B5E2E]" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd"
                                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                                     clip-rule="evenodd"/>
@@ -292,15 +301,15 @@
                         </h4>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Catatan (opsional)</label>
+                            <label class="block text-sm font-medium text-[#083D1D] mb-2">Catatan (opsional)</label>
                             <textarea name="admin_notes" rows="3"
                                       placeholder="Berikan catatan jika diperlukan..."
-                                      class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"></textarea>
+                                      class="w-full px-4 py-2 border border-[#DCE5DF] rounded-lg focus:ring-2 focus:ring-[#0B5E2E] focus:border-[#0B5E2E]"></textarea>
                         </div>
 
                         <button type="submit"
                                 onclick="return confirm('Yakin ingin menyetujui cuti ini?')"
-                                class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors flex items-center justify-center">
+                                class="w-full py-3 bg-[#0B5E2E] hover:bg-[#083D1D] text-white font-bold rounded-lg transition-colors flex items-center justify-center">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
@@ -310,7 +319,7 @@
 
                     {{-- REJECT FORM --}}
                     <form method="POST" action="{{ route('admin.leaves.reject', $leave->id) }}"
-                          class="bg-gradient-to-br from-red-50 to-white border-2 border-red-300 rounded-xl p-6">
+                          class="bg-gradient-to-br from-red-50/50 to-white border-2 border-red-300 rounded-xl p-6">
                         @csrf
                         @method('PUT')
 
@@ -324,12 +333,12 @@
                         </h4>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-slate-700 mb-2">
+                            <label class="block text-sm font-medium text-[#083D1D] mb-2">
                                 Alasan Penolakan <span class="text-red-600">*</span>
                             </label>
                             <textarea name="admin_notes" rows="3" required
                                       placeholder="Wajib diisi - berikan alasan penolakan..."
-                                      class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"></textarea>
+                                      class="w-full px-4 py-2 border border-[#DCE5DF] rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"></textarea>
                         </div>
 
                         <button type="submit"
@@ -347,15 +356,15 @@
 
         {{-- TOMBOL BATAL KAN APPROVAL --}}
         @if($leave->status === 'approved')
-            <div class="mt-8 pt-8 border-t">
-                <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-                    <h3 class="text-lg font-bold text-yellow-800 mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <div class="mt-8 pt-8 border-t border-[#DCE5DF]">
+                <div class="bg-[#F2B705]/10 border border-[#F2B705]/30 rounded-xl p-6">
+                    <h3 class="text-lg font-bold text-[#083D1D] mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-[#F2B705]" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                         </svg>
                         Batalkan Persetujuan
                     </h3>
-                    <p class="text-yellow-700 mb-4">
+                    <p class="text-[#083D1D] mb-4">
                         Pengajuan cuti ini sudah disetujui. Anda dapat membatalkan persetujuan jika diperlukan.
                     </p>
                     <form method="POST" action="{{ route('admin.leaves.cancel', $leave->id) }}" 
@@ -363,7 +372,7 @@
                         @csrf
                         @method('PUT')
                         <button type="submit"
-                                class="px-6 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg transition-colors">
+                                class="px-6 py-2 bg-[#F2B705] hover:bg-[#F2B705]/80 text-[#083D1D] font-medium rounded-lg transition-colors">
                             Batalkan Persetujuan
                         </button>
                     </form>

@@ -38,8 +38,8 @@ class AdminSeeder extends Seeder
             [
                 'name'               => 'Ahmad Rizki',
                 'email'              => '19850101@pegawai.local',
-                'employee_id'        => '19850101',
-                'password'           => '19850101',
+                'employee_id'        => '19850101',//(nip)
+                'password'           => '19850101',//(nrp)
                 'role'               => 'employee',
                 'login_type'         => 'employee_id',
                 'gender'             => 'male',
