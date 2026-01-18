@@ -122,7 +122,19 @@
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Durasi Cuti</p>
-                                <p class="text-lg font-semibold text-[#083D1D]">{{ $leave->days ?? 0 }} hari</p>
+                                @php
+                                    $start = \Carbon\Carbon::parse($leave->start_date);
+                                    $end = \Carbon\Carbon::parse($leave->end_date);
+                                    $workingDays = 0;
+                                    $current = $start->copy();
+                                    while ($current <= $end) {
+                                        if ($current->isWeekday()) {
+                                            $workingDays++;
+                                        }
+                                        $current->addDay();
+                                    }
+                                @endphp
+                                <p class="text-lg font-semibold text-[#083D1D]">{{ $workingDays }} hari kerja</p>
                             </div>
                         </div>
                     </div>
@@ -173,12 +185,12 @@
                         <h3 class="text-lg font-semibold text-[#083D1D]">Alasan Cuti</h3>
                     </div>
                     <div class="bg-[#F9FAF7] rounded-xl p-6 border border-[#DCE5DF]">
-                        <p class="text-[#083D1D] whitespace-pre-line leading-relaxed">{{ $leave->reason ?? '-' }}</p>
+                        <p class="text-[#083D1D] whitespace-pre-line leading-relaxed">{{ $leave->alasan ?? '-' }}</p>
                     </div>
                 </div>
 
                 <!-- Attachment Section -->
-                @if($leave->file_path)
+                @if(false)
                 <div class="mb-8">
                     <div class="flex items-center mb-4">
                         <div class="p-2 bg-white rounded-lg mr-3 border border-[#DCE5DF]">

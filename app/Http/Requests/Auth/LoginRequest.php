@@ -83,7 +83,10 @@ class LoginRequest extends FormRequest
         if ($loginType === 'email') {
             $user = \App\Models\User::where('email', $login)->first();
         } else {
-            $user = \App\Models\User::where('employee_id', $login)->first();
+            // Cari user via relasi pegawai->nip
+            $user = \App\Models\User::whereHas('pegawai', function($query) use ($login) {
+                $query->where('nip', $login);
+            })->first();
         }
 
         // Jika user tidak ditemukan atau password salah
@@ -91,7 +94,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
             
             throw ValidationException::withMessages([
-                'login' => 'Email/ID Pegawai atau password salah',
+                'login' => 'Email/NIP atau password salah',
             ]);
         }
 

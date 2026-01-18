@@ -273,12 +273,12 @@
 
                                 <!-- Leave Type -->
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-[#083D1D] capitalize">
-                                        {{ str_replace('_', ' ', $leave->leave_type) }}
+                                    <div class="text-sm text-[#083D1D]">
+                                        Cuti Tahunan
                                     </div>
-                                    @if($leave->reason)
+                                    @if($leave->alasan)
                                         <div class="text-xs text-gray-500 truncate max-w-xs mt-1">
-                                            {{ \Illuminate\Support\Str::limit($leave->reason, 50) }}
+                                            {{ \Illuminate\Support\Str::limit($leave->alasan, 50) }}
                                         </div>
                                     @endif
                                 </td>

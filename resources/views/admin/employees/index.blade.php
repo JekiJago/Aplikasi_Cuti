@@ -263,7 +263,7 @@
                                             </div>
                                             <div class="text-xs text-gray-500 flex items-center mt-1">
                                                 <span class="capitalize px-2 py-0.5 rounded-full bg-green-50 text-[#083D1D] border border-[#DCE5DF]">
-                                                    {{ $employee->gender === 'male' ? 'Pria' : 'Wanita' }}
+                                                    {{ $employee->pegawai->jenis_kelamin === 'male' ? 'Laki-laki' : 'Perempuan' }}
                                                 </span>
                                                 @if($employee->department)
                                                 <span class="mx-1">•</span>

@@ -43,13 +43,13 @@
                                     <span class="text-red-500 mr-2">*</span> Semua field bertanda wajib diisi
                                 </li>
                                 <li class="flex items-start">
-                                    <span class="text-red-500 mr-2">*</span> Password ditentukan oleh Admin
+                                    <span class="text-red-500 mr-2">*</span> Login menggunakan NIP dan NRP sebagai password
                                 </li>
                                 <li class="flex items-start">
-                                    <span class="text-red-500 mr-2">*</span> Login menggunakan ID Pegawai
+                                    <span class="text-red-500 mr-2">*</span> NIP adalah Nomor Induk Pegawai
                                 </li>
                                 <li class="flex items-start">
-                                    <span class="text-red-500 mr-2">*</span> Tanggal masuk kerja menentukan periode kerja pegawai
+                                    <span class="text-red-500 mr-2">*</span> NRP adalah Nomor Registrasi Pegawai yang berfungsi sebagai password
                                 </li>
                             </ul>
                         </div>
@@ -90,10 +90,10 @@
 
                     {{-- GRID INPUTS --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        {{-- ID PEGAWAI --}}
+                        {{-- NIP --}}
                         <div>
                             <label class="block text-sm font-medium text-[#083D1D] mb-2">
-                                ID Pegawai <span class="text-red-500">*</span>
+                                NIP (Nomor Induk Pegawai) <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -104,7 +104,7 @@
                                     id="employee_id"
                                     value="{{ old('employee_id') }}"
                                     class="pl-10 block w-full rounded-lg border-[#DCE5DF] bg-[#F9FAF7] shadow-sm focus:border-[#F2B705] focus:ring-[#F2B705] @error('employee_id') border-red-500 @enderror"
-                                    placeholder="Masukkan ID Pegawai"
+                                    placeholder="Masukkan NIP"
                                     maxlength="20"
                                     required>
                             </div>
@@ -116,26 +116,28 @@
                             @enderror
                         </div>
 
-                        {{-- TANGGAL MASUK KERJA --}}
+                        {{-- NRP --}}
                         <div>
                             <label class="block text-sm font-medium text-[#083D1D] mb-2">
-                                Tanggal Masuk Kerja <span class="text-red-500">*</span>
+                                NRP (Nomor Registrasi Pegawai) <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="fas fa-calendar-alt text-gray-400"></i>
+                                    <i class="fas fa-lock text-gray-400"></i>
                                 </div>
-                                <input type="date"
-                                    name="hire_date"
-                                    id="hire_date"
-                                    value="{{ old('hire_date', date('Y-m-d')) }}"
-                                    class="pl-10 block w-full rounded-lg border-[#DCE5DF] bg-[#F9FAF7] shadow-sm focus:border-[#F2B705] focus:ring-[#F2B705] @error('hire_date') border-red-500 @enderror"
+                                <input type="text"
+                                    name="nrp"
+                                    id="nrp"
+                                    value="{{ old('nrp') }}"
+                                    class="pl-10 block w-full rounded-lg border-[#DCE5DF] bg-[#F9FAF7] shadow-sm focus:border-[#F2B705] focus:ring-[#F2B705] @error('nrp') border-red-500 @enderror"
+                                    placeholder="Masukkan NRP"
+                                    maxlength="20"
                                     required>
                             </div>
                             <p class="mt-1 text-xs text-gray-500">
-                                <i class="fas fa-calendar mr-1 text-[#F2B705]"></i> Format: <span id="dateFormatDisplay">Tanggal Bulan Tahun</span>
+                                <i class="fas fa-lock mr-1 text-[#F2B705]"></i> Berfungsi sebagai password login
                             </p>
-                            @error('hire_date')
+                            @error('nrp')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
@@ -166,62 +168,7 @@
                             @enderror
                         </div>
 
-                        {{-- PASSWORD --}}
-                        <div>
-                            <label class="block text-sm font-medium text-[#083D1D] mb-2">
-                                Password <span class="text-red-500">*</span>
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="fas fa-lock text-gray-400"></i>
-                                </div>
-                                <input type="password"
-                                    name="password"
-                                    id="password"
-                                    class="pl-10 pr-10 block w-full rounded-lg border-[#DCE5DF] bg-[#F9FAF7] shadow-sm focus:border-[#F2B705] focus:ring-[#F2B705] @error('password') border-red-500 @enderror"
-                                    placeholder="Minimal 6 karakter"
-                                    minlength="6"
-                                    required>
-                                <button type="button"
-                                    class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-password"
-                                    data-target="password">
-                                    <i class="fas fa-eye text-gray-400 hover:text-[#F2B705]"></i>
-                                </button>
-                            </div>
-                            <p class="mt-1 text-xs text-gray-500">
-                                <i class="fas fa-shield-alt mr-1 text-[#F2B705]"></i> Password akan dienkripsi secara otomatis
-                            </p>
-                            @error('password')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
 
-                        {{-- KONFIRMASI PASSWORD --}}
-                        <div>
-                            <label class="block text-sm font-medium text-[#083D1D] mb-2">
-                                Konfirmasi Password <span class="text-red-500">*</span>
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="fas fa-lock text-gray-400"></i>
-                                </div>
-                                <input type="password"
-                                    name="password_confirmation"
-                                    id="password_confirmation"
-                                    class="pl-10 pr-10 block w-full rounded-lg border-[#DCE5DF] bg-[#F9FAF7] shadow-sm focus:border-[#F2B705] focus:ring-[#F2B705]"
-                                    placeholder="Ulangi password"
-                                    minlength="6"
-                                    required>
-                                <button type="button"
-                                    class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-password"
-                                    data-target="password_confirmation">
-                                    <i class="fas fa-eye text-gray-400 hover:text-[#F2B705]"></i>
-                                </button>
-                            </div>
-                            <p class="mt-1 text-xs text-gray-500">
-                                <i class="fas fa-check-circle mr-1 text-[#F2B705]"></i> Pastikan password sama dengan di atas
-                            </p>
-                        </div>
                     </div>
 
                     {{-- JENIS KELAMIN --}}
@@ -260,19 +207,7 @@
                         @enderror
                     </div>
 
-                    {{-- PREVIEW TANGGAL --}}
-                    <div class="mb-8 p-4 bg-yellow-50 border border-[#F2B705] rounded-lg">
-                        <div class="flex items-center">
-                            <i class="fas fa-calendar-check text-[#F2B705] text-xl mr-3"></i>
-                            <div>
-                                <h6 class="font-semibold text-[#083D1D]">Preview Tanggal Masuk Kerja</h6>
-                                <p class="text-gray-600 text-sm mt-1">
-                                    Pegawai akan tercatat mulai bekerja pada: 
-                                    <span id="hireDatePreview" class="font-bold text-[#0B5E2E]">{{ date('d F Y') }}</span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+
 
                     {{-- SECTION: INFO LOGIN --}}
                     <div class="mb-6">
@@ -288,10 +223,10 @@
                                 <h6 class="font-semibold text-[#083D1D]">Catatan Penting:</h6>
                                 <ul class="mt-2 text-sm text-[#083D1D] space-y-1">
                                     <li class="flex items-start">
-                                        • ID Pegawai akan menjadi username untuk login sistem
+                                        • NIP akan menjadi username untuk login sistem
                                     </li>
                                     <li class="flex items-start">
-                                        • Password dapat diubah oleh pegawai setelah login pertama
+                                        • NRP akan menjadi password untuk login sistem
                                     </li>
                                     <li class="flex items-start">
                                         • Simpan informasi login dengan aman
@@ -354,170 +289,33 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Toggle password visibility
-    document.querySelectorAll('.toggle-password').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const target = document.getElementById(btn.dataset.target);
-            const icon = btn.querySelector('i');
-            
-            if (target.type === 'password') {
-                target.type = 'text';
-                icon.classList.replace('fa-eye', 'fa-eye-slash');
-            } else {
-                target.type = 'password';
-                icon.classList.replace('fa-eye-slash', 'fa-eye');
-            }
+    // Auto-format NIP and NRP to uppercase
+    const employeeIdInput = document.getElementById('employee_id');
+    if (employeeIdInput) {
+        employeeIdInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
         });
-    });
-    
-    // Format tanggal untuk preview
-    const hireDateInput = document.getElementById('hire_date');
-    const hireDatePreview = document.getElementById('hireDatePreview');
-    const dateFormatDisplay = document.getElementById('dateFormatDisplay');
-    
-    // Format tanggal Indonesia
-    function formatDateIndonesian(dateString) {
-        const date = new Date(dateString);
-        const options = { 
-            day: 'numeric', 
-            month: 'long', 
-            year: 'numeric' 
-        };
-        return date.toLocaleDateString('id-ID', options);
     }
-    
-    // Update preview saat tanggal berubah
-    if (hireDateInput && hireDatePreview) {
-        // Set initial preview
-        hireDatePreview.textContent = formatDateIndonesian(hireDateInput.value);
-        dateFormatDisplay.textContent = formatDateIndonesian(hireDateInput.value);
-        
-        // Update preview saat tanggal diubah
-        hireDateInput.addEventListener('change', function() {
-            if (this.value) {
-                const formattedDate = formatDateIndonesian(this.value);
-                hireDatePreview.textContent = formattedDate;
-                dateFormatDisplay.textContent = formattedDate;
-            }
+
+    const nrpInput = document.getElementById('nrp');
+    if (nrpInput) {
+        nrpInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
         });
     }
     
-    // Validasi form
+    // Simple form submission
     const form = document.getElementById('employeeForm');
     const submitBtn = document.getElementById('submitBtn');
     
     if (form) {
         form.addEventListener('submit', function(e) {
-            // Validasi password match
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('password_confirmation').value;
-            
-            if (password !== confirmPassword) {
-                e.preventDefault();
-                // SweetAlert2 atau alert biasa
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Password Tidak Cocok',
-                        text: 'Password dan Konfirmasi Password harus sama!',
-                        confirmButtonColor: '#F2B705',
-                        confirmButtonText: 'Baik'
-                    });
-                } else {
-                    alert('Password dan Konfirmasi Password harus sama!');
-                }
-                document.getElementById('password').focus();
-                return false;
-            }
-            
-            // Validasi minimal 6 karakter
-            if (password.length < 6) {
-                e.preventDefault();
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Password Terlalu Pendek',
-                        text: 'Password minimal 6 karakter!',
-                        confirmButtonColor: '#F2B705',
-                        confirmButtonText: 'Baik'
-                    });
-                } else {
-                    alert('Password minimal 6 karakter!');
-                }
-                return false;
-            }
-            
-            // Validasi annual_leave_quota
-            const annualQuota = document.querySelector('input[name="annual_leave_quota"]');
-            if (annualQuota && (annualQuota.value < 0 || annualQuota.value > 365)) {
-                e.preventDefault();
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Kuota Tidak Valid',
-                        text: 'Kuota cuti tahunan harus antara 0-365 hari!',
-                        confirmButtonColor: '#F2B705',
-                        confirmButtonText: 'Baik'
-                    });
-                } else {
-                    alert('Kuota cuti tahunan harus antara 0-365 hari!');
-                }
-                annualQuota.focus();
-                return false;
-            }
-            
             // Disable submit button to prevent double submission
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...';
-            
-            // Validasi tanggal tidak di masa depan (opsional)
-            const hireDate = new Date(hireDateInput.value);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            if (hireDate > today) {
-                e.preventDefault();
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Tanggal Masa Depan',
-                        html: 'Tanggal masuk kerja lebih dari hari ini.<br>Apakah Anda yakin?',
-                        showCancelButton: true,
-                        confirmButtonText: 'Ya, Simpan',
-                        cancelButtonText: 'Periksa Kembali',
-                        confirmButtonColor: '#F2B705',
-                        cancelButtonColor: '#6b7280'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Pegawai';
-                            form.submit();
-                        } else {
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Pegawai';
-                            hireDateInput.focus();
-                        }
-                    });
-                } else {
-                    if (!confirm('Tanggal masuk kerja lebih dari hari ini. Lanjutkan?')) {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Pegawai';
-                        hireDateInput.focus();
-                        return false;
-                    }
-                }
-                return false;
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...';
             }
-            
             return true;
-        });
-    }
-    
-    // Auto-format employee ID to uppercase
-    const employeeIdInput = document.getElementById('employee_id');
-    if (employeeIdInput) {
-        employeeIdInput.addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
         });
     }
 });

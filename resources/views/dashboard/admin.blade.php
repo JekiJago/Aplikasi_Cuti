@@ -389,54 +389,6 @@
                     </a>
                 </div>
             </div>
-
-            {{-- Recent Leaves --}}
-            <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-[#DCE5DF] p-4 sm:p-6">
-                <h3 class="text-base sm:text-lg font-semibold text-[#083D1D] mb-3 sm:mb-4 flex items-center">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    Pengajuan Terbaru
-                </h3>
-
-                <div class="space-y-2 sm:space-y-3">
-                    @forelse($recentLeaves as $leave)
-                    <div class="flex items-start">
-                        <div class="p-1 {{ $leave->status == 'approved' ? 'bg-[#0B5E2E]/10 border border-[#0B5E2E]/20' : ($leave->status == 'rejected' ? 'bg-red-100 border border-red-200' : 'bg-[#F2B705]/10 border border-[#F2B705]/20') }} rounded-lg mr-2 sm:mr-3 mt-0.5">
-                            @if($leave->status == 'approved')
-                            <svg class="w-3 h-3 sm:w-4 sm:h-4 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            @elseif($leave->status == 'rejected')
-                            <svg class="w-3 h-3 sm:w-4 sm:h-4 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                            @else
-                            <svg class="w-3 h-3 sm:w-4 sm:h-4 text-[#F2B705]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            @endif
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-sm text-[#083D1D] font-medium">{{ $leave->user->name ?? 'Unknown' }}</p>
-                            <p class="text-xs text-[#083D1D]/70">
-                                {{ $leave->start_date->format('d M') }} - {{ $leave->end_date->format('d M Y') }}
-                                <span class="ml-2 px-2 py-0.5 text-xs rounded-full 
-                                    {{ $leave->status == 'approved' ? 'bg-[#0B5E2E]/10 text-[#083D1D] border border-[#0B5E2E]/20' : 
-                                       ($leave->status == 'rejected' ? 'bg-red-100 text-red-800 border border-red-200' : 
-                                       'bg-[#F2B705]/10 text-[#083D1D] border border-[#F2B705]/20') }}">
-                                    {{ ucfirst($leave->status) }}
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="text-center py-4">
-                        <p class="text-sm text-[#083D1D]/70">Belum ada pengajuan cuti</p>
-                    </div>
-                    @endforelse
-                </div>
-            </div>
         </div>
     </div>
 </div>

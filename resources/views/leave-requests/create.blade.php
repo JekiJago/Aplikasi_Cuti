@@ -108,29 +108,20 @@
         </div>
         @endif
 
-        <!-- Quota Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            @foreach ($quotaCards as $card)
-                <div class="bg-white rounded-2xl shadow-xl border border-[#DCE5DF] p-5 hover:shadow-2xl transition-shadow duration-300">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="p-2 rounded-lg {{ $card['remaining'] > 0 ? 'bg-[#F9FAF7]' : 'bg-red-50' }}">
-                            <svg class="w-5 h-5 {{ $card['remaining'] > 0 ? 'text-[#0B5E2E]' : 'text-red-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <span class="text-xs font-medium px-2 py-1 rounded-full {{ $card['remaining'] > 0 ? 'bg-green-50 text-[#083D1D]' : 'bg-red-50 text-red-700' }}">
-                            {{ $card['remaining'] > 0 ? 'Tersedia' : 'Habis' }}
-                        </span>
-                    </div>
-                    <p class="text-sm text-gray-500 mb-1">{{ $card['label'] }}</p>
-                    <p class="text-3xl font-bold {{ $card['remaining'] > 0 ? 'text-[#083D1D]' : 'text-red-600' }} mb-2">
-                        {{ $card['remaining'] }} <span class="text-lg">{{ $card['unit'] }}</span>
-                    </p>
-                    <p class="text-xs text-gray-500">
-                        {{ $card['note'] }}
-                    </p>
+        <!-- Quota Summary Card -->
+        <div class="bg-white rounded-2xl shadow-xl border border-[#DCE5DF] p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-2">Sisa Kuota Cuti Tahunan</p>
+                    <p class="text-4xl font-bold text-[#083D1D]">{{ $remaining }} <span class="text-lg">hari</span></p>
                 </div>
-            @endforeach
+                <div class="p-3 rounded-full {{ $remaining > 0 ? 'bg-green-50' : 'bg-red-50' }}">
+                    <svg class="w-8 h-8 {{ $remaining > 0 ? 'text-green-600' : 'text-red-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-3">Hanya menghitung hari kerja (Senin-Jumat), hari libur tidak dihitung</p>
         </div>
 
         <!-- Form Card -->
@@ -144,7 +135,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-lg font-semibold text-[#083D1D]">Informasi Cuti</h2>
+                        <h2 class="text-lg font-semibold text-[#083D1D]">Pengajuan Cuti Tahunan</h2>
                         <p class="text-sm text-gray-600">Lengkapi data pengajuan cuti Anda</p>
                     </div>
                 </div>
@@ -158,55 +149,8 @@
                   class="p-6 space-y-6">
                 @csrf
 
-                <!-- Leave Type -->
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-[#083D1D]">
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                            </svg>
-                            Jenis Cuti <span class="text-red-500 ml-1">*</span>
-                        </div>
-                    </label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-                            </svg>
-                        </div>
-                        <select name="leave_type" required
-                                class="block w-full pl-10 pr-10 py-3 rounded-lg border border-[#DCE5DF] 
-                                       bg-[#F9FAF7] focus:ring-2 focus:ring-[#F2B705] focus:border-[#0B5E2E] 
-                                       focus:bg-white transition-colors text-[#083D1D] appearance-none">
-                            <option value="" class="text-gray-500">Pilih jenis cuti</option>
-                            @foreach ([
-                                'tahunan'        => 'Cuti Tahunan',
-                                'urusan_penting' => 'Cuti Urusan Penting',
-                                'cuti_besar'     => 'Cuti Besar',
-                                'cuti_non_aktif' => 'Cuti Non Aktif',
-                                'cuti_bersalin'  => 'Cuti Bersalin',
-                                'cuti_sakit'     => 'Cuti Sakit',
-                            ] as $val => $label)
-                                <option value="{{ $val }}" {{ old('leave_type') === $val ? 'selected' : '' }} class="text-[#083D1D]">
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-                    </div>
-                    @error('leave_type')
-                        <div class="flex items-start space-x-2 text-red-600 text-sm mt-1 bg-red-50 px-3 py-2 rounded-lg">
-                            <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>{{ $message }}</span>
-                        </div>
-                    @enderror
-                </div>
+                <!-- Hidden leave type - always tahunan -->
+                <input type="hidden" name="leave_type" value="tahunan">
 
                 <!-- Date Range -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -299,56 +243,13 @@
                         </div>
                     </label>
                     <div class="relative">
-                        <textarea name="reason" id="reason" rows="5" required
+                        <textarea name="alasan" id="alasan" rows="5" required
                                   class="block w-full px-4 py-3 rounded-lg border border-[#DCE5DF] 
                                          bg-[#F9FAF7] focus:ring-2 focus:ring-[#F2B705] focus:border-[#0B5E2E] 
                                          focus:bg-white transition-colors placeholder-gray-500 text-[#083D1D]"
-                                  placeholder="Jelaskan alasan pengajuan cuti Anda dengan jelas...">{{ old('reason') }}</textarea>
+                                  placeholder="Jelaskan alasan pengajuan cuti Anda dengan jelas...">{{ old('alasan') }}</textarea>
                     </div>
-                    @error('reason')
-                        <div class="flex items-start space-x-2 text-red-600 text-sm mt-1 bg-red-50 px-3 py-2 rounded-lg">
-                            <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>{{ $message }}</span>
-                        </div>
-                    @enderror
-                </div>
-
-                <!-- Attachment -->
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-[#083D1D]">
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
-                            </svg>
-                            Dokumen Pendukung (opsional)
-                        </div>
-                    </label>
-                    <div class="border-2 border-dashed border-[#DCE5DF] rounded-xl p-6 text-center hover:border-[#0B5E2E] hover:bg-[#F9FAF7] transition-colors duration-200">
-                        <div class="flex flex-col items-center">
-                            <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                            </svg>
-                            <p class="text-sm text-gray-600 mb-2">
-                                <span class="font-medium text-[#0B5E2E]">Klik untuk upload</span> atau drag & drop
-                            </p>
-                            <input type="file" name="attachment" id="attachment"
-                                   class="hidden"
-                                   accept=".pdf,.jpg,.jpeg,.png">
-                            <label for="attachment" 
-                                   class="cursor-pointer inline-flex items-center px-4 py-2 border border-[#DCE5DF] rounded-lg text-sm font-medium text-[#083D1D] bg-white hover:bg-[#F9FAF7] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F2B705] transition-colors">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                                </svg>
-                                Pilih File
-                            </label>
-                            <p class="text-xs text-gray-500 mt-3" id="file-name">
-                                Maksimal 5MB (PDF, JPG, JPEG, PNG)
-                            </p>
-                        </div>
-                    </div>
-                    @error('attachment')
+                    @error('alasan')
                         <div class="flex items-start space-x-2 text-red-600 text-sm mt-1 bg-red-50 px-3 py-2 rounded-lg">
                             <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
@@ -400,6 +301,12 @@
                             <svg class="w-4 h-4 text-[#0B5E2E] mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                             </svg>
+                            Perhitungan cuti hanya menghitung hari kerja (Senin-Jumat), hari Sabtu dan Minggu tidak dihitung
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-[#0B5E2E] mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
                             Pengajuan akan diproses dalam 1-3 hari kerja
                         </li>
                         <li class="flex items-start">
@@ -407,12 +314,6 @@
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                             </svg>
                             Pastikan alasan cuti dijelaskan dengan jelas
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-4 h-4 text-[#0B5E2E] mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            Upload dokumen pendukung untuk cuti sakit atau urusan penting
                         </li>
                     </ul>
                 </div>
@@ -429,11 +330,26 @@
         const endDateInput = document.getElementById('end_date');
         const durationDisplay = document.getElementById('duration-display');
         const dateRangeDisplay = document.getElementById('date-range-display');
-        const fileInput = document.getElementById('attachment');
-        const fileNameDisplay = document.getElementById('file-name');
         const resetBtn = document.getElementById('resetBtn');
         const resetText = document.getElementById('resetText');
         const leaveForm = document.getElementById('leaveForm');
+        
+        // Function to calculate working days only (exclude weekends)
+        function calculateWorkingDays(start, end) {
+            let workDays = 0;
+            let current = new Date(start);
+            
+            while (current <= end) {
+                // 0 = Sunday, 6 = Saturday
+                const dayOfWeek = current.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    workDays++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            
+            return workDays;
+        }
         
         // Function to calculate duration
         function calculateDuration() {
@@ -441,17 +357,18 @@
             const end = new Date(endDateInput.value);
             
             if (startDateInput.value && endDateInput.value && start <= end) {
-                const diffTime = Math.abs(end - start);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                // Calculate only working days (Monday-Friday)
+                const workDays = calculateWorkingDays(start, end);
                 
-                durationDisplay.textContent = diffDays + ' hari';
+                durationDisplay.textContent = workDays + ' hari kerja';
+                durationDisplay.classList.remove('text-red-600');
                 
                 // Format dates for display
                 const options = { day: 'numeric', month: 'long', year: 'numeric' };
                 const startFormatted = start.toLocaleDateString('id-ID', options);
                 const endFormatted = end.toLocaleDateString('id-ID', options);
                 
-                dateRangeDisplay.textContent = `${startFormatted} - ${endFormatted}`;
+                dateRangeDisplay.textContent = `${startFormatted} - ${endFormatted} (${workDays} hari kerja)`;
             } else if (startDateInput.value && endDateInput.value && start > end) {
                 durationDisplay.textContent = 'Tanggal tidak valid';
                 dateRangeDisplay.textContent = 'Tanggal selesai harus setelah tanggal mulai';
@@ -467,17 +384,6 @@
         startDateInput.addEventListener('change', calculateDuration);
         endDateInput.addEventListener('change', calculateDuration);
         
-        // File upload display
-        fileInput.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                const file = this.files[0];
-                const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-                fileNameDisplay.textContent = `${file.name} (${fileSize} MB)`;
-            } else {
-                fileNameDisplay.textContent = 'Maksimal 5MB (PDF, JPG, JPEG, PNG)';
-            }
-        });
-        
         // Set minimum date to today
         const today = new Date().toISOString().split('T')[0];
         startDateInput.min = today;
@@ -489,10 +395,6 @@
         function resetForm() {
             // Reset the form
             leaveForm.reset();
-            
-            // Manually clear file input (HTML reset doesn't clear file inputs)
-            fileInput.value = '';
-            fileNameDisplay.textContent = 'Maksimal 5MB (PDF, JPG, JPEG, PNG)';
             
             // Reset duration display
             durationDisplay.textContent = '0 hari';
@@ -534,7 +436,7 @@
             }, 2000);
             
             // Focus on first input for better UX
-            document.querySelector('select[name="leave_type"]').focus();
+            startDateInput.focus();
         }
         
         // Add click event to reset button

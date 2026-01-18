@@ -16,8 +16,9 @@ class AdminSettingController extends Controller
     public function storeHoliday(Request $request)
     {
         $data = $request->validate([
-            'date'        => ['required', 'date', 'unique:holidays,date'],
-            'description' => ['required', 'string', 'max:255'],
+            'date'        => ['required', 'date', 'unique:libur,date'],
+            'name'        => ['required', 'string', 'max:255'],
+            'keterangan'  => ['nullable', 'string', 'max:500'],
         ]);
 
         Holiday::create($data);
@@ -28,8 +29,9 @@ class AdminSettingController extends Controller
     public function updateHoliday(Request $request, Holiday $holiday)
     {
         $data = $request->validate([
-            'date'        => ['required', 'date', 'unique:holidays,date,' . $holiday->id],
-            'description' => ['required', 'string', 'max:255'],
+            'date'        => ['required', 'date', 'unique:libur,date,' . $holiday->id],
+            'name'        => ['required', 'string', 'max:255'],
+            'keterangan'  => ['nullable', 'string', 'max:500'],
         ]);
 
         $holiday->update($data);

@@ -134,25 +134,55 @@
                                 @enderror
                             </div>
 
-                            <!-- Description Field -->
+                            <!-- Name Field -->
                             <div class="space-y-2">
                                 <label class="block">
-                                    <span class="text-gray-700 font-medium">Keterangan Libur <span class="text-red-500">*</span></span>
+                                    <span class="text-gray-700 font-medium">Nama Hari Libur <span class="text-red-500">*</span></span>
+                                    <div class="relative mt-1">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v13a2 2 0 002 2z"/>
+                                            </svg>
+                                        </div>
+                                        <input type="text" name="name" required
+                                               class="block w-full pl-10 pr-3 py-3 rounded-lg border border-[#DCE5DF] bg-[#F9FAF7] 
+                                                      focus:ring-2 focus:ring-[#F2B705] focus:border-[#F2B705] focus:bg-white 
+                                                      transition-colors placeholder-gray-500 text-gray-800"
+                                               placeholder="Contoh: Hari Raya Idul Fitri"
+                                               value="{{ old('name') }}">
+                                    </div>
+                                </label>
+                                @error('name')
+                                    <div class="flex items-start space-x-2 text-red-600 text-sm mt-1 bg-red-50 px-3 py-2 rounded-lg">
+                                        <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span>{{ $message }}</span>
+                                    </div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div>
+                            <!-- Keterangan Field -->
+                            <div class="space-y-2">
+                                <label class="block">
+                                    <span class="text-gray-700 font-medium">Keterangan (Opsional)</span>
                                     <div class="relative mt-1">
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
                                             </svg>
                                         </div>
-                                        <input type="text" name="description" required
+                                        <input type="text" name="keterangan"
                                                class="block w-full pl-10 pr-3 py-3 rounded-lg border border-[#DCE5DF] bg-[#F9FAF7] 
                                                       focus:ring-2 focus:ring-[#F2B705] focus:border-[#F2B705] focus:bg-white 
                                                       transition-colors placeholder-gray-500 text-gray-800"
-                                               placeholder="Contoh: Hari Raya Idul Fitri"
-                                               value="{{ old('description') }}">
+                                               placeholder="Contoh: Hari Besar Islam"
+                                               value="{{ old('keterangan') }}">
                                     </div>
                                 </label>
-                                @error('description')
+                                @error('keterangan')
                                     <div class="flex items-start space-x-2 text-red-600 text-sm mt-1 bg-red-50 px-3 py-2 rounded-lg">
                                         <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
@@ -202,6 +232,9 @@
                                         <div>
                                             <!-- Format tanggal Indonesia: Senin, 15 Januari 2025 -->
                                             <p class="font-medium text-[#083D1D]">
+                                                {{ $holiday->name }}
+                                            </p>
+                                            <p class="text-xs text-gray-500 mt-0.5">
                                                 @php
                                                     // Set locale Carbon ke Indonesia
                                                     \Carbon\Carbon::setLocale('id');
@@ -209,14 +242,16 @@
                                                 @endphp
                                                 {{ $date->isoFormat('dddd, D MMMM YYYY') }}
                                             </p>
-                                            <p class="text-sm text-gray-600 mt-1">{{ $holiday->description }}</p>
+                                            @if($holiday->keterangan)
+                                                <p class="text-sm text-gray-600 mt-1">{{ $holiday->keterangan }}</p>
+                                            @endif
                                         </div>
                                     </div>
                                     
                                     <div class="flex items-center space-x-2">
                                         <!-- Edit Button dengan Modal -->
                                         <button type="button" 
-                                                onclick="openEditModal({{ $holiday->id }}, '{{ $holiday->date }}', '{{ addslashes($holiday->description) }}')"
+                                                onclick="openEditModal({{ $holiday->id }}, '{{ $holiday->date }}', '{{ addslashes($holiday->name) }}', '{{ addslashes($holiday->keterangan) }}')"
                                                 class="inline-flex items-center px-3 py-1.5 rounded-lg border border-yellow-200 
                                                        bg-yellow-50 text-yellow-700 hover:bg-yellow-100 hover:border-yellow-300 
                                                        transition-colors duration-200">
@@ -349,10 +384,28 @@
                         </div>
                     </div>
                     
-                    <!-- Description Field -->
+                    <!-- Name Field -->
                     <div>
                         <label class="block text-sm font-medium text-[#083D1D] mb-1">
-                            Keterangan Libur <span class="text-red-500">*</span>
+                            Nama Hari Libur <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v13a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <input type="text" name="name" id="editName" required
+                                   class="block w-full pl-10 pr-3 py-2.5 rounded-lg border border-[#DCE5DF] bg-[#F9FAF7]
+                                          focus:ring-2 focus:ring-[#F2B705] focus:border-[#F2B705]"
+                                   placeholder="Contoh: Hari Raya Idul Fitri">
+                        </div>
+                    </div>
+                    
+                    <!-- Keterangan Field -->
+                    <div>
+                        <label class="block text-sm font-medium text-[#083D1D] mb-1">
+                            Keterangan (Opsional)
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -360,10 +413,10 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
                                 </svg>
                             </div>
-                            <input type="text" name="description" id="editDescription" required
+                            <input type="text" name="keterangan" id="editKeterangan"
                                    class="block w-full pl-10 pr-3 py-2.5 rounded-lg border border-[#DCE5DF] bg-[#F9FAF7]
                                           focus:ring-2 focus:ring-[#F2B705] focus:border-[#F2B705]"
-                                   placeholder="Contoh: Hari Raya Idul Fitri">
+                                   placeholder="Contoh: Hari Besar Islam">
                         </div>
                     </div>
                 </div>
@@ -407,9 +460,9 @@
         if (form) {
             form.addEventListener('submit', function(e) {
                 const date = document.querySelector('input[name="date"]').value;
-                const description = document.querySelector('input[name="description"]').value.trim();
+                const name = document.querySelector('input[name="name"]').value.trim();
                 
-                if (!date || !description) {
+                if (!date || !name) {
                     e.preventDefault();
                     alert('Harap isi semua field yang diperlukan!');
                     return false;
@@ -437,14 +490,15 @@
     }
     
     // Edit Modal Functions
-    function openEditModal(id, date, description) {
+    function openEditModal(id, date, name, keterangan) {
         // Set form action
         const form = document.getElementById('editForm');
         form.action = `/admin/settings/holidays/${id}`;
         
         // Fill form values
         document.getElementById('editDate').value = date;
-        document.getElementById('editDescription').value = description.replace(/\\/g, '');
+        document.getElementById('editName').value = name.replace(/\\/g, '');
+        document.getElementById('editKeterangan').value = keterangan ? keterangan.replace(/\\/g, '') : '';
         
         // Show modal with animation
         const modal = document.getElementById('editModal');
@@ -492,9 +546,9 @@
     if (editForm) {
         editForm.addEventListener('submit', function(e) {
             const date = document.getElementById('editDate').value;
-            const description = document.getElementById('editDescription').value.trim();
+            const name = document.getElementById('editName').value.trim();
             
-            if (!date || !description) {
+            if (!date || !name) {
                 e.preventDefault();
                 alert('Harap isi semua field yang diperlukan!');
                 return false;

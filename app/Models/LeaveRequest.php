@@ -14,28 +14,25 @@ use Carbon\Carbon;
 
 class LeaveRequest extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+
+    protected $table = 'cuti_pengajuan';
 
     protected $fillable = [
         'user_id',
-        'leave_type',
         'start_date',
         'end_date',
-        'days',
-        'reason',
-        'file_path',
+        'alasan',
         'status',
-        'approved_by',
-        'admin_notes',
-        'submitted_at',
-        'reviewed_at',
+        'catatan_penolakan',
+        'disetujui_oleh',
+        'disetujui_pada',
     ];
 
     protected $casts = [
-        'start_date'   => 'date',
-        'end_date'     => 'date',
-        'submitted_at' => 'datetime',
-        'reviewed_at'  => 'datetime',
+        'start_date'      => 'date',
+        'end_date'        => 'date',
+        'disetujui_pada'  => 'datetime',
     ];
 
     /**
@@ -43,16 +40,6 @@ class LeaveRequest extends Model
      */
     protected static function booted()
     {
-        static::saving(function (LeaveRequest $leave) {
-            // Hanya hitung jika data tanggal lengkap
-            if ($leave->start_date && $leave->end_date) {
-                $days = $leave->calculateDays();
-                
-                // Simpan nilai days (ini akan di-override jika ada perhitungan khusus)
-                $leave->days = $days;
-            }
-        });
-
         // Setelah disimpan, jika approved, potong kuota
         static::updated(function (LeaveRequest $leave) {
             if ($leave->wasChanged('status') && $leave->status === 'approved') {
@@ -253,7 +240,7 @@ class LeaveRequest extends Model
         }
 
         // Ambil tanggal libur
-        $holidayDates = Holiday::pluck('date')
+        $holidayDates = \App\Models\Libur::pluck('date')
             ->map(fn ($date) => Carbon::parse($date)->format('Y-m-d'))
             ->all();
 

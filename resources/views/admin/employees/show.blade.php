@@ -9,22 +9,22 @@
     $backgroundColor = '#F9FAF7';   // Putih / Abu muda
     $borderColor = '#DCE5DF';       // Abu kehijauan
 
-    // Gunakan data dari controller - INI PERUBAHAN PENTING
-    $totalActiveLeave = $totalActiveLeave ?? 0;
-    $activeLeaveDetails = $activeLeaveDetails ?? [];
-    $currentYear = $currentYear ?? now()->year;
-    $prevYear = $prevYear ?? $currentYear - 1;
-    $currentYearUsed = $currentYearUsed ?? 0;
-    $currentYearQuota = $currentYearQuota ?? 0;
-    $usedFromPrev = $usedFromPrev ?? 0;
-    $usedFromCurrent = $usedFromCurrent ?? 0;
+    // Hitung sisa cuti dari objek cuti
+    $totalActiveLeave = $cuti ? ($cuti->kuota_tahunan - $cuti->cuti_dipakai) : 0;
+    $activeLeaveDetails = [];
+    $currentYear = now()->year;
+    $prevYear = $currentYear - 1;
+    $currentYearUsed = $cuti ? $cuti->cuti_dipakai : 0;
+    $currentYearQuota = $cuti ? $cuti->kuota_tahunan : 0;
+    $usedFromPrev = 0;
+    $usedFromCurrent = $currentYearUsed;
     
     // Cari detail tahun sebelumnya dan berjalan dari activeLeaveDetails
     $prevYearDetail = collect($activeLeaveDetails)->firstWhere('year', $prevYear);
     $currentYearDetail = collect($activeLeaveDetails)->firstWhere('year', $currentYear);
     
     $prevYearRemaining = $prevYearDetail['remaining'] ?? 0;
-    $currentYearRemaining = $currentYearDetail['remaining'] ?? 0;
+    $currentYearRemaining = $currentYearDetail['remaining'] ?? $totalActiveLeave;
     $isPrevExpired = $prevYearDetail['is_expired'] ?? false;
     
     // Warna untuk card Sisa Cuti Aktif - DIUBAH MENGGUNAKAN PALET KEJAKSAAN
@@ -111,24 +111,13 @@
                                     Pegawai Aktif
                                 </span>
                                 <span class="inline-flex items-center px-3 py-1 rounded-full bg-[#DCE5DF] text-[#083D1D] text-sm font-medium">
-                                    {{ $employee->gender === 'male' ? 'Pria' : 'Wanita' }}
+                                    {{ $pegawai->jenis_kelamin === 'male' ? 'Laki-laki' : 'Perempuan' }}
                                 </span>
                             </div>
                         </div>
                         
                         <!-- Quick Stats -->
                         <div class="flex flex-wrap gap-4 pt-2">
-                            <div class="flex items-center">
-                                <div class="p-1.5 bg-[#F2B705]/10 rounded-lg mr-2 border border-[#F2B705]/20">
-                                    <svg class="w-4 h-4 text-[#F2B705]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-[#083D1D]/70">Total Pengajuan</p>
-                                    <p class="text-sm font-semibold text-[#083D1D]">{{ $leaves->count() }} kali</p>
-                                </div>
-                            </div>
                             <!-- SISA CUTI AKTIF -->
                             <div class="flex items-center">
                                 <div class="p-1.5 bg-[#0B5E2E]/10 rounded-lg mr-2 border border-[#0B5E2E]/20">
@@ -453,7 +442,7 @@
                 <div class="tab-content hidden" id="leave-history-tab">
                     <h2 class="text-lg font-semibold text-[#083D1D] mb-6">Riwayat Pengajuan Cuti</h2>
 
-                    @forelse($leaves as $leave)
+                    @forelse([] as $leave)
                         @php
                             $statusConfig = [
                                 'pending' => [

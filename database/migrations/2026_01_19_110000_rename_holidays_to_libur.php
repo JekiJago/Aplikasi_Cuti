@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        // Rename table holidays menjadi libur
+        Schema::rename('holidays', 'libur');
+        
+        // Rename columns
+        Schema::table('libur', function (Blueprint $table) {
+            $table->renameColumn('description', 'keterangan');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        // Revert rename columns
+        Schema::table('libur', function (Blueprint $table) {
+            $table->renameColumn('keterangan', 'description');
+        });
+        
+        // Rename table back
+        Schema::rename('libur', 'holidays');
+    }
+};
