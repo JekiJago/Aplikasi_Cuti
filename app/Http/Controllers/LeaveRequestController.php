@@ -46,6 +46,42 @@ class LeaveRequestController extends Controller
         $currentYear   = now()->year;
         $previousYear  = $currentYear - 1;
         
+        // Import KuotaTahunan untuk ambil data kuota per tahun
+        $kuotaTahunanData = \App\Models\KuotaTahunan::where('user_id', $user->id)
+            ->whereIn('tahun', [$previousYear, $currentYear])
+            ->where('expired', false)
+            ->orderBy('tahun', 'asc')
+            ->get();
+
+        // Siapkan kuota detail seperti di dashboard
+        $kuotaDetail = [
+            'tahun_lalu' => null,
+            'tahun_sekarang' => null,
+            'total_tersedia' => 0,
+        ];
+
+        foreach ($kuotaTahunanData as $kuota) {
+            $sisa = $kuota->kuota - $kuota->dipakai;
+            
+            if ($kuota->tahun == $previousYear) {
+                $kuotaDetail['tahun_lalu'] = [
+                    'tahun' => $kuota->tahun,
+                    'kuota' => $kuota->kuota,
+                    'dipakai' => $kuota->dipakai,
+                    'sisa' => $sisa,
+                ];
+            } elseif ($kuota->tahun == $currentYear) {
+                $kuotaDetail['tahun_sekarang'] = [
+                    'tahun' => $kuota->tahun,
+                    'kuota' => $kuota->kuota,
+                    'dipakai' => $kuota->dipakai,
+                    'sisa' => $sisa,
+                ];
+            }
+            
+            $kuotaDetail['total_tersedia'] += $sisa;
+        }
+
         // Get available annual leave
         $availableQuota = $this->leaveBalanceService->getAvailableAnnualLeaveWithPriority($user->id);
         $totalAvailable = $availableQuota['total_available'];
@@ -54,6 +90,7 @@ class LeaveRequestController extends Controller
             'remaining'           => $totalAvailable,
             'currentYear'         => $currentYear,
             'previousYear'        => $previousYear,
+            'kuotaDetail'         => $kuotaDetail,
         ]);
     }
 

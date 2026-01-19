@@ -91,22 +91,20 @@
                 </div>
                 <p class="text-sm text-[#083D1D]/70 mb-2">Sisa Cuti {{ $currentYear }}</p>
                 <p class="text-3xl font-bold text-[#0B5E2E] mb-1">
-                    {{ $currentYearSummary['current_year_available'] ?? 0 }} hari
+                    {{ $kuotaDetail['tahun_sekarang']['sisa'] ?? 0 }} hari
                 </p>
                 <div class="text-xs text-[#083D1D]/70">
-                    @if(isset($currentYearSummary['details'][$currentYear]))
+                    @if($kuotaDetail['tahun_sekarang'])
                         @php
-                            $detail = $currentYearSummary['details'][$currentYear];
-                            $used = $detail['used'] ?? 0;
-                            $quota = $detail['quota'] ?? 0;
+                            $detail = $kuotaDetail['tahun_sekarang'];
                         @endphp
                         <div class="flex items-center justify-between mb-1">
-                            <span>Terpakai: {{ $used }} hari</span>
-                            <span>Kuota: {{ $quota }} hari</span>
+                            <span>Terpakai: {{ $detail['dipakai'] }} hari</span>
+                            <span>Kuota: {{ $detail['kuota'] }} hari</span>
                         </div>
                         <div class="w-full bg-[#DCE5DF] rounded-full h-1.5">
                             <div class="bg-gradient-to-r from-[#0B5E2E] to-[#083D1D] h-1.5 rounded-full" 
-                                 style="width: {{ $quota > 0 ? min(100, round(($used / $quota) * 100)) : 0 }}%">
+                                 style="width: {{ $detail['kuota'] > 0 ? min(100, round(($detail['dipakai'] / $detail['kuota']) * 100)) : 0 }}%">
                             </div>
                         </div>
                     @else
@@ -129,33 +127,22 @@
                 </div>
                 <p class="text-sm text-[#083D1D]/70 mb-2">Sisa Cuti {{ $previousYear }}</p>
                 <p class="text-3xl font-bold text-[#083D1D] mb-1">
-                    {{ $previousYearSummary['current_year_available'] ?? 0 }} hari
+                    {{ $kuotaDetail['tahun_lalu']['sisa'] ?? 0 }} hari
                 </p>
                 <div class="text-xs text-[#083D1D]/70">
-                    @if(isset($previousYearSummary['details'][$previousYear]))
+                    @if($kuotaDetail['tahun_lalu'])
                         @php
-                            $detail = $previousYearSummary['details'][$previousYear];
-                            $used = $detail['used'] ?? 0;
-                            $quota = $detail['quota'] ?? 0;
-                            $isExpired = $detail['is_expired'] ?? false;
+                            $detail = $kuotaDetail['tahun_lalu'];
                         @endphp
                         <div class="flex items-center justify-between mb-1">
-                            <span>Terpakai: {{ $used }} hari</span>
-                            <span>Kuota: {{ $quota }} hari</span>
+                            <span>Terpakai: {{ $detail['dipakai'] }} hari</span>
+                            <span>Kuota: {{ $detail['kuota'] }} hari</span>
                         </div>
                         <div class="w-full bg-[#DCE5DF] rounded-full h-1.5">
                             <div class="bg-gradient-to-r from-[#083D1D] to-[#0B5E2E] h-1.5 rounded-full" 
-                                 style="width: {{ $quota > 0 ? min(100, round(($used / $quota) * 100)) : 0 }}%">
+                                 style="width: {{ $detail['kuota'] > 0 ? min(100, round(($detail['dipakai'] / $detail['kuota']) * 100)) : 0 }}%">
                             </div>
                         </div>
-                        @if($isExpired)
-                            <div class="mt-1 text-[#F2B705]">
-                                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                Kuota telah kadaluarsa
-                            </div>
-                        @endif
                     @else
                         <span class="text-[#F2B705]">Kuota belum diatur</span>
                     @endif
@@ -180,36 +167,32 @@
                     <div class="text-center">
                         <p class="text-sm text-[#083D1D]/70 mb-1">Tahun {{ $currentYear }}</p>
                         <p class="text-2xl font-bold text-[#0B5E2E]">
-                            {{ $currentYearSummary['current_year_available'] ?? 0 }}<span class="text-sm">hr</span>
+                            {{ $kuotaDetail['tahun_sekarang']['sisa'] ?? 0 }}<span class="text-sm">hr</span>
                         </p>
-                        @if(isset($currentYearSummary['details'][$currentYear]))
+                        @if($kuotaDetail['tahun_sekarang'])
                             <p class="text-xs text-[#083D1D]/70 mt-1">
-                                {{ $currentYearSummary['details'][$currentYear]['used'] ?? 0 }}/{{ $currentYearSummary['details'][$currentYear]['quota'] ?? 0 }} hari
+                                {{ $kuotaDetail['tahun_sekarang']['dipakai'] }}/{{ $kuotaDetail['tahun_sekarang']['kuota'] }} hari
                             </p>
                         @endif
                     </div>
                     <div class="text-center">
                         <p class="text-sm text-[#083D1D]/70 mb-1">Tahun {{ $previousYear }}</p>
                         <p class="text-2xl font-bold text-[#083D1D]">
-                            {{ $previousYearSummary['current_year_available'] ?? 0 }}<span class="text-sm">hr</span>
+                            {{ $kuotaDetail['tahun_lalu']['sisa'] ?? 0 }}<span class="text-sm">hr</span>
                         </p>
-                        @if(isset($previousYearSummary['details'][$previousYear]))
+                        @if($kuotaDetail['tahun_lalu'])
                             <p class="text-xs text-[#083D1D]/70 mt-1">
-                                {{ $previousYearSummary['details'][$previousYear]['used'] ?? 0 }}/{{ $previousYearSummary['details'][$previousYear]['quota'] ?? 0 }} hari
+                                {{ $kuotaDetail['tahun_lalu']['dipakai'] }}/{{ $kuotaDetail['tahun_lalu']['kuota'] }} hari
                             </p>
                         @endif
                     </div>
                 </div>
                 <div class="mt-4">
                     @php
-                        $totalCurrent = $currentYearSummary['current_year_available'] ?? 0;
-                        $totalPrevious = $previousYearSummary['current_year_available'] ?? 0;
-                        $totalAvailable = $totalCurrent + $totalPrevious;
-                        $maxQuota = max(1, 
-                            (($currentYearSummary['details'][$currentYear]['quota'] ?? 12) +
-                            ($previousYearSummary['details'][$previousYear]['quota'] ?? 12))
-                        );
-                        $percentage = $maxQuota > 0 ? min(100, round(($totalAvailable / $maxQuota) * 100)) : 0;
+                        $totalAvailable = $kuotaDetail['total_tersedia'];
+                        $totalQuota = ($kuotaDetail['tahun_sekarang']['kuota'] ?? 0) + 
+                                     ($kuotaDetail['tahun_lalu']['kuota'] ?? 0);
+                        $percentage = $totalQuota > 0 ? min(100, round(($totalAvailable / $totalQuota) * 100)) : 0;
                     @endphp
                     <div class="flex justify-between text-xs text-[#083D1D]/70 mb-1">
                         <span>Total Kuota Tersedia</span>
@@ -290,12 +273,13 @@
                 <div class="divide-y divide-[#DCE5DF]/50">
                     @php
                         $yearsData = [
-                            $currentYear => $currentYearSummary['details'][$currentYear] ?? null,
-                            $previousYear => $previousYearSummary['details'][$previousYear] ?? null,
+                            $currentYear => $kuotaDetail['tahun_sekarang'],
+                            $previousYear => $kuotaDetail['tahun_lalu'],
                         ];
                     @endphp
                     
                     @foreach($yearsData as $year => $detail)
+                        @if($detail)
                         <div class="px-6 py-4 hover:bg-[#F9FAF7] transition-colors duration-150">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
@@ -308,85 +292,29 @@
                                     </div>
                                     <div>
                                         <p class="text-sm font-medium text-[#083D1D]">
-                                            @if($detail)
-                                                @if($year == $currentYear)
-                                                    {{ $currentYearSummary['current_year_available'] }} hari tersisa
-                                                @else
-                                                    {{ $previousYearSummary['current_year_available'] }} hari tersisa
-                                                @endif
-                                                @if($detail['is_expired'] ?? false)
-                                                    <span class="ml-2 text-xs text-[#F2B705]">(Kadaluarsa)</span>
-                                                @endif
-                                            @else
-                                                Kuota belum diatur
-                                            @endif
+                                            {{ $detail['sisa'] }} hari tersisa
                                         </p>
-                                        @if($detail)
-                                            <p class="text-xs text-[#083D1D]/70 mt-1">
-                                                Terpakai: {{ $detail['used'] }} hari | 
-                                                Kuota: {{ $detail['quota'] }} hari |
-                                                Sisa: 
-                                                @if($year == $currentYear)
-                                                    {{ $currentYearSummary['current_year_available'] }}
-                                                @else
-                                                    {{ $previousYearSummary['current_year_available'] }}
-                                                @endif
-                                                hari
-                                            </p>
-                                        @endif
+                                        <p class="text-xs text-[#083D1D]/70 mt-1">
+                                            Terpakai: {{ $detail['dipakai'] }} hari | 
+                                            Kuota: {{ $detail['kuota'] }} hari |
+                                            Sisa: {{ $detail['sisa'] }} hari
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    @if($detail)
-                                        @if($year == $currentYear)
-                                            @if($currentYearSummary['current_year_available'] > 0)
-                                                <span class="text-xs px-2 py-1 rounded-full bg-[#0B5E2E]/10 text-[#083D1D] border border-[#0B5E2E]/20">
-                                                    Tersedia
-                                                </span>
-                                            @else
-                                                <span class="text-xs px-2 py-1 rounded-full bg-[#DCE5DF] text-[#083D1D]/70 border border-[#DCE5DF]">
-                                                    Habis
-                                                </span>
-                                            @endif
-                                        @else
-                                            @if($previousYearSummary['current_year_available'] > 0)
-                                                <span class="text-xs px-2 py-1 rounded-full bg-[#083D1D]/10 text-[#083D1D] border border-[#083D1D]/20">
-                                                    Tersedia
-                                                </span>
-                                            @else
-                                                <span class="text-xs px-2 py-1 rounded-full bg-[#DCE5DF] text-[#083D1D]/70 border border-[#DCE5DF]">
-                                                    Habis
-                                                </span>
-                                            @endif
-                                        @endif
+                                    @if($detail['sisa'] > 0)
+                                        <span class="text-xs px-2 py-1 rounded-full @if($year == $currentYear) bg-[#0B5E2E]/10 text-[#083D1D] border border-[#0B5E2E]/20 @else bg-[#083D1D]/10 text-[#083D1D] border border-[#083D1D]/20 @endif">
+                                            Tersedia
+                                        </span>
                                     @else
-                                        <span class="text-xs px-2 py-1 rounded-full bg-[#F2B705]/10 text-[#083D1D] border border-[#F2B705]/20">
-                                            Belum diatur
+                                        <span class="text-xs px-2 py-1 rounded-full bg-[#DCE5DF] text-[#083D1D]/70 border border-[#DCE5DF]">
+                                            Habis
                                         </span>
                                     @endif
                                 </div>
                             </div>
-                            <!-- Progress Bar -->
-                            @if($detail && $detail['quota'] > 0)
-                                @php
-                                    $usedPercentage = round(($detail['used'] / $detail['quota']) * 100);
-                                @endphp
-                                <div class="mt-3">
-                                    <div class="flex justify-between text-xs text-[#083D1D]/70 mb-1">
-                                        <span>Penggunaan</span>
-                                        <span>{{ $usedPercentage }}%</span>
-                                    </div>
-                                    <div class="w-full h-2 bg-[#DCE5DF] rounded-full overflow-hidden">
-                                        <div class="h-full 
-                                            @if($year == $currentYear) bg-gradient-to-r from-[#0B5E2E] to-[#083D1D]
-                                            @else bg-gradient-to-r from-[#083D1D] to-[#0B5E2E]
-                                            @endif 
-                                            rounded-full transition-all duration-500" 
-                                             style="width: {{ $usedPercentage }}%"></div>
-                                    </div>
-                                </div>
-                            @endif
                         </div>
+                        @endif
                     @endforeach
                 </div>
             </div>
@@ -412,7 +340,7 @@
                         <div class="px-6 py-4 hover:bg-[#F9FAF7] transition-colors duration-150">
                             <div class="flex items-center justify-between mb-2">
                                 <div>
-                                    <p class="font-medium text-[#083D1D] capitalize">{{ str_replace('_', ' ', $leave->leave_type) }}</p>
+                                    <p class="font-medium text-[#083D1D]">Pengajuan Cuti</p>
                                     <p class="text-sm text-[#083D1D]/70 mt-1">
                                         <svg class="w-4 h-4 inline mr-1 text-[#083D1D]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>

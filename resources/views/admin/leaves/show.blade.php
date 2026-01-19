@@ -108,12 +108,12 @@
                     
                     <div>
                         <p class="text-xs text-[#083D1D]/70 mb-1">Durasi Cuti</p>
-                        <p class="text-lg font-bold text-[#083D1D]">{{ $leave->days }} hari</p>
+                        <p class="text-lg font-bold text-[#083D1D]">{{ $leave->days ?? 0 }} hari</p>
                     </div>
                     
                     <div>
                         <p class="text-xs text-[#083D1D]/70 mb-1">Alasan Cuti</p>
-                        <p class="text-[#083D1D] p-3 bg-[#F9FAF7] rounded-lg border border-[#DCE5DF]">{{ $leave->reason ?: '-' }}</p>
+                        <p class="text-[#083D1D] p-3 bg-[#F9FAF7] rounded-lg border border-[#DCE5DF]">{{ $leave->alasan ?: '-' }}</p>
                     </div>
                 </div>
                 

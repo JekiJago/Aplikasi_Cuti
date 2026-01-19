@@ -110,18 +110,102 @@
 
         <!-- Quota Summary Card -->
         <div class="bg-white rounded-2xl shadow-xl border border-[#DCE5DF] p-6 mb-8">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between mb-6">
                 <div>
-                    <p class="text-sm text-gray-600 mb-2">Sisa Kuota Cuti Tahunan</p>
-                    <p class="text-4xl font-bold text-[#083D1D]">{{ $remaining }} <span class="text-lg">hari</span></p>
+                    <p class="text-sm text-gray-600 mb-2">Sisa Kuota Cuti Tersedia</p>
+                    <p class="text-4xl font-bold text-[#083D1D]">{{ $kuotaDetail['total_tersedia'] }} <span class="text-lg">hari</span></p>
                 </div>
-                <div class="p-3 rounded-full {{ $remaining > 0 ? 'bg-green-50' : 'bg-red-50' }}">
-                    <svg class="w-8 h-8 {{ $remaining > 0 ? 'text-green-600' : 'text-red-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="p-3 rounded-full {{ $kuotaDetail['total_tersedia'] > 0 ? 'bg-green-50' : 'bg-red-50' }}">
+                    <svg class="w-8 h-8 {{ $kuotaDetail['total_tersedia'] > 0 ? 'text-green-600' : 'text-red-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
             </div>
-            <p class="text-xs text-gray-500 mt-3">Hanya menghitung hari kerja (Senin-Jumat), hari libur tidak dihitung</p>
+
+            <!-- Breakdown per Tahun -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Tahun Sekarang (2026) -->
+                <div class="bg-gradient-to-br from-[#F9FAF7] to-[#DCE5DF]/30 border border-[#0B5E2E]/20 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="p-2 bg-[#0B5E2E]/10 rounded-lg mr-2">
+                                <svg class="w-5 h-5 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-[#083D1D]/70">Tahun Ini</p>
+                                <p class="text-lg font-bold text-[#0B5E2E]">{{ $currentYear }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    @if($kuotaDetail['tahun_sekarang'])
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Kuota</span>
+                                <span class="font-semibold text-[#083D1D]">{{ $kuotaDetail['tahun_sekarang']['kuota'] }} hari</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Terpakai</span>
+                                <span class="font-semibold text-[#083D1D]">{{ $kuotaDetail['tahun_sekarang']['dipakai'] }} hari</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Sisa</span>
+                                <span class="font-bold text-[#0B5E2E]">{{ $kuotaDetail['tahun_sekarang']['sisa'] }} hari</span>
+                            </div>
+                            <div class="w-full bg-[#DCE5DF] rounded-full h-2 mt-2">
+                                <div class="bg-gradient-to-r from-[#0B5E2E] to-[#083D1D] h-2 rounded-full" 
+                                     style="width: {{ $kuotaDetail['tahun_sekarang']['kuota'] > 0 ? min(100, round(($kuotaDetail['tahun_sekarang']['dipakai'] / $kuotaDetail['tahun_sekarang']['kuota']) * 100)) : 0 }}%">
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <p class="text-sm text-[#F2B705]">Kuota belum diatur</p>
+                    @endif
+                </div>
+
+                <!-- Tahun Lalu (2025) -->
+                <div class="bg-gradient-to-br from-[#F9FAF7] to-[#DCE5DF]/30 border border-[#083D1D]/20 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="p-2 bg-[#083D1D]/10 rounded-lg mr-2">
+                                <svg class="w-5 h-5 text-[#083D1D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-[#083D1D]/70">Tahun Sebelumnya</p>
+                                <p class="text-lg font-bold text-[#083D1D]">{{ $previousYear }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    @if($kuotaDetail['tahun_lalu'])
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Kuota</span>
+                                <span class="font-semibold text-[#083D1D]">{{ $kuotaDetail['tahun_lalu']['kuota'] }} hari</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Terpakai</span>
+                                <span class="font-semibold text-[#083D1D]">{{ $kuotaDetail['tahun_lalu']['dipakai'] }} hari</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Sisa</span>
+                                <span class="font-bold text-[#083D1D]">{{ $kuotaDetail['tahun_lalu']['sisa'] }} hari</span>
+                            </div>
+                            <div class="w-full bg-[#DCE5DF] rounded-full h-2 mt-2">
+                                <div class="bg-gradient-to-r from-[#083D1D] to-[#0B5E2E] h-2 rounded-full" 
+                                     style="width: {{ $kuotaDetail['tahun_lalu']['kuota'] > 0 ? min(100, round(($kuotaDetail['tahun_lalu']['dipakai'] / $kuotaDetail['tahun_lalu']['kuota']) * 100)) : 0 }}%">
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <p class="text-sm text-[#F2B705]">Kuota belum diatur</p>
+                    @endif
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-500 mt-4 pt-4 border-t border-[#DCE5DF]">Hanya menghitung hari kerja (Senin-Jumat), hari libur tidak dihitung. Pengurangan kuota dengan prioritas: Tahun {{ $previousYear }} dulu, baru Tahun {{ $currentYear }}</p>
         </div>
 
         <!-- Form Card -->

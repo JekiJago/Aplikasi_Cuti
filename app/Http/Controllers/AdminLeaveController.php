@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LeaveRequest;
+use App\Models\KuotaTahunan;
 use App\Services\LeaveBalanceService;
 use App\Models\AnnualQuota;
 use Illuminate\Http\Request;
@@ -61,19 +62,9 @@ class AdminLeaveController extends Controller
      */
     public function show($id)
     {
-        $leave = LeaveRequest::with(['user', 'approver'])->findOrFail($id);
-        
-        // Hitung hari kerja aktual jika cuti tahunan
-        $workingDays = 0;
-        if ($leave->leave_type === 'tahunan' && $leave->start_date && $leave->end_date) {
-            $daysPerYear = $this->leaveBalanceService->calculateAnnualDaysPerYear(
-                Carbon::parse($leave->start_date),
-                Carbon::parse($leave->end_date)
-            );
-            $workingDays = array_sum($daysPerYear);
-        }
+        $leave = LeaveRequest::with('user')->findOrFail($id);
 
-        return view('admin.leaves.show', compact('leave', 'workingDays'));
+        return view('admin.leaves.show', compact('leave'));
     }
 
     /**
@@ -102,27 +93,6 @@ class AdminLeaveController extends Controller
                     auth()->id(),
                     $request->input('admin_notes')
                 );
-
-                // 2. Potong kuota HANYA untuk cuti tahunan
-                if ($leave->leave_type === 'tahunan') {
-                    // Validasi ketersediaan kuota sebelum memotong
-                    $hasEnoughBalance = $this->leaveBalanceService->validateLeaveBalance(
-                        $leave->user_id,
-                        Carbon::parse($leave->start_date),
-                        Carbon::parse($leave->end_date)
-                    );
-
-                    if (!$hasEnoughBalance) {
-                        throw new \Exception('Kuota cuti tahunan tidak mencukupi.');
-                    }
-
-                    // Potong kuota dengan perhitungan hari kerja
-                    $this->leaveBalanceService->deductAnnualLeave(
-                        $leave->user_id,
-                        Carbon::parse($leave->start_date),
-                        Carbon::parse($leave->end_date)
-                    );
-                }
             });
 
             // TODO: kirim notifikasi ke pegawai
@@ -180,49 +150,21 @@ class AdminLeaveController extends Controller
 
         try {
             DB::transaction(function () use ($leave) {
-                // Kembalikan kuota jika cuti tahunan
-                if ($leave->leave_type === 'tahunan' && $leave->start_date && $leave->end_date) {
-                    // Hitung hari kerja yang sudah dipotong
-                    $daysPerYear = $this->leaveBalanceService->calculateAnnualDaysPerYear(
-                        Carbon::parse($leave->start_date),
-                        Carbon::parse($leave->end_date)
-                    );
-                    
-                    // Kembalikan kuota (reverse FIFO - newest first)
-                    foreach ($daysPerYear as $year => $daysToReturn) {
-                        if ($daysToReturn <= 0) continue;
-                        
-                        // Cari kuota untuk tahun ini atau sebelumnya
-                        $quotas = AnnualQuota::where('user_id', $leave->user_id)
-                            ->where('year', '<=', $year)
-                            ->where('used_days', '>', 0)
-                            ->orderBy('year', 'desc') // LIFO untuk pengembalian
-                            ->lockForUpdate()
-                            ->get();
-                        
-                        $remainingDays = $daysToReturn;
-                        
-                        foreach ($quotas as $quota) {
-                            if ($remainingDays <= 0) break;
-                            
-                            $used = $quota->used_days;
-                            $canReturn = min($used, $remainingDays);
-                            
-                            $quota->decrement('used_days', $canReturn);
-                            $remainingDays -= $canReturn;
-                        }
-                    }
-                }
+                // Hitung hari cuti yang sudah dipotong
+                $days = $leave->calculateDays();
 
                 // Batalkan status cuti
                 $leave->update([
                     'status' => 'pending',
-                    'approved_at' => null,
-                    'approved_by' => null,
-                    'rejected_at' => null,
-                    'rejected_by' => null,
-                    'admin_notes' => null,
+                    'disetujui_pada' => null,
+                    'disetujui_oleh' => null,
+                    'catatan_penolakan' => null,
                 ]);
+
+                // Kembalikan kuota menggunakan LIFO (current year first, then previous year)
+                if ($days > 0) {
+                    KuotaTahunan::kembalikanKuota($leave->user_id, $days);
+                }
             });
 
         } catch (\Throwable $e) {

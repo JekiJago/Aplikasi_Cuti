@@ -142,33 +142,75 @@
                             @enderror
                         </div>
 
-                        {{-- KUOTA CUTI TAHUNAN DEFAULT --}}
+                    </div>
+
+                    {{-- SECTION: KUOTA CUTI TAHUNAN --}}
+                    <div class="mb-6 mt-8">
+                        <h5 class="text-lg font-semibold text-[#083D1D] border-l-4 border-[#0B5E2E] pl-3 py-2 bg-green-50 rounded-r">
+                            <i class="fas fa-calendar-alt mr-2 text-[#0B5E2E]"></i> Kuota Cuti per Tahun (FIFO System)
+                        </h5>
+                    </div>
+
+                    <div class="mb-8 p-4 bg-blue-50 border-l-4 border-[#0B5E2E] rounded-r-lg">
+                        <div class="flex items-start">
+                            <i class="fas fa-info-circle text-[#0B5E2E] mt-0.5 mr-3 text-lg"></i>
+                            <div>
+                                <h6 class="font-semibold text-[#083D1D]">Sistem FIFO (First In First Out)</h6>
+                                <ul class="mt-2 text-sm text-[#083D1D] space-y-1">
+                                    <li>• Pegawai dapat menggunakan sisa cuti tahun sebelumnya terlebih dahulu</li>
+                                    <li>• Contoh: Tahun 2026 bisa gunakan sisa 2025 + kuota 2026</li>
+                                    <li>• Tahun 2027 bisa gunakan sisa 2026 + kuota 2027</li>
+                                    <li>• Kuota otomatis bergeser setiap tahun baru</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- KUOTA CUTI PER TAHUN --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
                             <label class="block text-sm font-medium text-[#083D1D] mb-2">
-                                Kuota Cuti Tahunan Default <span class="text-red-500">*</span>
+                                Sisa Cuti Tahun {{ now()->year - 1 }} (Opsional)
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-calendar text-gray-400"></i>
+                                </div>
+                                <input type="number"
+                                    name="previous_year_quota"
+                                    value="{{ old('previous_year_quota', 0) }}"
+                                    class="pl-10 block w-full rounded-lg border-[#DCE5DF] bg-[#F9FAF7] shadow-sm focus:border-[#0B5E2E] focus:ring-[#0B5E2E]"
+                                    placeholder="Contoh: 5"
+                                    min="0"
+                                    max="365">
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">
+                                <i class="fas fa-info-circle mr-1 text-[#0B5E2E]"></i> Sisa cuti tahun {{ now()->year - 1 }} yang belum digunakan
+                            </p>
+                        </div>
+
+                        {{-- KUOTA CUTI TAHUN SEKARANG --}}
+                        <div>
+                            <label class="block text-sm font-medium text-[#083D1D] mb-2">
+                                Kuota Cuti Tahun {{ now()->year }} <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <i class="fas fa-calendar-check text-gray-400"></i>
                                 </div>
                                 <input type="number"
-                                    name="annual_leave_quota"
-                                    value="{{ old('annual_leave_quota', 12) }}"
-                                    class="pl-10 block w-full rounded-lg border-[#DCE5DF] bg-[#F9FAF7] shadow-sm focus:border-[#F2B705] focus:ring-[#F2B705] @error('annual_leave_quota') border-red-500 @enderror"
+                                    name="current_year_quota"
+                                    value="{{ old('current_year_quota', 12) }}"
+                                    class="pl-10 block w-full rounded-lg border-[#DCE5DF] bg-[#F9FAF7] shadow-sm focus:border-[#0B5E2E] focus:ring-[#0B5E2E]"
                                     placeholder="Contoh: 12"
                                     min="0"
                                     max="365"
                                     required>
                             </div>
                             <p class="mt-1 text-xs text-gray-500">
-                                <i class="fas fa-info-circle mr-1 text-[#F2B705]"></i> Jumlah hari cuti tahunan default
+                                <i class="fas fa-info-circle mr-1 text-[#0B5E2E]"></i> Kuota cuti tahunan tahun {{ now()->year }}
                             </p>
-                            @error('annual_leave_quota')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
-
-
                     </div>
 
                     {{-- JENIS KELAMIN --}}

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Holiday;
 use App\Models\User;
 use App\Models\AnnualQuota;
+use App\Models\KuotaTahunan;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -36,19 +37,11 @@ class LeaveRequest extends Model
     ];
 
     /**
-     * 🔒 KUNCI PERHITUNGAN DAYS - OTOMATIS SETIAP KALI SIMPAN
+     * Accessor untuk menghitung jumlah hari kerja
      */
-    protected static function booted()
+    public function getDaysAttribute(): int
     {
-        // Setelah disimpan, jika approved, potong kuota
-        static::updated(function (LeaveRequest $leave) {
-            if ($leave->wasChanged('status') && $leave->status === 'approved') {
-                // Potong kuota tahunan jika jenis cuti tahunan
-                if ($leave->leave_type === 'tahunan') {
-                    $leave->deductAnnualQuota();
-                }
-            }
-        });
+        return $this->calculateDays();
     }
 
     /* ================= RELATIONS ================= */
@@ -60,7 +53,7 @@ class LeaveRequest extends Model
 
     public function approver(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $this->belongsTo(User::class, 'disetujui_oleh');
     }
 
     /* ================= SCOPES ================= */
@@ -89,7 +82,7 @@ class LeaveRequest extends Model
     /* ================= LOGIC ================= */
 
     /**
-     * Hitung jumlah hari cuti
+     * Hitung jumlah hari cuti (hari kerja: Senin-Jumat, tanpa libur)
      */
     public function calculateDays(): int
     {
@@ -100,11 +93,25 @@ class LeaveRequest extends Model
         $start = Carbon::parse($this->start_date);
         $end   = Carbon::parse($this->end_date);
 
-        if ($this->leave_type === 'tahunan') {
-            return self::workingDaysBetween($start, $end);
+        // Ambil tanggal libur
+        $holidayDates = Holiday::pluck('date')
+            ->map(fn ($date) => Carbon::parse($date)->format('Y-m-d'))
+            ->all();
+
+        $days   = 0;
+        $cursor = $start->copy();
+
+        while ($cursor->lte($end)) {
+            if (
+                !$cursor->isWeekend() &&
+                !in_array($cursor->format('Y-m-d'), $holidayDates, true)
+            ) {
+                $days++;
+            }
+            $cursor->addDay();
         }
 
-        return $start->diffInDays($end) + 1;
+        return $days;
     }
 
     /**
@@ -124,95 +131,17 @@ class LeaveRequest extends Model
             throw new \Exception('Cuti tidak bisa disetujui');
         }
 
-        // Pastikan days dihitung ulang sebelum approve
-        $this->days = $this->calculateDays();
-
         $this->status      = 'approved';
-        $this->approved_by = $adminId;
-        $this->admin_notes = $notes;
-        $this->reviewed_at = now();
+        $this->disetujui_oleh = $adminId;
+        $this->catatan_penolakan = $notes;
+        $this->disetujui_pada = now();
         
         $this->save();
-
-        // Update statistik user
-        $user = $this->user;
-        if (!$user) {
-            return;
-        }
-
-        switch ($this->leave_type) {
-            case 'tahunan':
-                $user->used_leave_days += $this->days;
-                break;
-
-            case 'urusan_penting':
-                $user->important_leave_used_days += $this->days;
-                break;
-
-            case 'cuti_besar':
-                $user->big_leave_used_days += $this->days;
-                $user->big_leave_last_used_at = now();
-                break;
-
-            case 'cuti_non_aktif':
-                $user->non_active_leave_used_days += $this->days;
-                break;
-
-            case 'cuti_bersalin':
-                $user->maternity_leave_used_count += 1;
-                break;
-
-            case 'cuti_sakit':
-                $user->sick_leave_used_days += $this->days;
-                break;
-        }
-
-        $user->save();
-    }
-
-    /**
-     * Potong kuota tahunan dengan sistem FIFO
-     */
-    private function deductAnnualQuota(): void
-    {
-        $user = $this->user;
-        if (!$user) {
-            return;
-        }
-
-        $remainingDays = $this->days;
-        $currentYear = now()->year;
-        $previousYear = $currentYear - 1;
-
-        // Ambil kuota untuk 2 tahun (sebelumnya dan berjalan)
-        $quotas = AnnualQuota::where('user_id', $user->id)
-            ->whereIn('year', [$previousYear, $currentYear])
-            ->where('is_expired', false)
-            ->orderBy('year', 'asc') // FIFO: tahun sebelumnya dulu
-            ->get();
-
-        foreach ($quotas as $quota) {
-            if ($remainingDays <= 0) {
-                break;
-            }
-
-            $available = $quota->annual_quota - $quota->used_days;
-
-            if ($available >= $remainingDays) {
-                $quota->used_days += $remainingDays;
-                $remainingDays = 0;
-            } else {
-                $quota->used_days += $available;
-                $remainingDays -= $available;
-            }
-
-            $quota->save();
-        }
-
-        if ($remainingDays > 0) {
-            throw new \Exception('Kuota cuti tahunan tidak mencukupi.');
-        }
-    }
+        // Potong kuota dari tabel kuota_tahunan menggunakan FIFO
+        $days = $this->calculateDays();
+        if ($days > 0) {
+            KuotaTahunan::potonganKuota($this->user_id, $days);
+        }    }
 
     /**
      * REJECT CUTI
@@ -224,9 +153,9 @@ class LeaveRequest extends Model
         }
 
         $this->status      = 'rejected';
-        $this->approved_by = $adminId;
-        $this->admin_notes = $notes;
-        $this->reviewed_at = now();
+        $this->disetujui_oleh = $adminId;
+        $this->catatan_penolakan = $notes;
+        $this->disetujui_pada = now();
         $this->save();
     }
 
@@ -240,7 +169,7 @@ class LeaveRequest extends Model
         }
 
         // Ambil tanggal libur
-        $holidayDates = \App\Models\Libur::pluck('date')
+        $holidayDates = Holiday::pluck('date')
             ->map(fn ($date) => Carbon::parse($date)->format('Y-m-d'))
             ->all();
 

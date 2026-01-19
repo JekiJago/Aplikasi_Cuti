@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Pegawai;
 use App\Models\Cuti;
+use App\Models\KuotaTahunan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class AdminEmployeeController extends Controller
 {
@@ -41,36 +43,63 @@ class AdminEmployeeController extends Controller
             'name' => 'required|string|max:255',
             'employee_id' => 'required|string|max:50|unique:pegawai,nip',
             'nrp' => 'required|string|max:50|unique:pegawai,nrp',
-            'annual_leave_quota' => 'required|integer|min:0|max:365',
+            'previous_year_quota' => 'nullable|integer|min:0|max:365',
+            'current_year_quota' => 'required|integer|min:0|max:365',
             'gender' => 'required|in:male,female',
         ]);
 
         try {
-            // Create pegawai record first
-            $pegawai = Pegawai::create([
-                'nip' => $validated['employee_id'],
-                'nrp' => $validated['nrp'],
-                'nama' => $validated['name'],
-                'jenis_kelamin' => $validated['gender'],
-            ]);
+            $user = null;
+            
+            DB::transaction(function () use ($validated, &$user) {
+                // Create pegawai record first
+                $pegawai = Pegawai::create([
+                    'nip' => $validated['employee_id'],
+                    'nrp' => $validated['nrp'],
+                    'nama' => $validated['name'],
+                    'jenis_kelamin' => $validated['gender'],
+                ]);
 
-            // Create user account with NRP as password
-            // Note: pegawai_id should reference the nip (not id) based on foreign key
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['employee_id'] . '@pegawai.local',
-                'password' => Hash::make($validated['nrp']),
-                'pegawai_id' => $pegawai->nip,  // Use nip instead of id
-                'role' => 'employee',
-                'login_type' => 'nip',
-            ]);
+                // Create user account with NRP as password
+                $user = User::create([
+                    'name' => $validated['name'],
+                    'email' => $validated['employee_id'] . '@pegawai.local',
+                    'password' => Hash::make($validated['nrp']),
+                    'pegawai_id' => $pegawai->nip,
+                    'role' => 'employee',
+                    'login_type' => 'nip',
+                ]);
 
-            // Create cuti (leave quota) record
-            Cuti::create([
-                'pegawai_id' => $pegawai->id,
-                'kuota_tahunan' => $validated['annual_leave_quota'],
-                'cuti_dipakai' => 0,
-            ]);
+                // Create cuti (leave quota) record (legacy)
+                Cuti::create([
+                    'pegawai_id' => $pegawai->id,
+                    'kuota_tahunan' => $validated['current_year_quota'],
+                    'cuti_dipakai' => 0,
+                ]);
+
+                // Create kuota tahunan untuk tahun lalu (jika ada)
+                $tahunSekarang = now()->year;
+                $tahunLalu = $tahunSekarang - 1;
+
+                if ($validated['previous_year_quota'] > 0) {
+                    KuotaTahunan::create([
+                        'user_id' => $user->id,
+                        'tahun' => $tahunLalu,
+                        'kuota' => $validated['previous_year_quota'],
+                        'dipakai' => 0,
+                        'expired' => false,
+                    ]);
+                }
+
+                // Create kuota tahunan untuk tahun sekarang
+                KuotaTahunan::create([
+                    'user_id' => $user->id,
+                    'tahun' => $tahunSekarang,
+                    'kuota' => $validated['current_year_quota'],
+                    'dipakai' => 0,
+                    'expired' => false,
+                ]);
+            });
 
             return redirect()->route('admin.employees.show', $user->id)
                 ->with('success', 'Pegawai berhasil ditambahkan.');
