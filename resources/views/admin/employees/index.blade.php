@@ -275,7 +275,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-mono text-[#083D1D] bg-[#F9FAF7] px-3 py-1.5 rounded-lg inline-block border border-[#DCE5DF]">
-                                        {{ $employee->employee_id }}
+                                        {{ $employee->pegawai->nip ?? '-' }}
                                     </div>
                                     @if($employee->hire_date)
                                     <div class="text-xs text-gray-500 mt-1 flex items-center">
@@ -289,11 +289,20 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="space-y-2">
                                         <!-- Total Cuti Aktif -->
+                                        @php
+                                            $cutiData = $employee->pegawai->cuti;
+                                            $cutiAktif = $cutiData ? max($cutiData->kuota_tahunan - $cutiData->cuti_dipakai, 0) : 0;
+                                            $badgeColor = $cutiAktif >= 20 ? 'bg-green-100 text-[#0B5E2E] border border-green-200' : 
+                                                         ($cutiAktif >= 10 ? 'bg-blue-100 text-blue-800 border border-blue-200' : 
+                                                         ($cutiAktif >= 5 ? 'bg-yellow-100 text-[#F2B705] border border-[#F2B705]' : 
+                                                         ($cutiAktif >= 1 ? 'bg-orange-100 text-orange-800 border border-orange-200' : 
+                                                         'bg-red-100 text-red-800 border border-red-200')));
+                                        @endphp
                                         <div class="flex items-center justify-between">
                                             <span class="px-3 py-1.5 rounded-full text-sm font-semibold {{ $badgeColor }} min-w-[100px] text-center">
-                                                {{ $remaining }} hari
+                                                {{ $cutiAktif }} hari
                                             </span>
-                                            @if($remaining <= 3)
+                                            @if($cutiAktif <= 3)
                                                 <svg class="w-4 h-4 ml-2 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                                 </svg>
