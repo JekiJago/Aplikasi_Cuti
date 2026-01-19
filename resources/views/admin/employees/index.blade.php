@@ -310,13 +310,6 @@
                                         </div>
                                         
                                         <!-- Breakdown Tooltip (on hover) -->
-                                        <div class="relative group/breakdown">
-                                            <div class="text-xs text-gray-500 cursor-help hover:text-gray-700 flex items-center">
-                                                <svg class="w-3 h-3 mr-1 text-[#F2B705]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                                <span>Detail tahunan</span>
-                                            </div>
                                             <div class="absolute left-0 bottom-full mb-2 w-64 bg-white rounded-lg shadow-xl border border-[#DCE5DF] p-3 z-20 hidden group-hover/breakdown:block">
                                                 <div class="text-xs font-semibold text-[#083D1D] mb-2">Rincian Cuti Aktif:</div>
                                                 <div class="space-y-2">

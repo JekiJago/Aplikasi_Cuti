@@ -141,7 +141,7 @@
                     <!-- Login Field -->
                     <div>
                         <label for="login" class="block text-sm font-medium text-[#083D1D] mb-2">
-                            <i class="fas fa-user mr-2"></i>Username / Email
+                            <i class="fas fa-user mr-2"></i>NIP / Email
                         </label>
 
                         <div class="relative">

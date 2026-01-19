@@ -27,38 +27,38 @@
     $currentYearRemaining = $currentYearDetail['remaining'] ?? $totalActiveLeave;
     $isPrevExpired = $prevYearDetail['is_expired'] ?? false;
     
-    // Warna untuk card Sisa Cuti Aktif - DIUBAH MENGGUNAKAN PALET KEJAKSAAN
+    // Warna untuk card Sisa Cuti Aktif
     if ($totalActiveLeave >= 20) {
         $bgColor = 'bg-gradient-to-br from-green-50 to-[#0B5E2E]/10';
-        $borderColor = 'border-[#0B5E2E]/20';
+        $cardBorderColor = 'border-[#0B5E2E]/20';
         $textColor = 'text-[#083D1D]';
         $numberColor = 'text-[#0B5E2E]';
         $iconColor = 'text-[#0B5E2E]';
         $iconBg = 'bg-[#0B5E2E]/10';
     } elseif ($totalActiveLeave >= 10) {
         $bgColor = 'bg-gradient-to-br from-[#F2B705]/10 to-[#0B5E2E]/5';
-        $borderColor = 'border-[#F2B705]/20';
+        $cardBorderColor = 'border-[#F2B705]/20';
         $textColor = 'text-[#083D1D]';
         $numberColor = 'text-[#0B5E2E]';
         $iconColor = 'text-[#F2B705]';
         $iconBg = 'bg-[#F2B705]/10';
     } elseif ($totalActiveLeave >= 5) {
         $bgColor = 'bg-gradient-to-br from-[#F2B705]/5 to-[#0B5E2E]/5';
-        $borderColor = 'border-[#F2B705]/20';
+        $cardBorderColor = 'border-[#F2B705]/20';
         $textColor = 'text-[#083D1D]';
         $numberColor = 'text-[#0B5E2E]';
         $iconColor = 'text-[#F2B705]';
         $iconBg = 'bg-[#F2B705]/10';
     } else {
         $bgColor = 'bg-gradient-to-br from-red-50/50 to-[#083D1D]/5';
-        $borderColor = 'border-red-200';
+        $cardBorderColor = 'border-red-200';
         $textColor = 'text-[#083D1D]';
         $numberColor = 'text-red-600';
         $iconColor = 'text-red-500';
         $iconBg = 'bg-red-100';
     }
     
-    // Warna untuk card Cuti Terpakai - DIUBAH MENGGUNAKAN PALET KEJAKSAAN
+    // Warna untuk card Cuti Terpakai
     $percentUsed = $currentYearQuota > 0 ? round(($currentYearUsed / $currentYearQuota) * 100) : 0;
     if ($percentUsed <= 50) {
         $usedBgColor = 'bg-gradient-to-br from-green-50 to-[#0B5E2E]/10';
@@ -188,7 +188,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                         <!-- Card 1: SISA CUTI AKTIF (2 Tahun dengan FIFO) -->
                         <div>
-                            <div class="bg-white rounded-xl border {{ $borderColor }} p-6 h-full {{ $bgColor }}">
+                            <div class="bg-white rounded-xl border {{ $cardBorderColor }} p-6 h-full {{ $bgColor }}">
                                 <div class="flex items-center justify-between mb-4">
                                     <h3 class="text-lg font-semibold {{ $textColor }}">Sisa Cuti Aktif</h3>
                                     <div class="p-3 {{ $iconBg }} rounded-xl shadow-sm border border-[#DCE5DF]">
@@ -201,11 +201,10 @@
                                 <p class="text-4xl font-bold {{ $numberColor }} mb-2">{{ $totalActiveLeave }} hari</p>
                                 <p class="text-sm {{ $textColor }} mb-4">
                                     Total sisa cuti yang masih dapat digunakan
-                                    <span class="block text-xs opacity-75 mt-1">(Sistem FIFO: kuota {{ $prevYear }} dipakai dulu)</span>
                                 </p>
                                 
                                 <!-- Breakdown per tahun -->
-                                <div class="mt-6 pt-4 border-t {{ $borderColor }}">
+                                <div class="mt-6 pt-4 border-t {{ $cardBorderColor }}">
                                     <p class="text-sm font-medium {{ $textColor }} mb-3">Detail kuota:</p>
                                     <div class="space-y-4">
                                         <!-- Tahun Sebelumnya (2024) -->
@@ -255,27 +254,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <!-- Info Sistem FIFO -->
-                                    <div class="mt-4 p-3 bg-white bg-opacity-50 rounded-lg border {{ $borderColor }}">
-                                        <p class="text-xs {{ $textColor }}">
-                                            <span class="font-semibold">Sistem FIFO (First In First Out):</span> 
-                                            <span class="block mt-1">
-                                                1. Kuota {{ $prevYear }} dipakai terlebih dahulu
-                                                <br>2. Baru kuota {{ $currentYear }} dipakai
-                                                <br>3. Cuti {{ $prevYear }} hangus: 31 Des {{ $currentYear }}
-                                            </span>
-                                            @if($isPrevExpired)
-                                                <span class="text-red-600 block mt-1">
-                                                    ⚠️ Cuti {{ $prevYear }} sudah hangus sejak 1 Jan {{ $prevYear + 2 }}
-                                                </span>
-                                            @endif
-                                        </p>
-                                    </div>
                                 </div>
                             </div>
                         </div>
-
                         <!-- Card 2: CUTI TERPAKAI (Tahun Berjalan) -->
                         <div>
                             <div class="bg-white rounded-xl border {{ $usedBorderColor }} p-6 h-full {{ $usedBgColor }}">
@@ -319,23 +300,7 @@
                                             <span>100%</span>
                                         </div>
                                     </div>
-                                    
-                                    <!-- Detail Sumber Cuti (FIFO Breakdown) -->
-                                    <div class="space-y-3">
-                                        <p class="text-sm font-medium {{ $usedTextColor }} mb-2">Sumber cuti terpakai:</p>
-                                        
-                                        @if($usedFromPrev > 0)
-                                        <div class="flex justify-between items-center p-2 bg-[#F2B705]/10 rounded-lg border border-[#F2B705]/20">
-                                            <div class="flex items-center">
-                                                <svg class="w-4 h-4 text-[#F2B705] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                                <span class="text-sm text-[#083D1D]">Dari kuota {{ $prevYear }}</span>
-                                            </div>
-                                            <span class="text-sm font-semibold text-[#083D1D]">{{ $usedFromPrev }} hari</span>
-                                        </div>
-                                        @endif
-                                        
+                                                                            
                                         @if($usedFromCurrent > 0)
                                         <div class="flex justify-between items-center p-2 bg-[#0B5E2E]/10 rounded-lg border border-[#0B5E2E]/20">
                                             <div class="flex items-center">
@@ -348,18 +313,6 @@
                                         </div>
                                         @endif
                                         
-                                        <!-- Info FIFO -->
-                                        <div class="mt-3 p-3 bg-white bg-opacity-50 rounded-lg border {{ $usedBorderColor }}">
-                                            <p class="text-xs {{ $usedTextColor }}">
-                                                <span class="font-semibold">Catatan FIFO:</span> 
-                                                Sistem memotong kuota {{ $prevYear }} terlebih dahulu sebelum menggunakan kuota {{ $currentYear }}.
-                                                @if($usedFromPrev > 0)
-                                                    <span class="block mt-1 text-[#0B5E2E]">
-                                                        ✓ {{ $usedFromPrev }} hari sudah dipotong dari kuota {{ $prevYear }}
-                                                    </span>
-                                                @endif
-                                            </p>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -367,7 +320,7 @@
                     </div>
 
                     <!-- Summary Card -->
-                    <div>
+                    <div class="mt-6">
                         <div class="bg-white rounded-xl border border-[#DCE5DF] p-6">
                             <h2 class="text-lg font-semibold text-[#083D1D] mb-6">Ringkasan Status Pengajuan</h2>
                             
@@ -442,109 +395,111 @@
                 <div class="tab-content hidden" id="leave-history-tab">
                     <h2 class="text-lg font-semibold text-[#083D1D] mb-6">Riwayat Pengajuan Cuti</h2>
 
-                    @forelse([] as $leave)
-                        @php
-                            $statusConfig = [
-                                'pending' => [
-                                    'bg' => 'bg-[#F2B705]/10', 
+                    @if(isset($leaves) && $leaves->count() > 0)
+                        @foreach($leaves as $leave)
+                            @php
+                                $statusConfig = [
+                                    'pending' => [
+                                        'bg' => 'bg-[#F2B705]/10', 
+                                        'text' => 'text-[#083D1D]',
+                                        'border' => 'border-[#F2B705]/20',
+                                        'icon' => '<svg class="w-4 h-4 mr-2 text-[#F2B705]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                                        'label' => 'Menunggu'
+                                    ],
+                                    'approved' => [
+                                        'bg' => 'bg-[#0B5E2E]/10', 
+                                        'text' => 'text-[#083D1D]',
+                                        'border' => 'border-[#0B5E2E]/20',
+                                        'icon' => '<svg class="w-4 h-4 mr-2 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>',
+                                        'label' => 'Disetujui'
+                                    ],
+                                    'rejected' => [
+                                        'bg' => 'bg-red-50', 
+                                        'text' => 'text-red-800',
+                                        'border' => 'border-red-200',
+                                        'icon' => '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>',
+                                        'label' => 'Ditolak'
+                                    ]
+                                ][$leave->status] ?? [
+                                    'bg' => 'bg-[#DCE5DF]', 
                                     'text' => 'text-[#083D1D]',
-                                    'border' => 'border-[#F2B705]/20',
-                                    'icon' => '<svg class="w-4 h-4 mr-2 text-[#F2B705]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
-                                    'label' => 'Menunggu'
-                                ],
-                                'approved' => [
-                                    'bg' => 'bg-[#0B5E2E]/10', 
-                                    'text' => 'text-[#083D1D]',
-                                    'border' => 'border-[#0B5E2E]/20',
-                                    'icon' => '<svg class="w-4 h-4 mr-2 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>',
-                                    'label' => 'Disetujui'
-                                ],
-                                'rejected' => [
-                                    'bg' => 'bg-red-50', 
-                                    'text' => 'text-red-800',
-                                    'border' => 'border-red-200',
-                                    'icon' => '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>',
-                                    'label' => 'Ditolak'
-                                ]
-                            ][$leave->status] ?? [
-                                'bg' => 'bg-[#DCE5DF]', 
-                                'text' => 'text-[#083D1D]',
-                                'border' => 'border-[#DCE5DF]',
-                                'icon' => '',
-                                'label' => ucfirst($leave->status)
-                            ];
-                        @endphp
-                        
-                        <div class="rounded-xl border {{ $statusConfig['border'] }} p-4 mb-4 hover:shadow-md transition-shadow duration-200 bg-white">
-                            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                                <!-- Left Section -->
-                                <div class="flex-1">
-                                    <div class="flex items-start justify-between">
-                                        <div>
-                                            <h3 class="text-lg font-semibold text-[#083D1D] mb-1">
-                                                {{ ucfirst(str_replace('_', ' ', $leave->leave_type)) }}
-                                            </h3>
-                                            <p class="text-sm text-[#083D1D]/70 mb-3">{{ $leave->reason }}</p>
-                                            
-                                            <div class="flex flex-wrap gap-4">
-                                                <div class="flex items-center">
-                                                    <div class="p-1.5 bg-[#DCE5DF] rounded-lg mr-2">
-                                                        <svg class="w-4 h-4 text-[#083D1D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                                        </svg>
-                                                    </div>
-                                                    <div>
-                                                        <p class="text-xs text-[#083D1D]/70">Periode</p>
-                                                        <p class="text-sm font-medium text-[#083D1D]">
-                                                            {{ \Carbon\Carbon::parse($leave->start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($leave->end_date)->format('d M Y') }}
-                                                        </p>
-                                                    </div>
-                                                </div>
+                                    'border' => 'border-[#DCE5DF]',
+                                    'icon' => '',
+                                    'label' => ucfirst($leave->status)
+                                ];
+                            @endphp
+                            
+                            <div class="rounded-xl border {{ $statusConfig['border'] }} p-4 mb-4 hover:shadow-md transition-shadow duration-200 bg-white">
+                                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                                    <!-- Left Section -->
+                                    <div class="flex-1">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <h3 class="text-lg font-semibold text-[#083D1D] mb-1">
+                                                    {{ ucfirst(str_replace('_', ' ', $leave->leave_type)) }}
+                                                </h3>
+                                                <p class="text-sm text-[#083D1D]/70 mb-3">{{ $leave->reason }}</p>
                                                 
-                                                <div class="flex items-center">
-                                                    <div class="p-1.5 bg-[#DCE5DF] rounded-lg mr-2">
-                                                        <svg class="w-4 h-4 text-[#083D1D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                        </svg>
+                                                <div class="flex flex-wrap gap-4">
+                                                    <div class="flex items-center">
+                                                        <div class="p-1.5 bg-[#DCE5DF] rounded-lg mr-2">
+                                                            <svg class="w-4 h-4 text-[#083D1D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                            </svg>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-xs text-[#083D1D]/70">Periode</p>
+                                                            <p class="text-sm font-medium text-[#083D1D]">
+                                                                {{ \Carbon\Carbon::parse($leave->start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($leave->end_date)->format('d M Y') }}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p class="text-xs text-[#083D1D]/70">Durasi</p>
-                                                        <p class="text-sm font-medium text-[#083D1D]">{{ $leave->days }} hari</p>
+                                                    
+                                                    <div class="flex items-center">
+                                                        <div class="p-1.5 bg-[#DCE5DF] rounded-lg mr-2">
+                                                            <svg class="w-4 h-4 text-[#083D1D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-xs text-[#083D1D]/70">Durasi</p>
+                                                            <p class="text-sm font-medium text-[#083D1D]">{{ $leave->days }} hari</p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                            
+                                            <!-- Status Badge -->
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium {{ $statusConfig['bg'] }} {{ $statusConfig['text'] }} border {{ $statusConfig['border'] }}">
+                                                {!! $statusConfig['icon'] !!}
+                                                {{ $statusConfig['label'] }}
+                                            </span>
                                         </div>
                                         
-                                        <!-- Status Badge -->
-                                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium {{ $statusConfig['bg'] }} {{ $statusConfig['text'] }} border {{ $statusConfig['border'] }}">
-                                            {!! $statusConfig['icon'] !!}
-                                            {{ $statusConfig['label'] }}
-                                        </span>
-                                    </div>
-                                    
-                                    <!-- Metadata -->
-                                    <div class="mt-4 pt-4 border-t border-[#DCE5DF]">
-                                        <div class="flex flex-wrap gap-4 text-sm text-[#083D1D]/70">
-                                            <div class="flex items-center">
-                                                <svg class="w-4 h-4 mr-1.5 text-[#083D1D]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                                </svg>
-                                                Diajukan: {{ \Carbon\Carbon::parse($leave->created_at)->format('d M Y, H:i') }}
-                                            </div>
-                                            @if($leave->status === 'approved' || $leave->status === 'rejected')
+                                        <!-- Metadata -->
+                                        <div class="mt-4 pt-4 border-t border-[#DCE5DF]">
+                                            <div class="flex flex-wrap gap-4 text-sm text-[#083D1D]/70">
                                                 <div class="flex items-center">
                                                     <svg class="w-4 h-4 mr-1.5 text-[#083D1D]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                                     </svg>
-                                                    Diperbarui: {{ \Carbon\Carbon::parse($leave->updated_at)->format('d M Y, H:i') }}
+                                                    Diajukan: {{ \Carbon\Carbon::parse($leave->created_at)->format('d M Y, H:i') }}
                                                 </div>
-                                            @endif
+                                                @if($leave->status === 'approved' || $leave->status === 'rejected')
+                                                    <div class="flex items-center">
+                                                        <svg class="w-4 h-4 mr-1.5 text-[#083D1D]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                                        </svg>
+                                                        Diperbarui: {{ \Carbon\Carbon::parse($leave->updated_at)->format('d M Y, H:i') }}
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    @empty
+                        @endforeach
+                    @else
                         <div class="text-center py-12">
                             <div class="mx-auto w-20 h-20 text-[#DCE5DF] mb-4">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -554,7 +509,7 @@
                             <p class="text-[#083D1D]/70 font-medium">Belum ada riwayat cuti</p>
                             <p class="text-[#083D1D]/50 text-sm mt-1">Pegawai ini belum pernah mengajukan cuti</p>
                         </div>
-                    @endforelse
+                    @endif
                 </div>
             </div>
         </div>

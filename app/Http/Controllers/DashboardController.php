@@ -18,7 +18,8 @@ class DashboardController extends Controller
         // Jika admin → langsung tampilkan dashboard admin
         if ($user->isAdmin()) {
             $stats = $this->adminStats();
-            return view('dashboard.admin', compact('stats'));
+            $monthlyStats = $this->getMonthlyStats();
+            return view('dashboard.admin', compact('stats', 'monthlyStats'));
         }
 
         // Jika pegawai → tampilkan dashboard pegawai
@@ -97,7 +98,8 @@ class DashboardController extends Controller
         }
 
         $stats = $this->adminStats();
-        return view('dashboard.admin', compact('stats'));
+        $monthlyStats = $this->getMonthlyStats();
+        return view('dashboard.admin', compact('stats', 'monthlyStats'));
     }
 
     private function adminStats(): array
@@ -154,5 +156,43 @@ class DashboardController extends Controller
             'monthly_activity' => $monthlyActivity,
             'employee_growth' => 0,
         ];
+    }
+
+    private function getMonthlyStats(): array
+    {
+        $monthlyStats = [];
+        $currentYear = now()->year;
+        
+        // Nama bulan dalam bahasa Indonesia
+        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        
+        for ($i = 0; $i < 12; $i++) {
+            $month = $i + 1;
+            
+            $approved = LeaveRequest::whereYear('created_at', $currentYear)
+                ->whereMonth('created_at', $month)
+                ->where('status', 'approved')
+                ->count();
+                
+            $rejected = LeaveRequest::whereYear('created_at', $currentYear)
+                ->whereMonth('created_at', $month)
+                ->where('status', 'rejected')
+                ->count();
+                
+            $pending = LeaveRequest::whereYear('created_at', $currentYear)
+                ->whereMonth('created_at', $month)
+                ->where('status', 'pending')
+                ->count();
+            
+            $monthlyStats[] = [
+                'label' => $months[$i],
+                'approved' => $approved,
+                'rejected' => $rejected,
+                'pending' => $pending,
+                'total' => $approved + $rejected + $pending
+            ];
+        }
+        
+        return $monthlyStats;
     }
 }

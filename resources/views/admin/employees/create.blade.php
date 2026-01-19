@@ -144,28 +144,6 @@
 
                     </div>
 
-                    {{-- SECTION: KUOTA CUTI TAHUNAN --}}
-                    <div class="mb-6 mt-8">
-                        <h5 class="text-lg font-semibold text-[#083D1D] border-l-4 border-[#0B5E2E] pl-3 py-2 bg-green-50 rounded-r">
-                            <i class="fas fa-calendar-alt mr-2 text-[#0B5E2E]"></i> Kuota Cuti per Tahun (FIFO System)
-                        </h5>
-                    </div>
-
-                    <div class="mb-8 p-4 bg-blue-50 border-l-4 border-[#0B5E2E] rounded-r-lg">
-                        <div class="flex items-start">
-                            <i class="fas fa-info-circle text-[#0B5E2E] mt-0.5 mr-3 text-lg"></i>
-                            <div>
-                                <h6 class="font-semibold text-[#083D1D]">Sistem FIFO (First In First Out)</h6>
-                                <ul class="mt-2 text-sm text-[#083D1D] space-y-1">
-                                    <li>• Pegawai dapat menggunakan sisa cuti tahun sebelumnya terlebih dahulu</li>
-                                    <li>• Contoh: Tahun 2026 bisa gunakan sisa 2025 + kuota 2026</li>
-                                    <li>• Tahun 2027 bisa gunakan sisa 2026 + kuota 2027</li>
-                                    <li>• Kuota otomatis bergeser setiap tahun baru</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
                     {{-- KUOTA CUTI PER TAHUN --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>

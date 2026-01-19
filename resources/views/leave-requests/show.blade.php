@@ -9,15 +9,6 @@
         <!-- Header -->
         <div class="mb-8">
             <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center">
-                    <a href="{{ route('leave-requests.index') }}" 
-                       class="inline-flex items-center text-[#083D1D] hover:text-[#0B5E2E] mr-4 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                        <span class="ml-1">Kembali ke Daftar</span>
-                    </a>
-                </div>
                 <div class="text-right">
                     <p class="text-sm text-gray-500">ID Pengajuan</p>
                     <p class="text-sm font-mono text-[#083D1D]">#{{ str_pad($leave->id, 6, '0', STR_PAD_LEFT) }}</p>
@@ -95,23 +86,6 @@
             <div class="p-6">
                 <!-- Basic Information Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <!-- Leave Type -->
-                    <div class="bg-[#F9FAF7] rounded-xl p-5 border border-[#DCE5DF]">
-                        <div class="flex items-center mb-3">
-                            <div class="p-2 bg-white rounded-lg mr-3 border border-[#DCE5DF]">
-                                <svg class="w-5 h-5 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Jenis Cuti</p>
-                                <p class="text-lg font-semibold text-[#083D1D] capitalize">
-                                    {{ $leave->leave_type ? str_replace('_', ' ', $leave->leave_type) : '-' }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Duration -->
                     <div class="bg-[#F9FAF7] rounded-xl p-5 border border-[#DCE5DF]">
                         <div class="flex items-center mb-3">

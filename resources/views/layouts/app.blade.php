@@ -169,21 +169,12 @@
 
                     {{-- Tombol Profil dan Logout --}}
                     <div class="flex items-center space-x-3">
-                        <!-- Tombol Profil -->
-                        <a href="{{ route('profile.edit') }}" 
-                           class="inline-flex items-center px-3 py-2 border border-[#DCE5DF] rounded-lg text-sm font-medium text-[#083D1D] bg-white hover:bg-[#F9FAF7] transition-colors duration-200"
-                           title="Edit Profil">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                            </svg>
-                            Profil
-                        </a>
                         
-                        <!-- Tombol Logout -->
+                        <!-- Tombol Logout - WARNA MERAH -->
                         <form method="POST" action="{{ route('logout') }}" class="m-0">
                             @csrf
                             <button type="submit"
-                                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-[#0B5E2E] hover:bg-[#083D1D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0B5E2E] transition-colors duration-200"
+                                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
                                     title="Keluar dari sistem">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
@@ -259,24 +250,18 @@
                     <div class="pt-4 border-t border-[#DCE5DF]">
                         <div class="px-3 py-2">
                             <p class="text-sm font-semibold text-[#083D1D]">{{ auth()->user()->name }}</p>
-                            <p class="text-xs text-[#083D1D]/70">{{ auth()->user()->employee_id ?? 'No ID' }}</p>
+                            <p class="text-xs text-[#083D1D]/70">{{ auth()->user()->employee_id ?? '' }}</p>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 mt-2">
-                            <a href="{{ route('profile.edit') }}" 
-                               class="flex items-center justify-center px-4 py-2 border border-[#DCE5DF] rounded-lg text-sm font-medium text-[#083D1D] hover:bg-[#F9FAF7]">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                </svg>
-                                Profil
-                            </a>
+                        <div class="grid grid-cols-1 gap-2 mt-2">
+                            <!-- HAPUS TOMBOL PROFIL -->
                             <form method="POST" action="{{ route('logout') }}" class="m-0">
                                 @csrf
                                 <button type="submit"
-                                        class="flex items-center justify-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-[#0B5E2E] hover:bg-[#083D1D]">
+                                        class="flex items-center justify-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 w-full">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                                     </svg>
-                                    Keluar
+                                    Keluar dari Sistem
                                 </button>
                             </form>
                         </div>

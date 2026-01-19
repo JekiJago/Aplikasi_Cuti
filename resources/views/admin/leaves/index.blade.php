@@ -67,7 +67,7 @@
                 <tr>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-[#083D1D] uppercase tracking-wider">Karyawan</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-[#083D1D] uppercase tracking-wider">Periode</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-[#083D1D] uppercase tracking-wider">Jenis</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-[#083D1D] uppercase tracking-wider">Alasan</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-[#083D1D] uppercase tracking-wider">Status</th>
                     <th class="px-6 py-4 text-right text-xs font-semibold text-[#083D1D] uppercase tracking-wider">Aksi</th>
                 </tr>
@@ -97,9 +97,15 @@
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-[#F2B705]/10 text-[#083D1D] text-xs font-semibold capitalize border border-[#F2B705]/20">
-                                {{ $leave->leave_type }}
-                            </span>
+                            <div class="max-w-xs">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full bg-[#F2B705]/10 text-[#083D1D] text-xs font-semibold border border-[#F2B705]/20">
+                                    @if($leave->alasan)
+                                        {{ Str::limit($leave->alasan, 30) }}
+                                    @else
+                                        -
+                                    @endif
+                                </span>
+                            </div>
                         </td>
                         <td class="px-6 py-4">
                             @php

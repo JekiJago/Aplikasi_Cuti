@@ -101,7 +101,7 @@
                 <h3 class="text-lg font-semibold text-[#083D1D]">Filter Pengajuan</h3>
             </div>
             
-            <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-[#083D1D] mb-2">Status</label>
                     <select name="status" 
@@ -145,28 +145,6 @@
                                       bg-[#F9FAF7] focus:ring-2 focus:ring-[#F2B705] focus:border-[#0B5E2E] 
                                       focus:bg-white transition-colors text-[#083D1D]">
                     </div>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-[#083D1D] mb-2">Jenis Cuti</label>
-                    <select name="leave_type" 
-                            class="block w-full pl-3 pr-10 py-3 rounded-lg border border-[#DCE5DF] 
-                                   bg-[#F9FAF7] focus:ring-2 focus:ring-[#F2B705] focus:border-[#0B5E2E] 
-                                   focus:bg-white transition-colors text-[#083D1D]">
-                        <option value="">Semua Jenis</option>
-                        @foreach([
-                            'tahunan'        => 'Cuti Tahunan',
-                            'urusan_penting' => 'Urusan Penting',
-                            'cuti_besar'     => 'Cuti Besar',
-                            'cuti_non_aktif' => 'Non Aktif',
-                            'cuti_bersalin'  => 'Bersalin',
-                            'cuti_sakit'     => 'Sakit',
-                        ] as $val => $label)
-                            <option value="{{ $val }}" {{ request('leave_type') === $val ? 'selected' : '' }}>
-                                {{ $label }}
-                            </option>
-                        @endforeach
-                    </select>
                 </div>
                 
                 <div class="flex items-end">
@@ -227,9 +205,9 @@
                             <th class="px-6 py-3 text-left text-xs font-semibold text-[#083D1D] uppercase tracking-wider">
                                 <div class="flex items-center">
                                     <svg class="w-4 h-4 mr-2 text-[#083D1D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
-                                    Jenis
+                                    Alasan
                                 </div>
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-[#083D1D] uppercase tracking-wider">
@@ -271,16 +249,15 @@
                                     </div>
                                 </td>
 
-                                <!-- Leave Type -->
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <!-- Alasan Cuti -->
+                                <td class="px-6 py-4">
                                     <div class="text-sm text-[#083D1D]">
-                                        Cuti Tahunan
+                                        @if($leave->alasan)
+                                            {{ \Illuminate\Support\Str::limit($leave->alasan, 80) }}
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
                                     </div>
-                                    @if($leave->alasan)
-                                        <div class="text-xs text-gray-500 truncate max-w-xs mt-1">
-                                            {{ \Illuminate\Support\Str::limit($leave->alasan, 50) }}
-                                        </div>
-                                    @endif
                                 </td>
 
                                 <!-- Duration -->

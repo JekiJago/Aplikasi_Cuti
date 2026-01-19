@@ -141,45 +141,96 @@
                         @enderror
                     </div>
 
-                    {{-- KUOTA CUTI --}}
+                    {{-- KUOTA CUTI TAHUN BERJALAN --}}
                     <div class="mb-8">
-                        <label class="block text-sm font-medium text-[#083D1D] mb-2">
-                            Kuota Cuti Tahunan <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-calendar text-gray-400"></i>
+                        <div class="bg-[#F9FAF7] rounded-xl p-4 border border-[#DCE5DF] mb-6">
+                            <h3 class="text-lg font-semibold text-[#083D1D] mb-4 flex items-center">
+                                <i class="fas fa-calendar-alt text-[#0B5E2E] mr-2"></i>
+                                Pengaturan Kuota Cuti
+                            </h3>
+                            
+                            {{-- KUOTA CUTI TAHUN INI --}}
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-[#083D1D] mb-2">
+                                    Kuota Cuti Tahun {{ date('Y') }} <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-calendar-check text-gray-400"></i>
+                                    </div>
+                                    @php
+                                        $quotaValue = 12; // default
+                                        if ($employee->pegawai && $employee->pegawai->cuti) {
+                                            $quotaValue = $employee->pegawai->cuti->kuota_tahunan;
+                                        }
+                                    @endphp
+                                    <input type="number"
+                                        name="annual_leave_quota"
+                                        value="{{ old('annual_leave_quota', $quotaValue) }}"
+                                        min="0"
+                                        max="365"
+                                        class="pl-10 block w-full rounded-lg border-[#DCE5DF] bg-white shadow-sm focus:border-[#F2B705] focus:ring-[#F2B705] @error('annual_leave_quota') border-red-500 @enderror"
+                                        placeholder="Masukkan kuota cuti tahunan"
+                                        required>
+                                </div>
+                                <p class="mt-1 text-xs text-[#083D1D]/70">
+                                    Jumlah cuti yang diberikan untuk tahun {{ date('Y') }}
+                                </p>
+                                @error('annual_leave_quota')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
+
+                            {{-- SISA CUTI TAHUN LALU (OPSIONAL) --}}
                             @php
-                                $quotaValue = 12; // default
+                                $prevYearRemaining = 0;
                                 if ($employee->pegawai && $employee->pegawai->cuti) {
-                                    $quotaValue = $employee->pegawai->cuti->kuota_tahunan;
+                                    // Hitung sisa tahun lalu berdasarkan logika FIFO
+                                    $prevYearRemaining = $employee->pegawai->cuti->sisa_tahun_lalu ?? 0;
                                 }
                             @endphp
-                            <input type="number"
-                                name="annual_leave_quota"
-                                value="{{ old('annual_leave_quota', $quotaValue) }}"
-                                min="0"
-                                max="365"
-                                class="pl-10 block w-full rounded-lg border-[#DCE5DF] bg-[#F9FAF7] shadow-sm focus:border-[#F2B705] focus:ring-[#F2B705] @error('annual_leave_quota') border-red-500 @enderror"
-                                placeholder="Masukkan kuota cuti tahunan"
-                                required>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-[#083D1D] mb-2">
+                                    Sisa Cuti Tahun {{ date('Y') - 1 }} (Opsional)
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-history text-gray-400"></i>
+                                    </div>
+                                    <input type="number"
+                                        name="previous_year_remaining"
+                                        value="{{ old('previous_year_remaining', $prevYearRemaining) }}"
+                                        min="0"
+                                        max="365"
+                                        class="pl-10 block w-full rounded-lg border-[#DCE5DF] bg-white shadow-sm focus:border-[#F2B705] focus:ring-[#F2B705] @error('previous_year_remaining') border-red-500 @enderror"
+                                        placeholder="Masukkan sisa cuti tahun lalu">
+                                </div>
+                                <p class="mt-1 text-xs text-[#083D1D]/70">
+                                    Sisa cuti tahun lalu yang masih bisa digunakan
+                                </p>
+                                @error('previous_year_remaining')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
-                        @error('annual_leave_quota')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     {{-- BUTTONS --}}
                     <div class="flex items-center justify-between pt-6 border-t border-gray-200">
                         <a href="{{ route('admin.employees.show', $employee->id) }}"
-                           class="px-6 py-2.5 rounded-lg border border-[#DCE5DF] text-[#083D1D] font-medium hover:bg-gray-50 transition">
+                           class="px-6 py-2.5 rounded-lg border border-[#DCE5DF] text-[#083D1D] font-medium hover:bg-gray-50 transition flex items-center">
                             <i class="fas fa-times mr-2"></i>Batal
                         </a>
-                        <button type="submit"
-                                class="px-8 py-2.5 rounded-lg bg-gradient-to-r from-[#F2B705] to-[#E6A800] text-[#083D1D] font-semibold hover:from-[#E6A800] hover:to-[#D99A00] transition shadow-md">
-                            <i class="fas fa-save mr-2"></i>Simpan Perubahan
-                        </button>
+                        <div class="flex gap-4">
+                            <button type="reset"
+                                    class="px-6 py-2.5 rounded-lg border border-[#DCE5DF] text-[#083D1D] font-medium hover:bg-gray-50 transition flex items-center">
+                                <i class="fas fa-redo mr-2"></i>Reset
+                            </button>
+                            <button type="submit"
+                                    class="px-8 py-2.5 rounded-lg bg-gradient-to-r from-[#F2B705] to-[#E6A800] text-[#083D1D] font-semibold hover:from-[#E6A800] hover:to-[#D99A00] transition shadow-md flex items-center">
+                                <i class="fas fa-save mr-2"></i>Simpan Perubahan
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -192,12 +243,52 @@
 @push('scripts')
 <script>
     document.getElementById('editEmployeeForm').addEventListener('submit', function(e) {
-        const genderSelect = this.querySelector('input[name="gender"]:checked');
-        if (!genderSelect) {
+        // Validasi jenis kelamin
+        const genderSelected = this.querySelector('input[name="gender"]:checked');
+        if (!genderSelected) {
             e.preventDefault();
             alert('Silakan pilih jenis kelamin!');
             return false;
         }
+
+        // Validasi NIP dan NRP harus angka
+        const employeeId = this.querySelector('input[name="employee_id"]').value;
+        const nrp = this.querySelector('input[name="nrp"]').value;
+        
+        if (!/^\d+$/.test(employeeId)) {
+            e.preventDefault();
+            alert('NIP harus berupa angka!');
+            return false;
+        }
+        
+        if (!/^\d+$/.test(nrp)) {
+            e.preventDefault();
+            alert('NRP harus berupa angka!');
+            return false;
+        }
+
+        // Validasi kuota cuti
+        const annualQuota = this.querySelector('input[name="annual_leave_quota"]').value;
+        if (annualQuota < 0 || annualQuota > 365) {
+            e.preventDefault();
+            alert('Kuota cuti tahunan harus antara 0 - 365 hari!');
+            return false;
+        }
+
+        // Validasi sisa tahun lalu
+        const prevYearRemaining = this.querySelector('input[name="previous_year_remaining"]').value;
+        if (prevYearRemaining && (prevYearRemaining < 0 || prevYearRemaining > 365)) {
+            e.preventDefault();
+            alert('Sisa cuti tahun lalu harus antara 0 - 365 hari!');
+            return false;
+        }
+
+        // Konfirmasi sebelum submit
+        if (!confirm('Apakah Anda yakin ingin menyimpan perubahan data pegawai ini?')) {
+            e.preventDefault();
+            return false;
+        }
+
         return true;
     });
 </script>

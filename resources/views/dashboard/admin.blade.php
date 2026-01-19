@@ -79,9 +79,6 @@
                             +{{ $stats['employee_growth'] ?? 0 }}%
                         </span>
                         @else
-                        <span class="text-xs font-medium text-[#083D1D]/70 bg-[#DCE5DF] px-2 py-1 rounded-full border border-[#DCE5DF]">
-                            {{ $stats['employee_growth'] ?? 0 }}%
-                        </span>
                         @endif
                     </div>
                 </div>
@@ -138,9 +135,6 @@
                     </div>
                     <div class="text-right">
                         @if(($stats['approval_rate'] ?? 0) > 0)
-                        <span class="text-xs font-medium text-[#0B5E2E] bg-[#0B5E2E]/10 px-2 py-1 rounded-full border border-[#0B5E2E]/20">
-                            {{ $stats['approval_rate'] ?? 0 }}%
-                        </span>
                         @endif
                     </div>
                 </div>
@@ -164,9 +158,6 @@
                     </div>
                     <div class="text-right">
                         @if(($stats['rejection_rate'] ?? 0) > 0)
-                        <span class="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-full border border-red-200">
-                            {{ $stats['rejection_rate'] ?? 0 }}%
-                        </span>
                         @endif
                     </div>
                 </div>
@@ -178,46 +169,8 @@
                     </svg>
                     {{ $stats['rejected'] ?? 0 }} total
                 </p>
-                <div class="pt-3 border-t border-[#DCE5DF] mt-3">
-                    <p id="last-update-time" class="text-xs text-[#083D1D]/70">
-                        Update terakhir: <span class="font-medium text-[#0B5E2E]">{{ now()->format('H:i') }}</span>
-                    </p>
-                </div>
             </div>
 
-        </div>
-
-        <!-- Quick Stats Bar -->
-        <div class="mb-6 sm:mb-8">
-            <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-[#DCE5DF] p-4 sm:p-6">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-                    <div class="grid grid-cols-3 gap-4 sm:gap-6 w-full sm:w-auto">
-                        <div class="text-center">
-                            <p class="text-xs sm:text-sm text-[#083D1D]/70 mb-1">Total Pengajuan</p>
-                            <p class="text-lg sm:text-xl font-bold text-[#083D1D]">
-                                {{ ($stats['pending'] ?? 0) + ($stats['approved'] ?? 0) + ($stats['rejected'] ?? 0) }}
-                            </p>
-                        </div>
-                        <div class="text-center border-x border-[#DCE5DF] px-4">
-                            <p class="text-xs sm:text-sm text-[#083D1D]/70 mb-1">Rata-rata Hari Cuti</p>
-                            <p class="text-lg sm:text-xl font-bold text-[#083D1D]">
-                                {{ $stats['avg_leave_days'] ?? 0 }}
-                            </p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-xs sm:text-sm text-[#083D1D]/70 mb-1">Aktivitas Bulan Ini</p>
-                            <p class="text-lg sm:text-xl font-bold text-[#083D1D]">
-                                {{ $stats['monthly_activity'] ?? 0 }}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="w-full sm:w-auto px-4 py-2 bg-[#0B5E2E]/5 rounded-lg border border-[#0B5E2E]/20 text-center sm:text-right">
-                        <p id="current-update-time" class="text-xs sm:text-sm text-[#083D1D] font-medium">
-                            Update terakhir: {{ now()->format('H:i') }}
-                        </p>
-                    </div>
-                </div>
-            </div>
         </div>
 
         {{-- GRAFIK DAN LISTS --}}
@@ -316,82 +269,6 @@
 
         {{-- BOTTOM INFO SECTION --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-
-            {{-- System Status --}}
-            <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-[#DCE5DF] p-4 sm:p-6">
-                <h3 class="text-base sm:text-lg font-semibold text-[#083D1D] mb-3 sm:mb-4 flex items-center">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
-                    Status Sistem
-                </h3>
-
-                <div class="space-y-2 sm:space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-[#083D1D]">Server Status</span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#0B5E2E]/10 text-[#083D1D] border border-[#0B5E2E]/20">
-                            <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#0B5E2E] rounded-full mr-1"></span>
-                            Online
-                        </span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-[#083D1D]">Database</span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#0B5E2E]/10 text-[#083D1D] border border-[#0B5E2E]/20">
-                            <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#0B5E2E] rounded-full mr-1"></span>
-                            Connected
-                        </span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-[#083D1D]">Total Pengajuan</span>
-                        <span class="text-sm font-medium text-[#083D1D]">{{ $stats['total_requests'] ?? 0 }}</span>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Quick Actions --}}
-            <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-[#DCE5DF] p-4 sm:p-6">
-                <h3 class="text-base sm:text-lg font-semibold text-[#083D1D] mb-3 sm:mb-4 flex items-center">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
-                    Akses Cepat
-                </h3>
-
-                <div class="space-y-2">
-                    <a href="{{ route('admin.employees.index') }}" 
-                       class="flex items-center justify-between p-2 sm:p-3 rounded-lg hover:bg-[#0B5E2E]/5 transition-colors group border border-transparent hover:border-[#0B5E2E]/20">
-                        <div class="flex items-center">
-                            <div class="p-1.5 sm:p-2 bg-[#0B5E2E]/10 rounded-lg mr-2 sm:mr-3 border border-[#0B5E2E]/20">
-                                <svg class="w-3 h-3 sm:w-4 sm:h-4 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                </svg>
-                            </div>
-                            <span class="text-sm text-[#083D1D] group-hover:text-[#0B5E2E]">Kelola Pegawai</span>
-                        </div>
-                        <svg class="w-3 h-3 sm:w-4 sm:h-4 text-[#083D1D]/50 group-hover:text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                    </a>
-
-                    <a href="{{ route('admin.leaves.index') }}" 
-                       class="flex items-center justify-between p-2 sm:p-3 rounded-lg hover:bg-[#F2B705]/5 transition-colors group border border-transparent hover:border-[#F2B705]/20">
-                        <div class="flex items-center">
-                            <div class="p-1.5 sm:p-2 bg-[#F2B705]/10 rounded-lg mr-2 sm:mr-3 border border-[#F2B705]/20">
-                                <svg class="w-3 h-3 sm:w-4 sm:h-4 text-[#F2B705]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                            </div>
-                            <span class="text-sm text-[#083D1D] group-hover:text-[#083D1D]">Pengajuan Cuti</span>
-                        </div>
-                        <svg class="w-3 h-3 sm:w-4 sm:h-4 text-[#083D1D]/50 group-hover:text-[#083D1D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- SCRIPT WAKTU REALTIME -->
 <script>
