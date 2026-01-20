@@ -5,6 +5,8 @@
 
 @section('content')
 @php
+    use Carbon\CarbonPeriod;
+
     // Definisi warna resmi Kejaksaan
     $primaryColor = '#F2B705';      // Kuning Emas
     $secondaryColor = '#0B5E2E';    // Hijau Kejaksaan
@@ -20,7 +22,7 @@
     </div>
 </div>
 
-<!-- FILTER FORM YANG DIUBAH: GANTI DEPARTEMEN JADI NAMA/NIP -->
+<!-- FILTER FORM -->
 <form method="GET" class="bg-[#F9FAF7] rounded-xl shadow-sm border border-[#DCE5DF] p-6 mb-6">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
@@ -34,13 +36,14 @@
                 @endforeach
             </select>
         </div>
-        <!-- GANTI INI: dari departemen jadi nama/NIP -->
+
         <div>
             <label class="block text-sm font-semibold text-[#083D1D] mb-2">Cari Pegawai (Nama/NIP)</label>
             <input type="text" name="search" value="{{ request('search') }}"
                    class="w-full px-4 py-2.5 border border-[#DCE5DF] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F2B705] focus:border-transparent bg-white"
                    placeholder="Nama atau NIP pegawai">
         </div>
+
         <div class="md:col-span-2 flex items-end gap-3">
             <button type="submit"
                     class="flex-1 px-6 py-2.5 rounded-lg bg-[#0B5E2E] text-white hover:bg-[#083D1D] transition-colors duration-200 font-medium shadow-sm inline-flex items-center justify-center">
@@ -49,6 +52,7 @@
                 </svg>
                 Filter
             </button>
+
             @if(request('status') || request('search'))
                 <a href="{{ route('admin.leaves.index') }}"
                    class="px-6 py-2.5 rounded-lg bg-[#DCE5DF] text-[#083D1D] hover:bg-[#DCE5DF]/80 transition-colors duration-200 font-medium">
@@ -59,21 +63,36 @@
     </div>
 </form>
 
-<!-- TABEL TETAP SAMA PERSIS -->
+<!-- TABEL -->
 <div class="bg-[#F9FAF7] rounded-xl shadow-sm border border-[#DCE5DF] overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead class="bg-gradient-to-r from-[#F9FAF7] to-[#DCE5DF]/50 border-b border-[#DCE5DF]">
                 <tr>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-[#083D1D] uppercase tracking-wider">Karyawan</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-[#083D1D] uppercase tracking-wider">Periode</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-[#083D1D] uppercase tracking-wider">Durasi</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-[#083D1D] uppercase tracking-wider">Alasan</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-[#083D1D] uppercase tracking-wider">Status</th>
                     <th class="px-6 py-4 text-right text-xs font-semibold text-[#083D1D] uppercase tracking-wider">Aksi</th>
                 </tr>
             </thead>
+
             <tbody class="divide-y divide-[#DCE5DF]">
                 @forelse($leaves as $leave)
+                    @php
+                        $start = $leave->start_date->copy();
+                        $end   = $leave->end_date->copy();
+
+                        $period = CarbonPeriod::create($start, $end);
+                        $workingDays = 0;
+
+                        foreach ($period as $date) {
+                            if ($date->isWeekday()) {
+                                $workingDays++;
+                            }
+                        }
+                    @endphp
+
                     <tr class="hover:bg-[#F9FAF7] transition-colors duration-150">
                         <td class="px-6 py-4">
                             <div class="flex items-center space-x-3">
@@ -84,29 +103,28 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-[#083D1D]">{{ $leave->user->name }}</p>
-                                    <p class="text-xs text-[#083D1D]/70">{{ $leave->user->employee_id }} • {{ $leave->user->department ?: '-' }}</p>
                                 </div>
                             </div>
                         </td>
+
+                        <!-- DURASI (HARI KERJA) -->
                         <td class="px-6 py-4 text-[#083D1D]">
                             <div class="text-sm font-medium">
-                                {{ $leave->start_date->format('d M Y') }}
+                                {{ $workingDays }} Hari Kerja
                             </div>
                             <div class="text-xs text-[#083D1D]/70">
-                                s/d {{ $leave->end_date->format('d M Y') }}
+                                {{ $start->format('d M Y') }} - {{ $end->format('d M Y') }}
                             </div>
                         </td>
+
                         <td class="px-6 py-4">
                             <div class="max-w-xs">
                                 <span class="inline-flex items-center px-3 py-1 rounded-full bg-[#F2B705]/10 text-[#083D1D] text-xs font-semibold border border-[#F2B705]/20">
-                                    @if($leave->alasan)
-                                        {{ Str::limit($leave->alasan, 30) }}
-                                    @else
-                                        -
-                                    @endif
+                                    {{ $leave->alasan ? Str::limit($leave->alasan, 30) : '-' }}
                                 </span>
                             </div>
                         </td>
+
                         <td class="px-6 py-4">
                             @php
                                 $statusConfig = match($leave->status) {
@@ -116,31 +134,23 @@
                                     default    => ['icon' => '❓', 'bg' => 'bg-[#DCE5DF]', 'text' => 'text-[#083D1D]', 'label' => ucfirst($leave->status)],
                                 };
                             @endphp
+
                             <span class="inline-flex items-center px-3 py-1 rounded-full {{ $statusConfig['bg'] }} {{ $statusConfig['text'] }} text-xs font-semibold border border-[#DCE5DF]">
                                 {{ $statusConfig['icon'] }} {{ $statusConfig['label'] }}
                             </span>
                         </td>
+
                         <td class="px-6 py-4 text-right">
                             <a href="{{ route('admin.leaves.show', $leave->id) }}"
                                class="inline-flex items-center px-4 py-2 rounded-lg border border-[#0B5E2E]/30 text-[#083D1D] hover:bg-[#0B5E2E]/5 transition-colors duration-200 font-medium text-xs">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
                                 Review
                             </a>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-12 text-center">
-                            <div class="flex flex-col items-center justify-center">
-                                <svg class="w-12 h-12 text-[#DCE5DF] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                </svg>
-                                <p class="text-[#083D1D]/70 font-medium">Belum ada pengajuan cuti</p>
-                                <p class="text-[#083D1D]/50 text-sm">Tidak ada pengajuan cuti yang sesuai dengan filter</p>
-                            </div>
+                        <td colspan="5" class="px-6 py-12 text-center text-[#083D1D]/70">
+                            Belum ada pengajuan cuti
                         </td>
                     </tr>
                 @endforelse
@@ -154,5 +164,4 @@
         </div>
     @endif
 </div>
-
 @endsection

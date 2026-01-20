@@ -141,7 +141,7 @@
                     <!-- Login Field -->
                     <div>
                         <label for="login" class="block text-sm font-medium text-[#083D1D] mb-2">
-                            <i class="fas fa-user mr-2"></i>NIP / Email
+                            <i class="fas fa-user mr-2"></i>NIP
                         </label>
 
                         <div class="relative">
@@ -154,7 +154,7 @@
                                    value="{{ old('login') }}"
                                    required
                                    autofocus
-                                   placeholder="ID Pegawai atau Email"
+                                   placeholder="Masukkan NIP Anda"
                                    class="pl-10 w-full px-4 py-3 rounded-lg border border-[#DCE5DF] bg-white
                                           focus:ring-1 focus:ring-[#0B5E2E] focus:border-[#0B5E2E]
                                           transition duration-200">
@@ -164,7 +164,7 @@
                     <!-- Password Field -->
                     <div>
                         <label for="password" class="block text-sm font-medium text-[#083D1D] mb-2">
-                            <i class="fas fa-lock mr-2"></i>Kata Sandi (maksimal 10 karakter)
+                            <i class="fas fa-lock mr-2"></i>NRP (maksimal 10 karakter)
                         </label>
 
                         <div class="relative">
@@ -176,7 +176,7 @@
                                    name="password"
                                    required
                                    maxlength="10"
-                                   placeholder="Masukkan kata sandi"
+                                   placeholder="Masukkan NRP Anda"
                                    class="pl-10 pr-12 w-full px-4 py-3 rounded-lg border border-[#DCE5DF] bg-white
                                           focus:ring-1 focus:ring-[#0B5E2E] focus:border-[#0B5E2E]
                                           transition duration-200">

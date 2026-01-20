@@ -45,7 +45,6 @@
             </div>
 
             <div class="space-y-2">
-                <p class="text-xs text-[#083D1D]/70">Jenis Cuti</p>
                 <p class="font-bold text-lg text-[#083D1D]">{{ ucfirst($leave->leave_type) }}</p>
                 
                 <p class="text-xs text-[#083D1D]/70 mt-4">Status</p>

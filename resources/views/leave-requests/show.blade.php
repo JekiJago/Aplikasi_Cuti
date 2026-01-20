@@ -215,52 +215,6 @@
                 </div>
                 @endif
 
-                <!-- Admin Notes Section -->
-                @if($leave->admin_notes || $leave->approver)
-                <div>
-                    <div class="flex items-center mb-4">
-                        <div class="p-2 bg-white rounded-lg mr-3 border border-[#DCE5DF]">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold text-[#083D1D]">Catatan dan Persetujuan</h3>
-                    </div>
-                    <div class="bg-[#F9FAF7] rounded-xl p-6 border border-[#DCE5DF]">
-                        @if($leave->admin_notes)
-                        <div class="mb-6">
-                            <p class="text-sm font-medium text-[#083D1D] mb-2">Catatan dari Admin:</p>
-                            <div class="bg-white rounded-lg p-4 border border-[#DCE5DF]">
-                                <p class="text-[#083D1D] whitespace-pre-line">{{ $leave->admin_notes }}</p>
-                            </div>
-                        </div>
-                        @endif
-
-                        @if($leave->approver)
-                        <div class="flex items-center justify-between pt-4 border-t border-[#DCE5DF]">
-                            <div class="flex items-center">
-                                <div class="h-10 w-10 rounded-full bg-gradient-to-r from-[#F9FAF7] to-[#DCE5DF] flex items-center justify-center text-sm font-bold text-[#0B5E2E] mr-3 border border-[#DCE5DF]">
-                                    {{ $leave->approver && $leave->approver->name ? strtoupper(substr($leave->approver->name, 0, 1)) : '?' }}
-                                </div>
-                                <div>
-                                    <p class="font-medium text-[#083D1D]">{{ $leave->approver->name ?? '-' }}</p>
-                                    <p class="text-sm text-gray-600">Admin / Penanggung Jawab</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm text-gray-500">Tanggal Diproses</p>
-                                <p class="font-medium text-[#083D1D]">
-                                    {{ $leave->reviewed_at?->format('d M Y, H:i') ?? 'N/A' }}
-                                </p>
-                            </div>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-                @endif
-            </div>
-        </div>
-
         <!-- Action Buttons -->
         <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center space-x-3">

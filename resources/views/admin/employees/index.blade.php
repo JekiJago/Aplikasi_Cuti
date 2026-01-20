@@ -23,22 +23,7 @@
                                 <p class="text-lg font-semibold text-[#083D1D]">{{ $employees->total() }}</p>
                             </div>
                         </div>
-                        
-                        <!-- Cuti Aktif Summary -->
-                        <div class="flex items-center bg-white px-4 py-2 rounded-lg shadow-sm border border-[#DCE5DF]">
-                            <div class="p-2 bg-yellow-50 rounded-lg mr-3">
-                                <svg class="w-5 h-5 text-[#F2B705]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Total Cuti Aktif</p>
-                                <p class="text-lg font-semibold text-[#0B5E2E]">
-                                    {{ $employees->sum('active_leave_balance') }} hari
-                                </p>
-                            </div>
-                        </div>
-                        
+                                                
                         <!-- Tahun Aktif Info -->
                         <div class="flex items-center bg-white px-4 py-2 rounded-lg shadow-sm border border-[#DCE5DF]">
                             <div class="p-2 bg-green-50 rounded-lg mr-3">
