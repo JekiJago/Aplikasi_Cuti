@@ -45,6 +45,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Relasi ke KuotaTahunan
+     */
+    public function kuotaTahunans()
+    {
+        return $this->hasMany(KuotaTahunan::class);
+    }
+
+    /**
      * Cek apakah user adalah admin
      */
     public function isAdmin(): bool

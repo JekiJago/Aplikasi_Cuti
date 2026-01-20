@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LeaveRequest;
+use App\Models\Holiday;
 use App\Services\LeaveBalanceService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,6 +17,48 @@ class LeaveRequestController extends Controller
     public function __construct(
         private LeaveBalanceService $leaveBalanceService
     ) {
+    }
+
+    /**
+     * API untuk hitung hari kerja (untuk preview di frontend)
+     */
+    public function calculateWorkingDays(Request $request)
+    {
+        $validated = $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $start = Carbon::parse($validated['start_date']);
+        $end = Carbon::parse($validated['end_date']);
+
+        // Ambil tanggal libur
+        $holidayDates = Holiday::pluck('date')
+            ->map(fn ($date) => Carbon::parse($date)->format('Y-m-d'))
+            ->toArray();
+
+        $days = 0;
+        $cursor = $start->copy();
+
+        while ($cursor->lte($end)) {
+            if (
+                !$cursor->isWeekend() &&
+                !in_array($cursor->format('Y-m-d'), $holidayDates, true)
+            ) {
+                $days++;
+            }
+            $cursor->addDay();
+        }
+
+        return response()->json([
+            'working_days' => $days,
+            'holidays_in_range' => collect($holidayDates)
+                ->filter(function ($date) use ($start, $end) {
+                    $dateCarbon = Carbon::parse($date);
+                    return $dateCarbon->between($start, $end);
+                })
+                ->count(),
+        ]);
     }
 
     public function index()

@@ -418,7 +418,63 @@
         const resetText = document.getElementById('resetText');
         const leaveForm = document.getElementById('leaveForm');
         
-        // Function to calculate working days only (exclude weekends)
+        // Function to calculate working days with holidays
+        function calculateDurationWithAPI() {
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+            
+            if (!startDate || !endDate) return;
+            
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            
+            if (start > end) {
+                durationDisplay.textContent = 'Tanggal tidak valid';
+                dateRangeDisplay.textContent = 'Tanggal selesai harus setelah tanggal mulai';
+                durationDisplay.classList.add('text-red-600');
+                return;
+            }
+            
+            // Fetch dari API untuk hitung dengan holiday dari database
+            fetch('{{ route("leave-requests.api.calculate-working-days") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({
+                    start_date: startDate,
+                    end_date: endDate,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const workDays = data.working_days;
+                const holidays = data.holidays_in_range || 0;
+                
+                durationDisplay.textContent = workDays + ' hari kerja';
+                durationDisplay.classList.remove('text-red-600');
+                
+                // Format dates for display
+                const options = { day: 'numeric', month: 'long', year: 'numeric' };
+                const startFormatted = start.toLocaleDateString('id-ID', options);
+                const endFormatted = end.toLocaleDateString('id-ID', options);
+                
+                let dateDisplay = `${startFormatted} - ${endFormatted} (${workDays} hari kerja)`;
+                if (holidays > 0) {
+                    dateDisplay += ` - ${holidays} hari libur`;
+                }
+                
+                dateRangeDisplay.textContent = dateDisplay;
+            })
+            .catch(error => {
+                console.error('Error calculating working days:', error);
+                // Fallback ke perhitungan lokal jika API gagal
+                calculateDuration();
+            });
+        }
+        
+        // Function to calculate working days only (exclude weekends) - FALLBACK
         function calculateWorkingDays(start, end) {
             let workDays = 0;
             let current = new Date(start);
@@ -435,7 +491,7 @@
             return workDays;
         }
         
-        // Function to calculate duration
+        // Function to calculate duration (FALLBACK ONLY)
         function calculateDuration() {
             const start = new Date(startDateInput.value);
             const end = new Date(endDateInput.value);
@@ -465,8 +521,8 @@
         }
         
         // Event listeners for date inputs
-        startDateInput.addEventListener('change', calculateDuration);
-        endDateInput.addEventListener('change', calculateDuration);
+        startDateInput.addEventListener('change', calculateDurationWithAPI);
+        endDateInput.addEventListener('change', calculateDurationWithAPI);
         
         // Set minimum date to today
         const today = new Date().toISOString().split('T')[0];

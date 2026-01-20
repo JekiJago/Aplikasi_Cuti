@@ -74,6 +74,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/{leaveRequest}', 'show')->name('show');
             Route::delete('/{leaveRequest}', 'destroy')->name('destroy');
             
+            // API untuk hitung hari kerja
+            Route::post('/api/calculate-working-days', 'calculateWorkingDays')->name('api.calculate-working-days');
+            
             // TAMBAHKAN ROUTES INI untuk approve/reject/cancel
             Route::post('/{leaveRequest}/approve', 'approve')->name('approve');
             Route::post('/{leaveRequest}/reject', 'reject')->name('reject');

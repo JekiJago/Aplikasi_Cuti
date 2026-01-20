@@ -31,28 +31,21 @@ class AdminLeaveController extends Controller
             $query->where('status', request('status'));
         }
 
-        if (request('department')) {
-            $query->whereHas('user', function ($q) {
-                $q->where('department', request('department'));
-            });
-        }
-
-        if (request('type')) {
-            $query->where('leave_type', request('type'));
-        }
-
         if (request('search')) {
             $search = request('search');
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
                   ->orWhereHas('user', function ($userQuery) use ($search) {
-                      $userQuery->where('name', 'like', "%{$search}%")
-                               ->orWhere('employee_id', 'like', "%{$search}%");
+                      $userQuery->where('name', 'like', "%{$search}%");
                   });
             });
         }
 
-        $leaves = $query->paginate(15);
+        // Pagination selector
+        $perPage = request('per_page', 15);
+        $perPage = in_array($perPage, [15, 25, 50, 100]) ? (int)$perPage : 15;
+
+        $leaves = $query->paginate($perPage)->appends(request()->query());
 
         return view('admin.leaves.index', compact('leaves'));
     }

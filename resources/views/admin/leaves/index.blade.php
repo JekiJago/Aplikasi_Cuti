@@ -24,7 +24,7 @@
 
 <!-- FILTER FORM -->
 <form method="GET" class="bg-[#F9FAF7] rounded-xl shadow-sm border border-[#DCE5DF] p-6 mb-6">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div>
             <label class="block text-sm font-semibold text-[#083D1D] mb-2">Status</label>
             <select name="status" class="w-full px-4 py-2.5 border border-[#DCE5DF] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F2B705] focus:border-transparent bg-white">
@@ -42,6 +42,17 @@
             <input type="text" name="search" value="{{ request('search') }}"
                    class="w-full px-4 py-2.5 border border-[#DCE5DF] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F2B705] focus:border-transparent bg-white"
                    placeholder="Nama atau NIP pegawai">
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-[#083D1D] mb-2">Per Halaman</label>
+            <select name="per_page" class="w-full px-4 py-2.5 border border-[#DCE5DF] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F2B705] focus:border-transparent bg-white">
+                @foreach([15, 25, 50, 100] as $option)
+                    <option value="{{ $option }}" {{ request('per_page') == $option ? 'selected' : '' }}>
+                        {{ $option }} Item
+                    </option>
+                @endforeach
+            </select>
         </div>
 
         <div class="md:col-span-2 flex items-end gap-3">

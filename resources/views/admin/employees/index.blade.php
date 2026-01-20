@@ -275,8 +275,18 @@
                                     <div class="space-y-2">
                                         <!-- Total Cuti Aktif -->
                                         @php
-                                            $cutiData = $employee->pegawai->cuti;
-                                            $cutiAktif = $cutiData ? max($cutiData->kuota_tahunan - $cutiData->cuti_dipakai, 0) : 0;
+                                            // Hitung dari kuota_tahunan table
+                                            $currentYear = now()->year;
+                                            $prevYear = $currentYear - 1;
+                                            $kuotaTahunans = $employee->kuotaTahunans()->whereIn('tahun', [$currentYear, $prevYear])->get();
+                                            
+                                            $currentYearQuota = $kuotaTahunans->firstWhere('tahun', $currentYear);
+                                            $prevYearQuota = $kuotaTahunans->firstWhere('tahun', $prevYear);
+                                            
+                                            $currentRemaining = $currentYearQuota ? max(0, $currentYearQuota->kuota - $currentYearQuota->dipakai) : 0;
+                                            $prevRemaining = $prevYearQuota ? max(0, $prevYearQuota->kuota - $prevYearQuota->dipakai) : 0;
+                                            $cutiAktif = $currentRemaining + $prevRemaining;
+                                            
                                             $badgeColor = $cutiAktif >= 20 ? 'bg-green-100 text-[#0B5E2E] border border-green-200' : 
                                                          ($cutiAktif >= 10 ? 'bg-blue-100 text-blue-800 border border-blue-200' : 
                                                          ($cutiAktif >= 5 ? 'bg-yellow-100 text-[#F2B705] border border-[#F2B705]' : 
@@ -292,31 +302,6 @@
                                                     <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                                 </svg>
                                             @endif
-                                        </div>
-                                        
-                                        <!-- Breakdown Tooltip (on hover) -->
-                                            <div class="absolute left-0 bottom-full mb-2 w-64 bg-white rounded-lg shadow-xl border border-[#DCE5DF] p-3 z-20 hidden group-hover/breakdown:block">
-                                                <div class="text-xs font-semibold text-[#083D1D] mb-2">Rincian Cuti Aktif:</div>
-                                                <div class="space-y-2">
-                                                    <div class="flex justify-between items-center">
-                                                        <span class="text-gray-600">Tahun {{ date('Y') }}:</span>
-                                                        <span class="font-semibold text-[#0B5E2E]">{{ $currentYearQuota }} hari</span>
-                                                    </div>
-                                                    <div class="flex justify-between items-center">
-                                                        <span class="text-gray-600">Tahun {{ date('Y')-1 }}:</span>
-                                                        <span class="font-semibold text-[#0B5E2E]">{{ $previousYearQuota }} hari</span>
-                                                    </div>
-                                                    <div class="border-t border-[#DCE5DF] pt-2 mt-2">
-                                                        <div class="flex justify-between items-center text-sm">
-                                                            <span class="text-[#083D1D] font-medium">Total:</span>
-                                                            <span class="font-bold text-[#083D1D]">{{ $remaining }} hari</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="text-xs text-gray-500 mt-2 italic">
-                                                    Kuota {{ date('Y')-2 }} dan sebelumnya sudah hangus
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </td>

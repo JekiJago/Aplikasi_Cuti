@@ -9,23 +9,37 @@
     $backgroundColor = '#F9FAF7';   // Putih / Abu muda
     $borderColor = '#DCE5DF';       // Abu kehijauan
 
-    // Hitung sisa cuti dari objek cuti
-    $totalActiveLeave = $cuti ? ($cuti->kuota_tahunan - $cuti->cuti_dipakai) : 0;
-    $activeLeaveDetails = [];
+    // Ambil data kuota dari table kuota_tahunan
     $currentYear = now()->year;
     $prevYear = $currentYear - 1;
-    $currentYearUsed = $cuti ? $cuti->cuti_dipakai : 0;
-    $currentYearQuota = $cuti ? $cuti->kuota_tahunan : 0;
-    $usedFromPrev = 0;
-    $usedFromCurrent = $currentYearUsed;
     
-    // Cari detail tahun sebelumnya dan berjalan dari activeLeaveDetails
-    $prevYearDetail = collect($activeLeaveDetails)->firstWhere('year', $prevYear);
-    $currentYearDetail = collect($activeLeaveDetails)->firstWhere('year', $currentYear);
+    // Cari kuota untuk tahun berjalan dan sebelumnya
+    $currentYearQuota = $kuotaTahunans->firstWhere('tahun', $currentYear);
+    $prevYearQuota = $kuotaTahunans->firstWhere('tahun', $prevYear);
     
-    $prevYearRemaining = $prevYearDetail['remaining'] ?? 0;
-    $currentYearRemaining = $currentYearDetail['remaining'] ?? $totalActiveLeave;
-    $isPrevExpired = $prevYearDetail['is_expired'] ?? false;
+    // Jika tidak ada, gunakan default
+    if (!$currentYearQuota) {
+        $currentYearQuota = (object)['kuota' => 0, 'dipakai' => 0, 'expired' => false, 'tahun' => $currentYear];
+    }
+    if (!$prevYearQuota) {
+        $prevYearQuota = (object)['kuota' => 0, 'dipakai' => 0, 'expired' => false, 'tahun' => $prevYear];
+    }
+    
+    // Hitung sisa dan terpakai
+    $currentYearTotal = $currentYearQuota->kuota ?? 0;
+    $currentYearUsed = $currentYearQuota->dipakai ?? 0;
+    $currentYearRemaining = max(0, $currentYearTotal - $currentYearUsed);
+    
+    $prevYearTotal = $prevYearQuota->kuota ?? 0;
+    $prevYearUsed = $prevYearQuota->dipakai ?? 0;
+    $prevYearRemaining = max(0, $prevYearTotal - $prevYearUsed);
+    $isPrevExpired = $prevYearQuota->expired ?? false;
+    
+    // Total sisa cuti aktif (FIFO: prev tahun dulu)
+    $totalActiveLeave = $prevYearRemaining + $currentYearRemaining;
+    
+    // Hitung penggunaan tahun berjalan
+    $percentUsed = $currentYearTotal > 0 ? round(($currentYearUsed / $currentYearTotal) * 100) : 0;
     
     // Warna untuk card Sisa Cuti Aktif
     if ($totalActiveLeave >= 20) {
@@ -59,7 +73,6 @@
     }
     
     // Warna untuk card Cuti Terpakai
-    $percentUsed = $currentYearQuota > 0 ? round(($currentYearUsed / $currentYearQuota) * 100) : 0;
     if ($percentUsed <= 50) {
         $usedBgColor = 'bg-gradient-to-br from-green-50 to-[#0B5E2E]/10';
         $usedBorderColor = 'border-[#0B5E2E]/20';
@@ -189,7 +202,7 @@
                                 <div class="mt-6 pt-4 border-t {{ $cardBorderColor }}">
                                     <p class="text-sm font-medium {{ $textColor }} mb-3">Detail kuota:</p>
                                     <div class="space-y-4">
-                                        <!-- Tahun Sebelumnya (2024) -->
+                                        <!-- Tahun Sebelumnya (2025) -->
                                         <div>
                                             <div class="flex justify-between items-center mb-1">
                                                 <div class="flex items-center">
@@ -206,16 +219,11 @@
                                                 </span>
                                             </div>
                                             <div class="ml-5 text-xs {{ $textColor }} opacity-80">
-                                                Kuota: {{ $prevYearDetail['total'] ?? 0 }} hari • Terpakai: {{ $prevYearDetail['used'] ?? 0 }} hari
-                                                @if($usedFromPrev > 0)
-                                                    <span class="block text-[#0B5E2E] font-medium mt-1">
-                                                        ✓ {{ $usedFromPrev }} hari digunakan tahun {{ $currentYear }}
-                                                    </span>
-                                                @endif
+                                                Kuota: {{ $prevYearTotal }} hari • Terpakai: {{ $prevYearUsed }} hari
                                             </div>
                                         </div>
                                         
-                                        <!-- Tahun Berjalan (2025) -->
+                                        <!-- Tahun Berjalan (2026) -->
                                         <div>
                                             <div class="flex justify-between items-center mb-1">
                                                 <div class="flex items-center">
@@ -227,20 +235,13 @@
                                                 </span>
                                             </div>
                                             <div class="ml-5 text-xs {{ $textColor }} opacity-80">
-                                                Kuota: {{ $currentYearDetail['total'] ?? 0 }} hari • Terpakai: {{ $currentYearDetail['used'] ?? 0 }} hari
-                                                @if($usedFromCurrent > 0)
-                                                    <span class="block text-[#0B5E2E] font-medium mt-1">
-                                                        ✓ {{ $usedFromCurrent }} hari digunakan tahun {{ $currentYear }}
-                                                    </span>
-                                                @endif
+                                                Kuota: {{ $currentYearTotal }} hari • Terpakai: {{ $currentYearUsed }} hari
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Card 2: CUTI TERPAKAI (Tahun Berjalan) -->
-                        <div>
                             <div class="bg-white rounded-xl border {{ $usedBorderColor }} p-6 h-full {{ $usedBgColor }}">
                                 <div class="flex items-center justify-between mb-4">
                                     <h3 class="text-lg font-semibold {{ $usedTextColor }}">Cuti Terpakai {{ $currentYear }}</h3>
@@ -255,11 +256,7 @@
                                 <p class="text-sm {{ $usedTextColor }} mb-4">
                                     Total cuti yang telah digunakan tahun {{ $currentYear }}
                                     <span class="block text-xs opacity-75 mt-1">
-                                        @if($usedFromPrev > 0)
-                                            ({{ $usedFromPrev }} hari dari kuota {{ $prevYear }} + {{ $usedFromCurrent }} hari dari kuota {{ $currentYear }})
-                                        @else
-                                            (Semua dari kuota {{ $currentYear }})
-                                        @endif
+                                        (Dari kuota {{ $currentYear }})
                                     </span>
                                 </p>
                                 
@@ -281,20 +278,6 @@
                                             <span>75%</span>
                                             <span>100%</span>
                                         </div>
-                                    </div>
-                                                                            
-                                        @if($usedFromCurrent > 0)
-                                        <div class="flex justify-between items-center p-2 bg-[#0B5E2E]/10 rounded-lg border border-[#0B5E2E]/20">
-                                            <div class="flex items-center">
-                                                <svg class="w-4 h-4 text-[#0B5E2E] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                                <span class="text-sm text-[#083D1D]">Dari kuota {{ $currentYear }}</span>
-                                            </div>
-                                            <span class="text-sm font-semibold text-[#083D1D]">{{ $usedFromCurrent }} hari</span>
-                                        </div>
-                                        @endif
-                                        
                                     </div>
                                 </div>
                             </div>

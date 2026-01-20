@@ -158,23 +158,18 @@
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-calendar-check text-gray-400"></i>
                                     </div>
-                                    @php
-                                        $quotaValue = 12; // default
-                                        if ($employee->pegawai && $employee->pegawai->cuti) {
-                                            $quotaValue = $employee->pegawai->cuti->kuota_tahunan;
-                                        }
-                                    @endphp
                                     <input type="number"
                                         name="annual_leave_quota"
-                                        value="{{ old('annual_leave_quota', $quotaValue) }}"
+                                        id="annual_leave_quota_edit"
+                                        value="{{ old('annual_leave_quota', $currentYearValue) }}"
                                         min="0"
-                                        max="365"
+                                        max="12"
                                         class="pl-10 block w-full rounded-lg border-[#DCE5DF] bg-white shadow-sm focus:border-[#F2B705] focus:ring-[#F2B705] @error('annual_leave_quota') border-red-500 @enderror"
                                         placeholder="Masukkan kuota cuti tahunan"
                                         required>
                                 </div>
                                 <p class="mt-1 text-xs text-[#083D1D]/70">
-                                    Jumlah cuti yang diberikan untuk tahun {{ date('Y') }}
+                                    Jumlah cuti yang diberikan untuk tahun {{ date('Y') }} (Maksimal 12 hari)
                                 </p>
                                 @error('annual_leave_quota')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -182,33 +177,27 @@
                             </div>
 
                             {{-- SISA CUTI TAHUN LALU (OPSIONAL) --}}
-                            @php
-                                $prevYearRemaining = 0;
-                                if ($employee->pegawai && $employee->pegawai->cuti) {
-                                    // Hitung sisa tahun lalu berdasarkan logika FIFO
-                                    $prevYearRemaining = $employee->pegawai->cuti->sisa_tahun_lalu ?? 0;
-                                }
-                            @endphp
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-[#083D1D] mb-2">
-                                    Sisa Cuti Tahun {{ date('Y') - 1 }} (Opsional)
+                                    Kuota Cuti Tahun {{ date('Y') - 1 }} (Opsional)
                                 </label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-history text-gray-400"></i>
                                     </div>
                                     <input type="number"
-                                        name="previous_year_remaining"
-                                        value="{{ old('previous_year_remaining', $prevYearRemaining) }}"
+                                        name="previous_year_quota"
+                                        id="previous_year_quota_edit"
+                                        value="{{ old('previous_year_quota', $prevYearValue) }}"
                                         min="0"
-                                        max="365"
-                                        class="pl-10 block w-full rounded-lg border-[#DCE5DF] bg-white shadow-sm focus:border-[#F2B705] focus:ring-[#F2B705] @error('previous_year_remaining') border-red-500 @enderror"
-                                        placeholder="Masukkan sisa cuti tahun lalu">
+                                        max="12"
+                                        class="pl-10 block w-full rounded-lg border-[#DCE5DF] bg-white shadow-sm focus:border-[#F2B705] focus:ring-[#F2B705] @error('previous_year_quota') border-red-500 @enderror"
+                                        placeholder="Masukkan kuota cuti tahun lalu">
                                 </div>
                                 <p class="mt-1 text-xs text-[#083D1D]/70">
-                                    Sisa cuti tahun lalu yang masih bisa digunakan
+                                    Kuota cuti tahun {{ date('Y') - 1 }} yang masih bisa digunakan (Maksimal 12 hari)
                                 </p>
-                                @error('previous_year_remaining')
+                                @error('previous_year_quota')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -217,11 +206,17 @@
 
                     {{-- BUTTONS --}}
                     <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-                        <a href="{{ route('admin.employees.show', $employee->id) }}"
-                           class="px-6 py-2.5 rounded-lg border border-[#DCE5DF] text-[#083D1D] font-medium hover:bg-gray-50 transition flex items-center">
-                            <i class="fas fa-times mr-2"></i>Batal
-                        </a>
+                        <div>
+                            <a href="{{ route('admin.employees.show', $employee->id) }}"
+                               class="px-6 py-2.5 rounded-lg border border-[#DCE5DF] text-[#083D1D] font-medium hover:bg-gray-50 transition flex items-center">
+                                <i class="fas fa-times mr-2"></i>Batal
+                            </a>
+                        </div>
                         <div class="flex gap-4">
+                            <button type="button" onclick="showDeleteConfirm()"
+                                    class="px-6 py-2.5 rounded-lg border border-red-300 text-red-600 font-medium hover:bg-red-50 transition flex items-center">
+                                <i class="fas fa-trash mr-2"></i>Hapus Pegawai
+                            </button>
                             <button type="reset"
                                     class="px-6 py-2.5 rounded-lg border border-[#DCE5DF] text-[#083D1D] font-medium hover:bg-gray-50 transition flex items-center">
                                 <i class="fas fa-redo mr-2"></i>Reset
@@ -233,6 +228,41 @@
                         </div>
                     </div>
                 </form>
+
+                {{-- DELETE FORM (HIDDEN) --}}
+                <form id="deleteForm" action="{{ route('admin.employees.destroy', $employee->id) }}" method="POST" style="display: none;">
+                    @csrf
+                    @method('DELETE')
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- DELETE CONFIRMATION MODAL --}}
+<div id="deleteModal" style="display: none;" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4">
+        <div class="p-6">
+            <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-[#083D1D] text-center mb-2">Hapus Pegawai</h3>
+            <p class="text-sm text-gray-600 text-center mb-4">
+                Apakah Anda yakin ingin menghapus pegawai <strong>{{ $employee->name }}</strong>?
+            </p>
+            <p class="text-xs text-red-600 bg-red-50 p-3 rounded-lg mb-6">
+                <i class="fas fa-info-circle mr-2"></i>
+                Tindakan ini tidak dapat dibatalkan. Semua data cuti dan riwayat akan dihapus.
+            </p>
+            <div class="flex gap-3">
+                <button type="button" onclick="closeDeleteConfirm()"
+                        class="flex-1 px-4 py-2.5 rounded-lg border border-[#DCE5DF] text-[#083D1D] font-medium hover:bg-gray-50 transition">
+                    Batal
+                </button>
+                <button type="button" onclick="confirmDelete()"
+                        class="flex-1 px-4 py-2.5 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition">
+                    <i class="fas fa-trash mr-2"></i>Hapus
+                </button>
             </div>
         </div>
     </div>
@@ -242,6 +272,73 @@
 
 @push('scripts')
 <script>
+    function showDeleteConfirm() {
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function closeDeleteConfirm() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+
+    function confirmDelete() {
+        document.getElementById('deleteForm').submit();
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('deleteModal').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeDeleteConfirm();
+        }
+    });
+
+    // Real-time validation untuk kuota cuti
+    const annualQuotaInput = document.getElementById('annual_leave_quota_edit');
+    if (annualQuotaInput) {
+        annualQuotaInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (isNaN(value)) return;
+            
+            if (value > 12) {
+                this.classList.add('border-red-500');
+                if (!document.getElementById('quota_warning')) {
+                    const warning = document.createElement('div');
+                    warning.id = 'quota_warning';
+                    warning.className = 'mt-2 p-3 bg-red-100 border border-red-400 text-red-700 rounded';
+                    warning.textContent = '⚠️ Kuota cuti tidak boleh melebihi 12 hari!';
+                    this.parentElement.parentElement.appendChild(warning);
+                }
+            } else {
+                this.classList.remove('border-red-500');
+                const warning = document.getElementById('quota_warning');
+                if (warning) warning.remove();
+            }
+        });
+    }
+
+    // Real-time validation untuk previous year quota
+    const prevYearQuotaInput = document.getElementById('previous_year_quota_edit');
+    if (prevYearQuotaInput) {
+        prevYearQuotaInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (isNaN(value)) return;
+            
+            if (value > 12) {
+                this.classList.add('border-red-500');
+                if (!document.getElementById('prev_quota_warning')) {
+                    const warning = document.createElement('div');
+                    warning.id = 'prev_quota_warning';
+                    warning.className = 'mt-2 p-3 bg-red-100 border border-red-400 text-red-700 rounded';
+                    warning.textContent = '⚠️ Kuota cuti tidak boleh melebihi 12 hari!';
+                    this.parentElement.parentElement.appendChild(warning);
+                }
+            } else {
+                this.classList.remove('border-red-500');
+                const warning = document.getElementById('prev_quota_warning');
+                if (warning) warning.remove();
+            }
+        });
+    }
+
     document.getElementById('editEmployeeForm').addEventListener('submit', function(e) {
         // Validasi jenis kelamin
         const genderSelected = this.querySelector('input[name="gender"]:checked');
@@ -269,9 +366,9 @@
 
         // Validasi kuota cuti
         const annualQuota = this.querySelector('input[name="annual_leave_quota"]').value;
-        if (annualQuota < 0 || annualQuota > 365) {
+        if (annualQuota < 0 || annualQuota > 12) {
             e.preventDefault();
-            alert('Kuota cuti tahunan harus antara 0 - 365 hari!');
+            alert('Kuota cuti tahunan harus antara 0 - 12 hari!');
             return false;
         }
 

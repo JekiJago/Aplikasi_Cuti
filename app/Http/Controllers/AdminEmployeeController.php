@@ -43,8 +43,8 @@ class AdminEmployeeController extends Controller
             'name' => 'required|string|max:255',
             'employee_id' => 'required|string|max:50|unique:pegawai,nip',
             'nrp' => 'required|string|max:50|unique:pegawai,nrp',
-            'previous_year_quota' => 'nullable|integer|min:0|max:365',
-            'current_year_quota' => 'required|integer|min:0|max:365',
+            'previous_year_quota' => 'nullable|integer|min:0|max:12',
+            'current_year_quota' => 'required|integer|min:0|max:12',
             'gender' => 'required|in:male,female',
         ]);
 
@@ -113,16 +113,56 @@ class AdminEmployeeController extends Controller
         $employee = User::where('role', 'employee')->findOrFail($id);
         $pegawai = $employee->pegawai;
         $cuti = $pegawai?->cuti;
+        
+        // Ambil semua kuota tahunan dari database
+        $kuotaTahunans = $employee->kuotaTahunans()->get();
+        
+        // Pastikan selalu ada data untuk tahun berjalan dan tahun sebelumnya
+        $currentYear = now()->year;
+        $prevYear = $currentYear - 1;
+        
+        // Cek tahun sebelumnya
+        if (!$kuotaTahunans->contains('tahun', $prevYear)) {
+            $kuotaTahunans->push((object)[
+                'tahun' => $prevYear,
+                'kuota' => 0,
+                'dipakai' => 0,
+                'expired' => false,
+            ]);
+        }
+        
+        // Cek tahun berjalan
+        if (!$kuotaTahunans->contains('tahun', $currentYear)) {
+            $kuotaTahunans->push((object)[
+                'tahun' => $currentYear,
+                'kuota' => 0,
+                'dipakai' => 0,
+                'expired' => false,
+            ]);
+        }
+        
+        // Urutkan dari tahun terbaru
+        $kuotaTahunans = $kuotaTahunans->sortByDesc('tahun');
 
-        return view('admin.employees.show', compact('employee', 'pegawai', 'cuti'));
+        return view('admin.employees.show', compact('employee', 'pegawai', 'cuti', 'kuotaTahunans'));
     }
 
     public function edit($id)
     {
         $employee = User::where('role', 'employee')->findOrFail($id);
         $pegawais = Pegawai::all();
+        
+        // Ambil data kuota tahunan untuk tahun berjalan dan tahun sebelumnya
+        $currentYear = now()->year;
+        $prevYear = $currentYear - 1;
+        
+        $currentYearQuota = $employee->kuotaTahunans()->where('tahun', $currentYear)->first();
+        $currentYearValue = $currentYearQuota ? $currentYearQuota->kuota : 0;
+        
+        $prevYearQuota = $employee->kuotaTahunans()->where('tahun', $prevYear)->first();
+        $prevYearValue = $prevYearQuota ? $prevYearQuota->kuota : 0;
 
-        return view('admin.employees.edit', compact('employee', 'pegawais'));
+        return view('admin.employees.edit', compact('employee', 'pegawais', 'currentYearValue', 'prevYearValue'));
     }
 
     public function update(Request $request, $id)
@@ -134,7 +174,8 @@ class AdminEmployeeController extends Controller
             'name' => 'required|string|max:255',
             'employee_id' => 'required|string|max:50|unique:pegawai,nip,' . $pegawai->id . ',id',
             'nrp' => 'required|string|max:50|unique:pegawai,nrp,' . $pegawai->id . ',id',
-            'annual_leave_quota' => 'required|integer|min:0|max:365',
+            'annual_leave_quota' => 'required|integer|min:0|max:12',
+            'previous_year_quota' => 'nullable|integer|min:0|max:12',
             'gender' => 'required|in:male,female',
         ]);
 
@@ -154,11 +195,40 @@ class AdminEmployeeController extends Controller
                 'pegawai_id' => $validated['employee_id'], // Updated NIP
             ]);
 
-            // Update cuti quota
-            if ($pegawai->cuti) {
-                $pegawai->cuti->update([
-                    'kuota_tahunan' => $validated['annual_leave_quota'],
+            // Update kuota cuti tahun berjalan dan tahun sebelumnya
+            $currentYear = now()->year;
+            $prevYear = $currentYear - 1;
+            
+            // Update kuota tahun berjalan (2026)
+            $kuotaTahunan = $employee->kuotaTahunans()->where('tahun', $currentYear)->first();
+            if ($kuotaTahunan) {
+                $kuotaTahunan->update([
+                    'kuota' => $validated['annual_leave_quota'],
                 ]);
+            } else {
+                $employee->kuotaTahunans()->create([
+                    'tahun' => $currentYear,
+                    'kuota' => $validated['annual_leave_quota'],
+                    'dipakai' => 0,
+                    'expired' => false,
+                ]);
+            }
+            
+            // Update kuota tahun lalu (2025) jika ada input
+            if ($validated['previous_year_quota'] !== null) {
+                $kuotaTahunanlalu = $employee->kuotaTahunans()->where('tahun', $prevYear)->first();
+                if ($kuotaTahunanlalu) {
+                    $kuotaTahunanlalu->update([
+                        'kuota' => $validated['previous_year_quota'],
+                    ]);
+                } else {
+                    $employee->kuotaTahunans()->create([
+                        'tahun' => $prevYear,
+                        'kuota' => $validated['previous_year_quota'],
+                        'dipakai' => 0,
+                        'expired' => false,
+                    ]);
+                }
             }
 
             return redirect()->route('admin.employees.show', $employee->id)

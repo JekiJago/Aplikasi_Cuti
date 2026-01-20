@@ -178,11 +178,12 @@
                                 </div>
                                 <input type="number"
                                     name="current_year_quota"
-                                    value="{{ old('current_year_quota', 12) }}"
+                                    id="current_year_quota"
+                                    value="{{ old('current_year_quota', '') }}"
                                     class="pl-10 block w-full rounded-lg border-[#DCE5DF] bg-[#F9FAF7] shadow-sm focus:border-[#0B5E2E] focus:ring-[#0B5E2E]"
                                     placeholder="Contoh: 12"
                                     min="0"
-                                    max="365"
+                                    max="12"
                                     required>
                             </div>
                             <p class="mt-1 text-xs text-gray-500">
@@ -323,6 +324,32 @@ document.addEventListener('DOMContentLoaded', function() {
             this.value = this.value.toUpperCase();
         });
     }
+
+    // Real-time validation untuk current_year_quota
+    const currentYearQuotaInput = document.querySelector('input[name="current_year_quota"]');
+    if (currentYearQuotaInput) {
+        currentYearQuotaInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (isNaN(value)) return;
+            
+            if (value > 12) {
+                this.classList.add('border-red-500');
+                // Remove existing warning if any
+                const existingWarning = this.parentElement.parentElement.querySelector('.quota-warning');
+                if (existingWarning) existingWarning.remove();
+                
+                // Add new warning
+                const warning = document.createElement('div');
+                warning.className = 'quota-warning mt-2 p-3 bg-red-100 border border-red-400 text-red-700 rounded';
+                warning.textContent = '⚠️ Kuota cuti tidak boleh melebihi 12 hari!';
+                this.parentElement.parentElement.appendChild(warning);
+            } else {
+                this.classList.remove('border-red-500');
+                const warning = this.parentElement.parentElement.querySelector('.quota-warning');
+                if (warning) warning.remove();
+            }
+        });
+    }
     
     // Simple form submission
     const form = document.getElementById('employeeForm');
@@ -330,6 +357,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (form) {
         form.addEventListener('submit', function(e) {
+            // Validasi current_year_quota
+            const currentYearQuotaValue = parseInt(currentYearQuotaInput.value);
+            if (currentYearQuotaValue > 12) {
+                e.preventDefault();
+                alert('Kuota cuti tidak boleh melebihi 12 hari!');
+                return false;
+            }
+
             // Disable submit button to prevent double submission
             if (submitBtn) {
                 submitBtn.disabled = true;
