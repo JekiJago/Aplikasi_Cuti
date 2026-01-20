@@ -110,7 +110,7 @@
                         <!-- DURASI (HARI KERJA) -->
                         <td class="px-6 py-4 text-[#083D1D]">
                             <div class="text-sm font-medium">
-                                {{ $workingDays }} Hari Kerja
+                                {{ $workingDays }} Hari
                             </div>
                             <div class="text-xs text-[#083D1D]/70">
                                 {{ $start->format('d M Y') }} - {{ $end->format('d M Y') }}

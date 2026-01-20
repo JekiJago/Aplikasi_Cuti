@@ -118,18 +118,7 @@
                         
                         <!-- Quick Stats -->
                         <div class="flex flex-wrap gap-4 pt-2">
-                            <!-- SISA CUTI AKTIF -->
-                            <div class="flex items-center">
-                                <div class="p-1.5 bg-[#0B5E2E]/10 rounded-lg mr-2 border border-[#0B5E2E]/20">
-                                    <svg class="w-4 h-4 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-[#083D1D]/70">Sisa Cuti Aktif</p>
-                                    <p class="text-sm font-semibold text-[#0B5E2E]">{{ $totalActiveLeave }} hari</p>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -311,78 +300,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Summary Card -->
-                    <div class="mt-6">
-                        <div class="bg-white rounded-xl border border-[#DCE5DF] p-6">
-                            <h2 class="text-lg font-semibold text-[#083D1D] mb-6">Ringkasan Status Pengajuan</h2>
-                            
-                            <div class="space-y-4">
-                                <!-- Pending -->
-                                <div class="bg-gradient-to-r from-[#F2B705]/10 to-[#F2B705]/5 rounded-xl p-4 border border-[#F2B705]/20">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <div class="flex items-center">
-                                            <div class="p-2 bg-[#F2B705]/10 rounded-lg mr-3 border border-[#F2B705]/20">
-                                                <svg class="w-5 h-5 text-[#F2B705]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <p class="text-sm font-medium text-[#083D1D]">Menunggu</p>
-                                                <p class="text-xs text-[#083D1D]/70">Menunggu persetujuan</p>
-                                            </div>
-                                        </div>
-                                        <span class="text-2xl font-bold text-[#083D1D]">{{ $summary['pending'] ?? 0 }}</span>
-                                    </div>
-                                </div>
-
-                                <!-- Approved -->
-                                <div class="bg-gradient-to-r from-[#0B5E2E]/10 to-[#0B5E2E]/5 rounded-xl p-4 border border-[#0B5E2E]/20">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <div class="flex items-center">
-                                            <div class="p-2 bg-[#0B5E2E]/10 rounded-lg mr-3 border border-[#0B5E2E]/20">
-                                                <svg class="w-5 h-5 text-[#0B5E2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <p class="text-sm font-medium text-[#083D1D]">Disetujui</p>
-                                                <p class="text-xs text-[#083D1D]/70">Cuti telah disetujui</p>
-                                            </div>
-                                        </div>
-                                        <span class="text-2xl font-bold text-[#0B5E2E]">{{ $summary['approved'] ?? 0 }}</span>
-                                    </div>
-                                </div>
-
-                                <!-- Rejected -->
-                                <div class="bg-gradient-to-r from-red-50/50 to-red-50/30 rounded-xl p-4 border border-red-200">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <div class="flex items-center">
-                                            <div class="p-2 bg-red-100 rounded-lg mr-3">
-                                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <p class="text-sm font-medium text-red-900">Ditolak</p>
-                                                <p class="text-xs text-red-700">Cuti tidak disetujui</p>
-                                            </div>
-                                        </div>
-                                        <span class="text-2xl font-bold text-red-800">{{ $summary['rejected'] ?? 0 }}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Total -->
-                            <div class="mt-6 pt-6 border-t border-[#DCE5DF]">
-                                <div class="flex items-center justify-between">
-                                    <p class="text-sm font-medium text-[#083D1D]">Total Pengajuan</p>
-                                    <p class="text-lg font-bold text-[#083D1D]">{{ ($summary['pending'] ?? 0) + ($summary['approved'] ?? 0) + ($summary['rejected'] ?? 0) }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Tab 2: Riwayat Cuti -->
                 <div class="tab-content hidden" id="leave-history-tab">
