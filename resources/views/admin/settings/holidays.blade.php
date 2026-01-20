@@ -9,17 +9,6 @@
         <div class="mb-8">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <div class="flex items-center mb-2">
-                        <a href="{{ route('admin.dashboard') }}" 
-                           class="inline-flex items-center text-gray-500 hover:text-gray-700 mr-3 transition-colors duration-200">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                            </svg>
-                            <span class="ml-1 text-sm">Dashboard</span>
-                        </a>
-                        <span class="text-gray-300">/</span>
-                        <span class="ml-3 text-gray-600">Pengaturan</span>
-                    </div>
                     <h1 class="text-2xl font-bold text-gray-800">Pengaturan Hari Libur Nasional</h1>
                     <p class="text-gray-600 mt-2">Kelola daftar hari libur yang tidak dihitung sebagai hari cuti</p>
                 </div>
@@ -163,36 +152,6 @@
                             </div>
                         </div>
 
-                        <div>
-                            <!-- Keterangan Field -->
-                            <div class="space-y-2">
-                                <label class="block">
-                                    <span class="text-gray-700 font-medium">Keterangan (Opsional)</span>
-                                    <div class="relative mt-1">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
-                                            </svg>
-                                        </div>
-                                        <input type="text" name="keterangan"
-                                               class="block w-full pl-10 pr-3 py-3 rounded-lg border border-[#DCE5DF] bg-[#F9FAF7] 
-                                                      focus:ring-2 focus:ring-[#F2B705] focus:border-[#F2B705] focus:bg-white 
-                                                      transition-colors placeholder-gray-500 text-gray-800"
-                                               placeholder="Contoh: Hari Besar Islam"
-                                               value="{{ old('keterangan') }}">
-                                    </div>
-                                </label>
-                                @error('keterangan')
-                                    <div class="flex items-start space-x-2 text-red-600 text-sm mt-1 bg-red-50 px-3 py-2 rounded-lg">
-                                        <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                        </svg>
-                                        <span>{{ $message }}</span>
-                                    </div>
-                                @enderror
-                            </div>
-                        </div>
-                        
                         <!-- Submit Button - Menggunakan Kuning Emas -->
                         <div class="pt-4">
                             <button type="submit"
@@ -251,7 +210,7 @@
                                     <div class="flex items-center space-x-2">
                                         <!-- Edit Button dengan Modal -->
                                         <button type="button" 
-                                                onclick="openEditModal({{ $holiday->id }}, '{{ $holiday->date }}', '{{ addslashes($holiday->name) }}', '{{ addslashes($holiday->keterangan) }}')"
+                                                onclick="openEditModal({{ $holiday->id }}, '{{ $holiday->date }}', '{{ addslashes($holiday->name) }}')"
                                                 class="inline-flex items-center px-3 py-1.5 rounded-lg border border-yellow-200 
                                                        bg-yellow-50 text-yellow-700 hover:bg-yellow-100 hover:border-yellow-300 
                                                        transition-colors duration-200">
@@ -401,24 +360,6 @@
                                    placeholder="Contoh: Hari Raya Idul Fitri">
                         </div>
                     </div>
-                    
-                    <!-- Keterangan Field -->
-                    <div>
-                        <label class="block text-sm font-medium text-[#083D1D] mb-1">
-                            Keterangan (Opsional)
-                        </label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
-                                </svg>
-                            </div>
-                            <input type="text" name="keterangan" id="editKeterangan"
-                                   class="block w-full pl-10 pr-3 py-2.5 rounded-lg border border-[#DCE5DF] bg-[#F9FAF7]
-                                          focus:ring-2 focus:ring-[#F2B705] focus:border-[#F2B705]"
-                                   placeholder="Contoh: Hari Besar Islam">
-                        </div>
-                    </div>
                 </div>
                 
                 <div class="mt-6 flex justify-end space-x-3">
@@ -490,7 +431,7 @@
     }
     
     // Edit Modal Functions
-    function openEditModal(id, date, name, keterangan) {
+    function openEditModal(id, date, name) {
         // Set form action
         const form = document.getElementById('editForm');
         form.action = `/admin/settings/holidays/${id}`;
@@ -498,7 +439,6 @@
         // Fill form values
         document.getElementById('editDate').value = date;
         document.getElementById('editName').value = name.replace(/\\/g, '');
-        document.getElementById('editKeterangan').value = keterangan ? keterangan.replace(/\\/g, '') : '';
         
         // Show modal with animation
         const modal = document.getElementById('editModal');
