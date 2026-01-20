@@ -102,6 +102,35 @@
 
 <div class="min-h-screen bg-gradient-to-b from-[#F9FAF7] to-[#DCE5DF]/30 py-8 px-4">
     <div class="max-w-7xl mx-auto space-y-6">
+        <!-- Success Alert dengan Credentials -->
+        @if (session('success'))
+            <div class="bg-green-50 border border-green-200 rounded-xl p-4 shadow-sm">
+                <div class="flex gap-4">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-sm font-medium text-green-800">{{ session('success') }}</h3>
+                        <div class="mt-2 text-sm text-green-700">
+                            <p class="font-semibold mb-2">Informasi Login Pegawai:</p>
+                            <div class="bg-white rounded p-3 border border-green-200 space-y-1 font-mono text-xs">
+                                <p><span class="font-semibold">NIP:</span> <span class="text-[#0B5E2E] font-bold">{{ $employee->employee_id }}</span></p>
+                                <p><span class="font-semibold">NRP (Password):</span> <span class="text-[#0B5E2E] font-bold">{{ $employee->pegawai->nrp }}</span></p>
+                            </div>
+                            <p class="mt-2 text-xs italic">⚠️ Pastikan pegawai mendapat informasi login ini</p>
+                        </div>
+                    </div>
+                    <button onclick="this.closest('.bg-green-50').remove()" class="text-green-400 hover:text-green-500">
+                        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        @endif
+
         <!-- Header Card -->
         <div class="bg-[#F9FAF7] rounded-2xl shadow-xl border border-[#DCE5DF] p-6">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">

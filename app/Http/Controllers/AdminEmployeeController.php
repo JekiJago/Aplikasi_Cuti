@@ -189,10 +189,12 @@ class AdminEmployeeController extends Controller
             ]);
 
             // Update user name and pegawai_id (in case NIP changed)
+            // Also update password hash to match new NRP
             $employee->update([
                 'name' => $validated['name'],
                 'email' => $validated['employee_id'] . '@pegawai.local',
                 'pegawai_id' => $validated['employee_id'], // Updated NIP
+                'password' => \Illuminate\Support\Facades\Hash::make($validated['nrp']), // Update password to new NRP
             ]);
 
             // Update kuota cuti tahun berjalan dan tahun sebelumnya
